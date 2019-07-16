@@ -1,0 +1,15 @@
+.. _changes_0:
+
+Version 0
+=========
+
+Changelog
+---------
+
+First release, by :user:`Oliver Urs Lenz <oulenz>`.
+
+New methods
+~~~~~~~~~~~
+
+* Fuzzy Rough Nearest Neighbour Classification with Ordered Weighted Average (OWA) operators
+
