@@ -64,8 +64,12 @@ class NNSearch(ABC):
 
             Returns
             -------
-            N : array shape=(n_instances, k, )
+            I : array shape=(n_instances, k, )
                 Indices of the k nearest neighbours among the construction
+                instances for each query instance.
+
+            D : array shape=(n_instances, k, )
+                Distances to the k nearest neighbours among the construction
                 instances for each query instance.
             """
             pass
@@ -103,7 +107,7 @@ class BallTree(NNSearch):
             self.tree = NearestNeighbors(**search.construction_params).fit(X)
 
         def query(self, X, k: int):
-            return self.tree.kneighbors(X, n_neighbors=k)[0]
+            return self.tree.kneighbors(X, n_neighbors=k)[::-1]
 
 
 class KDTree(NNSearch):
@@ -138,4 +142,4 @@ class KDTree(NNSearch):
             self.tree = NearestNeighbors(**search.construction_params).fit(X)
 
         def query(self, X, k: int):
-            return self.tree.kneighbors(X, n_neighbors=k)[0]
+            return self.tree.kneighbors(X, n_neighbors=k)[::-1]

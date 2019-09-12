@@ -41,7 +41,7 @@ class FRNNClassifierBase(BaseEstimator, SupervisedIntegerMixin,
         X = (X / self.scale_) / self.n_attributes_
 
         distances = [
-            np.pad(index.query(X, min(k, max_k)),
+            np.pad(index.query(X, min(k, max_k))[1],
                    ((0, 0), (0, max(0, k - max_k)))
                    , mode='constant', constant_values=1)
             for index, k, max_k
