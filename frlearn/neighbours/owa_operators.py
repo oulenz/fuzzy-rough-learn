@@ -176,4 +176,4 @@ mean = OWAOperator.family(
 
 trimmed = OWAOperator.family(
     lambda k: np.append(np.zeros(k - 1), np.ones(1)),
-    max_like=False, name='trimmed')
+    max_like=True, name='trimmed')
