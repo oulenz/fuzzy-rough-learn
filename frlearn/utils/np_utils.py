@@ -7,11 +7,18 @@ def argmax_and_max(a, axis):
     return ai, av
 
 
-def limit_and_sort(a, limit, axis):
-    a = np.partition(a, limit, axis=axis)
-    take_this = np.arange(limit) if limit > 0 else np.arange(limit % a.shape[axis], a.shape[axis])
+def least(a, k, axis=-1):
+    a = np.partition(a, k - 1, axis=axis)
+    take_this = np.arange(k)
     a = np.take(a, take_this, axis=axis)
     a = np.sort(a, axis=axis)
-    if limit < 0:
-        a = np.flip(a, axis=axis)
+    return a
+
+
+def greatest(a, k, axis=-1):
+    a = np.partition(a, -k, axis=axis)
+    take_this = np.arange(-k % a.shape[axis], a.shape[axis])
+    a = np.take(a, take_this, axis=axis)
+    a = np.sort(a, axis=axis)
+    a = np.flip(a, axis=axis)
     return a
