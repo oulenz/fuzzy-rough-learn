@@ -4,6 +4,7 @@ import numpy as np
 
 from ..utils import greatest, least
 
+
 class OWAOperator():
 
     """
@@ -98,94 +99,114 @@ class OWAOperator():
             return self.name.format(self.k)
         return str(self.w)
 
-    def _apply(self, v, flavour: str):
-        w = self.w
+    def _apply(self, a, axis, flavour: str):
+        w = np.reshape(self.w, [-1] + ((len(a.shape) - axis - 1) % len(a.shape)) * [1])
         if flavour == 'arithmetic':
-            return np.sum(w * v, axis=-1)
+            return np.sum(w * a, axis=axis)
         if flavour == 'geometric':
-            return np.exp(np.sum(w * np.log(v), axis=-1))
+            return np.exp(np.sum(w * np.log(a), axis=axis))
         if flavour == 'harmonic':
-            return 1 / np.sum(w / v, axis=-1)
+            return 1 / np.sum(w / a, axis=axis)
 
-    def soft_max(self, v, flavour: str = 'arithmetic'):
+    def soft_max(self, a, axis=-1, flavour: str = 'arithmetic'):
         """
         Calculates the soft maximum of an array.
 
         Parameters
         ----------
-        v : array shape=(n, )
-            Input vector of values.
+        a : ndarray
+            Input array of values.
+
+        axis : int, default=-1
+            The axis along which the soft maximum is calculated
 
         flavour : str {'arithmetic', 'geometric', 'harmonic', }, default='arithmetic'
             Determines the type of weighted average.
 
         Returns
         -------
-        y : numeric
-            Soft maximum of v.
+        soft_max_along_axis : ndarray
+            An array with the same shape as `a`, with the specified
+            axis removed. If `a` is a 0-d array, a scalar is returned.
         """
-        v = greatest(v, self.k, axis=-1)
-        return self._apply(v, flavour=flavour)
+        a = greatest(a, self.k, axis=axis)
+        return self._apply(a, axis=axis, flavour=flavour)
 
-    def soft_min(self, v, flavour: str = 'arithmetic'):
+    def soft_min(self, a, axis=-1, flavour: str = 'arithmetic'):
         """
         Calculates the soft minimum of an array.
 
         Parameters
         ----------
-        v : array shape=(n, )
-            Input vector of values.
+        a : ndarray
+            Input array of values.
+
+        axis : int, default=-1
+            The axis along which the soft minimum is calculated
 
         flavour : str {'arithmetic', 'geometric', 'harmonic', }, default='arithmetic'
             Determines the type of weighted average.
 
         Returns
         -------
-        y : numeric
-            Soft minimum of v.
+        soft_min_along_axis : ndarray
+            An array with the same shape as `a`, with the specified
+            axis removed. If `a` is a 0-d array, a scalar is returned.
         """
-        v = least(v, self.k, axis=-1)
-        return self._apply(v, flavour=flavour)
+        a = least(a, self.k, axis=axis)
+        return self._apply(a, axis=axis, flavour=flavour)
 
-    def soft_head(self, v, flavour: str = 'arithmetic'):
+    def soft_head(self, a, axis=-1, flavour: str = 'arithmetic'):
         """
         Calculates the soft head of an array.
 
         Parameters
         ----------
-        v : array shape=(n, )
-            Input vector of values.
+        a : ndarray
+            Input array of values.
+
+        axis : int, default=-1
+            The axis along which the soft head is calculated
 
         flavour : str {'arithmetic', 'geometric', 'harmonic', }, default='arithmetic'
             Determines the type of weighted average.
 
         Returns
         -------
-        y : numeric
-            Soft head of v.
+        soft_head_along_axis : ndarray
+            An array with the same shape as `a`, with the specified
+            axis removed. If `a` is a 0-d array, a scalar is returned.
         """
-        v = v[..., :self.k]
-        return self._apply(v, flavour=flavour)
+        slc = [slice(None)] * len(a.shape)
+        slc[axis] = slice(0, self.k)
+        a = a[tuple(slc)]
+        return self._apply(a, axis=axis, flavour=flavour)
 
-    def soft_tail(self, v, flavour: str = 'arithmetic'):
+    def soft_tail(self, a, axis=-1, flavour: str = 'arithmetic'):
         """
         Calculates the soft tail of an array.
 
         Parameters
         ----------
-        v : array shape=(n, )
-            Input vector of values.
+        a : ndarray
+            Input array of values.
+
+        axis : int, default=-1
+            The axis along which the soft tail is calculated
 
         flavour : str {'arithmetic', 'geometric', 'harmonic', }, default='arithmetic'
             Determines the type of weighted average.
 
         Returns
         -------
-        y : numeric
-            Soft tail of v.
+        soft_tail_along_axis : ndarray
+            An array with the same shape as `a`, with the specified
+            axis removed. If `a` is a 0-d array, a scalar is returned.
         """
-        v = v[..., -1:-self.k - 1:-1]
-        return self._apply(v, flavour=flavour)
+        slc = [slice(None)] * len(a.shape)
+        slc[axis] = slice(-1, -self.k -1, -1)
+        a = a[tuple(slc)]
+        return self._apply(a, axis=axis, flavour=flavour)
 
 
 strict = OWAOperator(np.ones(1), name='strict')
