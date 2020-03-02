@@ -22,3 +22,10 @@ def greatest(a, k, axis=-1):
     a = np.sort(a, axis=axis)
     a = np.flip(a, axis=axis)
     return a
+
+
+def div_or(x, y, fallback=np.nan):
+    with np.errstate(divide='ignore', invalid='ignore'):
+        z = x / y
+        z[np.isnan(z)] = fallback
+    return z
