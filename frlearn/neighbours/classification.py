@@ -3,7 +3,7 @@
 import numpy as np
 
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.neighbors.base import SupervisedIntegerMixin
+from sklearn.neighbors._base import SupervisedIntegerMixin
 from sklearn.utils import check_array
 
 from .neighbour_search import KDTree, NNSearch

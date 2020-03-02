@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-from sklearn.neighbors.unsupervised import NearestNeighbors
+from sklearn.neighbors._unsupervised import NearestNeighbors
 
 
 class NNSearch(ABC):
