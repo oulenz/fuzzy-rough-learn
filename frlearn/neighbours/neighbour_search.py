@@ -48,6 +48,7 @@ class NNSearch(ABC):
         @abstractmethod
         def __init__(self, search: NNSearch, X):
             self._X = X
+            self._len = len(X)
 
         def query_self(self, k):
             return [a[:, 1:] for a in self.query(self._X, k + 1)]
@@ -76,6 +77,9 @@ class NNSearch(ABC):
                 instances for each query instance.
             """
             pass
+
+        def __len__(self):
+            return self._len
 
 
 class BallTree(NNSearch):
