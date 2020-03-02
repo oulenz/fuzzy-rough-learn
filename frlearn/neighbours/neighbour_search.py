@@ -47,7 +47,10 @@ class NNSearch(ABC):
 
         @abstractmethod
         def __init__(self, search: NNSearch, X):
-            pass
+            self._X = X
+
+        def query_self(self, k):
+            return [a[:, 1:] for a in self.query(self._X, k + 1)]
 
         @abstractmethod
         def query(self, X, k: int):
@@ -104,6 +107,7 @@ class BallTree(NNSearch):
     class Index(NNSearch.Index):
 
         def __init__(self, search: BallTree, X):
+            super().__init__(search, X)
             self.tree = NearestNeighbors(**search.construction_params).fit(X)
 
         def query(self, X, k: int):
@@ -139,6 +143,7 @@ class KDTree(NNSearch):
     class Index(NNSearch.Index):
 
         def __init__(self, search: KDTree, X):
+            super().__init__(search, X)
             self.tree = NearestNeighbors(**search.construction_params).fit(X)
 
         def query(self, X, k: int):
