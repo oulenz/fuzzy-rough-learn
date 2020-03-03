@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn import datasets
 
-from frlearn.neighbours import FRNNClassifier, ImbalancedFRNNClassifier, KDTree
+from frlearn.neighbours import FRNNClassifier, KDTree
 from frlearn.neighbours.owa_operators import additive, strict
 
 n_neighbors = 15
