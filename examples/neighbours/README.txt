@@ -1,6 +1,6 @@
-.. _neighbours_examples:
+.. _literature_examples:
 
-Nearest Neighbours
-==================
+Literature
+==========
 
-Examples concerning the :mod:`frlearn.neighbours` module.
+Examples from the :mod:`frlearn.literature` module.

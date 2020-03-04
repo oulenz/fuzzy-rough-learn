@@ -1,3 +1,5 @@
+"""Utility functions for numpy"""
+
 import numpy as np
 
 

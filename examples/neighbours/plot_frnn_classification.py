@@ -13,8 +13,9 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn import datasets
 
-from frlearn.neighbours import FRNNClassifier, KDTree
-from frlearn.neighbours.owa_operators import additive, strict
+from frlearn.literature import FRNNClassifier
+from frlearn.neighbours import KDTree
+from frlearn.utils.owa_operators import additive, strict
 
 n_neighbors = 15
 
@@ -33,10 +34,10 @@ cmap_light = ListedColormap(['#FFAAAA', '#AAFFAA', '#AAAAFF'])
 cmap_bold = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
 
 
-for owa_weights in [strict, additive(20)]:
+for owa_weights, k in [(strict(), 1), (additive(), 20)]:
     # we create an instance of Neighbours Classifier and fit the data.
     nn_search = KDTree()
-    clf = FRNNClassifier(nn_search=nn_search, upper_weights=owa_weights)
+    clf = FRNNClassifier(nn_search=nn_search, upper_weights=owa_weights, lower_weights=owa_weights, upper_k=k)
     clf.fit(X, y)
 
     # Plot the decision boundary. For that, we will assign a color to each

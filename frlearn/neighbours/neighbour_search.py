@@ -1,4 +1,6 @@
+"""Nearest neighbour searches"""
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 from sklearn.neighbors._unsupervised import NearestNeighbors
