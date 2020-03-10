@@ -3,7 +3,7 @@ A package of tools for fuzzy rough machine learning.
 
 Subpackages
 -----------
-neighbours
+ensembles
     Fuzzy rough neighbour algorithms.
 utils
     Utility functions used in the other modules.

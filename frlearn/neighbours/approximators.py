@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from typing import Union
 
 import numpy as np
 
@@ -12,7 +13,7 @@ from ..utils.owa_operators import OWAOperator, trimmed
 class NNApproximator(Approximator):
 
     @abstractmethod
-    def __init__(self, k, owa: OWAOperator, *args, **kwargs):
+    def __init__(self, k: Union[int, float, None], owa: OWAOperator, *args, **kwargs):
         self.k = k
         self.owa = owa
 
@@ -20,9 +21,15 @@ class NNApproximator(Approximator):
 
         def __init__(self, approximator, index):
             self.index = index
-            self.k = approximator.k
             self.owa = approximator.owa
-            self.neighbours, self.distances = index.query_self(self.k + 1)
+            k = approximator.k
+            if k and 0 < k < 1:
+                self.k = max(int(k * len(index)), 1)
+            elif not k:
+                self.k = len(index)
+            else:
+                self.k = k
+            self.neighbours, self.distances = index.query_self(self.k + 1 if k else len(index) - 1)
 
         def query(self, X):
             q_neighbours, q_distances = self.index.query(X, self.k)
@@ -31,15 +38,6 @@ class NNApproximator(Approximator):
         @abstractmethod
         def _query(self, q_neighbours, q_distances):
             pass
-
-        @abstractmethod
-        def query_self(self):
-            pass
-
-        def _query_self_naive(self):
-            q_neighbours = self.neighbours[..., :self.k]
-            q_distances = self.distances[..., :self.k]
-            return self._query(q_neighbours, q_distances)
 
         def copy(self, **attribute_values):
             other = super().copy(**attribute_values)
@@ -55,7 +53,7 @@ class NNApproximator(Approximator):
 
 class ComplementedDistance(NNApproximator):
 
-    def __init__(self, k: int = 40, owa: OWAOperator = trimmed):
+    def __init__(self, k: Union[int, float, None] = 40, owa: OWAOperator = trimmed):
         super().__init__(k=k, owa=owa)
 
     class Approximation(NNApproximator.Approximation):

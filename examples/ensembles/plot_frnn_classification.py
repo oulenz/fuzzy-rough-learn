@@ -13,17 +13,15 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn import datasets
 
-from frlearn.literature import FRNNClassifier
+from frlearn.base import discretise_scores
+from frlearn.ensembles import FRNN
 from frlearn.neighbours import KDTree
 from frlearn.utils.owa_operators import additive, strict
 
 n_neighbors = 15
 
-# import some data to play with
+# import example data and reduce to 2 dimensions
 iris = datasets.load_iris()
-
-# we only take the first two features. We could avoid this ugly
-# slicing by using a two-dim dataset
 X = iris.data[:, :2]
 y = iris.target
 
@@ -35,10 +33,10 @@ cmap_bold = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
 
 
 for owa_weights, k in [(strict(), 1), (additive(), 20)]:
-    # we create an instance of Neighbours Classifier and fit the data.
+    # create an instance of the FRNN Classifier and construct the model.
     nn_search = KDTree()
-    clf = FRNNClassifier(nn_search=nn_search, upper_weights=owa_weights, lower_weights=owa_weights, upper_k=k)
-    clf.fit(X, y)
+    clf = FRNN(nn_search=nn_search, upper_weights=owa_weights, lower_weights=owa_weights, upper_k=k)
+    model = clf.construct(X, y)
 
     # Plot the decision boundary. For that, we will assign a color to each
     # point in the mesh [x_min, x_max]x[y_min, y_max].
@@ -46,7 +44,8 @@ for owa_weights, k in [(strict(), 1), (additive(), 20)]:
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
                          np.arange(y_min, y_max, h))
-    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = model.query(np.c_[xx.ravel(), yy.ravel()])
+    Z = discretise_scores(Z, labels=model.classes)
 
     # Put the result into a color plot
     Z = Z.reshape(xx.shape)

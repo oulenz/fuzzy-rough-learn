@@ -2,11 +2,11 @@ import pytest
 
 from sklearn.utils.estimator_checks import check_estimator
 
-from frlearn.literature import FRNNClassifier
+from frlearn.ensembles import FRNN, FROVOCO
 
 
 @pytest.mark.parametrize(
-    'Estimator', [FRNNClassifier, ]
+    'Estimator', [FRNN, FROVOCO, ]
 )
 @pytest.mark.skip('check_estimator is currently too strict')
 def test_all_estimators(Estimator):

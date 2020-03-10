@@ -58,7 +58,7 @@ class NNSearch(ABC):
         @abstractmethod
         def query(self, X, k: int):
             """
-            Identify the k nearest neighbours for each of the instances in X.
+            Identify the k nearest ensembles for each of the instances in X.
 
             Parameters
             ----------
@@ -66,16 +66,16 @@ class NNSearch(ABC):
                 Query instances.
 
             k : int
-                Number of neighbours to return
+                Number of ensembles to return
 
             Returns
             -------
             I : array shape=(n_instances, k, )
-                Indices of the k nearest neighbours among the construction
+                Indices of the k nearest ensembles among the construction
                 instances for each query instance.
 
             D : array shape=(n_instances, k, )
-                Distances to the k nearest neighbours among the construction
+                Distances to the k nearest ensembles among the construction
                 instances for each query instance.
             """
             pass

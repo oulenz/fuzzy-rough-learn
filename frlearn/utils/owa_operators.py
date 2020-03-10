@@ -75,6 +75,10 @@ class OWAOperator():
             An array with the same shape as `a`, with the specified
             axis removed. If `a` is a 0-d array, a scalar is returned.
         """
+        if k and 0 < k < 1:
+            k = max(int(k * a.shape[axis]), 1)
+        elif not k:
+            k = a.shape[axis]
         a = greatest(a, k, axis=axis)
         return self._apply(a, k, axis=axis, flavour=flavour)
 
