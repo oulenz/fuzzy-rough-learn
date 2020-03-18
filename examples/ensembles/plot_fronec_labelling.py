@@ -36,7 +36,7 @@ Y[((X[:, 0] >= 6) & (y == 1)), 2] = 1
 Y[((X[:, 0] <= 6) & (y == 2)), 1] = 1
 
 # Create a mesh of points in the attribute space.
-h = .02  # step size in the mesh
+h = .1  # step size in the mesh
 x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
 y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
 xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
