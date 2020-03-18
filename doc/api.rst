@@ -1,6 +1,6 @@
-####################
+#####################
 fuzzy-rough-learn API
-####################
+#####################
 
 This is the full API documentation of `fuzzy-rough-learn`.
 
@@ -13,22 +13,6 @@ Neighbours
     :no-inherited-members:
 
 .. currentmodule:: frlearn
-
-Fuzzy Rough Nearest Neighbour Classification
---------------------------------------------
-
-.. automodule:: frlearn.neighbours.classification
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: frlearn
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   neighbours.FRNNClassifier
-   neighbours.ImbalancedFRNNClassifier
 
 Nearest Neighbour Search
 ------------------------
@@ -43,6 +27,52 @@ Nearest Neighbour Search
    neighbours.neighbour_search.BallTree
    neighbours.neighbour_search.KDTree
 
+Ensembles
+=========
+
+.. automodule:: frlearn.ensembles
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: frlearn
+
+Classifiers
+-----------
+
+.. currentmodule:: frlearn
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   ensembles.classifiers.FRNN
+   ensembles.classifiers.FROVOCO
+   ensembles.classifiers.FRONEC
+
+Utils
+=====
+
+.. automodule:: frlearn.utils
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: frlearn
+
+numpy utils
+-------------
+
+.. currentmodule:: frlearn
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   utils.np_utils.first
+   utils.np_utils.last
+   utils.np_utils.least
+   utils.np_utils.greatest
+   utils.np_utils.div_or
+
 OWA Operators
 -------------
 
@@ -52,4 +82,4 @@ OWA Operators
    :toctree: generated/
    :template: class.rst
 
-   neighbours.owa_operators.OWAOperator
+   utils.owa_operators.OWAOperator
