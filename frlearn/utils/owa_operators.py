@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from .np_utils import greatest, least
+from .np_utils import first, greatest, last, least
 
 
 class OWAOperator():
@@ -41,8 +41,8 @@ class OWAOperator():
     def __str__(self):
         return self.name or str(self.f(4))
 
-    def _apply(self, a, k, axis, flavour: str):
-        w = self.f(k)
+    def _apply(self, a, axis, flavour: str):
+        w = self.f(a.shape[axis])
         w = np.reshape(w, [-1] + ((len(a.shape) - axis - 1) % len(a.shape)) * [1])
         if flavour == 'arithmetic':
             return np.sum(w * a, axis=axis)
@@ -51,7 +51,7 @@ class OWAOperator():
         if flavour == 'harmonic':
             return 1 / np.sum(w / a, axis=axis)
 
-    def soft_max(self, a, k, axis=-1, flavour: str = 'arithmetic'):
+    def soft_max(self, a, k=None, axis=-1, flavour: str = 'arithmetic'):
         """
         Calculates the soft maximum of an array.
 
@@ -60,8 +60,10 @@ class OWAOperator():
         a : ndarray
             Input array of values.
 
-        k : int
+        k : int or float or None, default=None
             Number of greatest values from which the soft maximum is calculated.
+            If a float in (0, 1), taken as a fraction of the total number of values.
+            If None, all values are used.
 
         axis : int, default=-1
             The axis along which the soft maximum is calculated.
@@ -75,14 +77,10 @@ class OWAOperator():
             An array with the same shape as `a`, with the specified
             axis removed. If `a` is a 0-d array, a scalar is returned.
         """
-        if k and 0 < k < 1:
-            k = max(int(k * a.shape[axis]), 1)
-        elif not k:
-            k = a.shape[axis]
         a = greatest(a, k, axis=axis)
-        return self._apply(a, k, axis=axis, flavour=flavour)
+        return self._apply(a, axis=axis, flavour=flavour)
 
-    def soft_min(self, a, k, axis=-1, flavour: str = 'arithmetic'):
+    def soft_min(self, a, k=None, axis=-1, flavour: str = 'arithmetic'):
         """
         Calculates the soft minimum of an array.
 
@@ -91,8 +89,10 @@ class OWAOperator():
         a : ndarray
             Input array of values.
 
-        k : int
+        k : int or float or None, default=None
             Number of least values from which the soft minimum is calculated.
+            If a float in (0, 1), taken as a fraction of the total number of values.
+            If None, all values are used.
 
         axis : int, default=-1
             The axis along which the soft minimum is calculated.
@@ -107,9 +107,9 @@ class OWAOperator():
             axis removed. If `a` is a 0-d array, a scalar is returned.
         """
         a = least(a, k, axis=axis)
-        return self._apply(a, k, axis=axis, flavour=flavour)
+        return self._apply(a, axis=axis, flavour=flavour)
 
-    def soft_head(self, a, k, axis=-1, flavour: str = 'arithmetic'):
+    def soft_head(self, a, k=None, axis=-1, flavour: str = 'arithmetic'):
         """
         Calculates the soft head of an array.
 
@@ -118,8 +118,10 @@ class OWAOperator():
         a : ndarray
             Input array of values.
 
-        k : int
+        k : int or float or None, default=None
             Number of initial values from which the soft head is calculated.
+            If a float in (0, 1), taken as a fraction of the total number of values.
+            If None, all values are used.
 
         axis : int, default=-1
             The axis along which the soft head is calculated.
@@ -133,12 +135,10 @@ class OWAOperator():
             An array with the same shape as `a`, with the specified
             axis removed. If `a` is a 0-d array, a scalar is returned.
         """
-        slc = [slice(None)] * len(a.shape)
-        slc[axis] = slice(0, k)
-        a = a[tuple(slc)]
-        return self._apply(a, k, axis=axis, flavour=flavour)
+        a = first(a, k, axis=axis)
+        return self._apply(a, axis=axis, flavour=flavour)
 
-    def soft_tail(self, a, k, axis=-1, flavour: str = 'arithmetic'):
+    def soft_tail(self, a, k=None, axis=-1, flavour: str = 'arithmetic'):
         """
         Calculates the soft tail of an array.
 
@@ -147,8 +147,10 @@ class OWAOperator():
         a : ndarray
             Input array of values.
 
-        k : int
+        k : int or float or None, default=None
             Number of terminal values from which the soft tail is calculated.
+            If a float in (0, 1), taken as a fraction of the total number of values.
+            If None, all values are used.
 
         axis : int, default=-1
             The axis along which the soft tail is calculated.
@@ -162,10 +164,8 @@ class OWAOperator():
             An array with the same shape as `a`, with the specified
             axis removed. If `a` is a 0-d array, a scalar is returned.
         """
-        slc = [slice(None)] * len(a.shape)
-        slc[axis] = slice(-1, -k -1, -1)
-        a = a[tuple(slc)]
-        return self._apply(a, k, axis=axis, flavour=flavour)
+        a = last(a, k, axis=axis)
+        return self._apply(a, axis=axis, flavour=flavour)
 
 
 class strict(OWAOperator):
