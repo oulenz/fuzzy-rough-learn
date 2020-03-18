@@ -3,14 +3,14 @@ from __future__ import annotations
 
 import numpy as np
 
-from ..base import Approximator, Classifier
+from ..base import Approximator, MultiClassClassifier, MultiLabelClassifier
 from ..neighbours.approximators import ComplementedDistance
 from ..neighbours.neighbour_search import KDTree, NNSearch
 from ..utils.np_utils import div_or
 from ..utils.owa_operators import OWAOperator, additive, exponential
 
 
-class FuzzyRoughEnsemble(Classifier):
+class FuzzyRoughEnsemble(MultiClassClassifier):
     def __init__(
             self,
             upper_approximator: Approximator = ComplementedDistance(),
@@ -21,7 +21,7 @@ class FuzzyRoughEnsemble(Classifier):
         self.lower_approximator = lower_approximator
         self.nn_search = nn_search
 
-    class Model(Classifier.Model):
+    class Model(MultiClassClassifier.Model):
         def __init__(self, classifier, X, y):
             super().__init__(classifier, X, y)
 
@@ -99,7 +99,7 @@ class FRNN(FuzzyRoughEnsemble):
         super().__init__(upper_approximator, lower_approximator, nn_search)
 
 
-class FROVOCO(Classifier):
+class FROVOCO(MultiClassClassifier):
     """
     Implementation of the Fuzzy Rough OVO COmbination (FROVOCO) ensemble classifier.
 
@@ -126,7 +126,7 @@ class FROVOCO(Classifier):
         self.additive_approximator = ComplementedDistance(owa=additive(), k=.1)
         self.nn_search = nn_search
 
-    class Model(Classifier.Model):
+    class Model(MultiClassClassifier.Model):
         def __init__(self, classifier, X, y):
             super().__init__(classifier, X, y)
             
@@ -184,3 +184,92 @@ class FROVOCO(Classifier):
             tot_vals = vals + vals.transpose(0, 2, 1)
             vals = div_or(vals, tot_vals, 0.5)
             return np.sum(vals, axis=2)
+
+
+class FRONEC(MultiLabelClassifier):
+    """
+    Implementation of the Fuzzy ROugh NEighbourhood Consensus (FRONEC) multilabel classifier.
+
+    Parameters
+    ----------
+    Q_type : int {1, 2, 3, }, default=2
+        Quality measure to use for identifying most relevant instances.
+        Q^1 uses lower approximation, Q^2 uses upper approximation, Q^3 is the mean of Q^1 and Q^2.
+    R_d_type : int {1, 2, }, default=1
+        Label similarity relation to use.
+        R_d^1 is simple Hamming similarity. R_d^2 is similar, but takes the prior label probabilities into account.
+    k : int, default=20
+        Number of neighbours to consider for neighbourhood consensus.
+    weights: OWAOperator, default=additive()
+        OWA weights to use for calculation of soft maximum and/or minimum.
+    nn_search : NNSearch, default=KDTree()
+        Nearest neighbour search algorithm to use.
+
+    References
+    ----------
+
+    .. [1] `Vluymans S, Cornelis C, Herrera F, Saeys Y (2018).
+       Multi-label classification using a fuzzy rough neighborhood consensus.
+       Information Sciences, vol 433, pp 96–114.
+       doi: 10.1016/j.ins.2017.12.034
+       <https://www.sciencedirect.com/science/article/pii/S002002551731157X>`_
+    """
+
+    def __init__(self, Q_type: int = 2, R_d_type: int = 1,
+                 k: int = 20, weights: OWAOperator = additive(), nn_search: NNSearch = KDTree()):
+        self.Q_type = Q_type
+        self.R_d_type = R_d_type
+        self.k = k
+        self.weights = weights
+        self.nn_search = nn_search
+
+    class Model(MultiLabelClassifier.Model):
+
+        def __init__(self, classifier, X, Y):
+            super().__init__(classifier, X, Y)
+
+            self.scale = (np.max(X, axis=0) - np.min(X, axis=0)) * self.n_attributes
+            X = X.copy() / self.scale
+            self.Q_type = classifier.Q_type
+            self.R_d = self._R_d_2(Y) if classifier.R_d_type == 2 else self._R_d_1(Y)
+            self.k = classifier.k
+            self.weights = classifier.weights
+            self.index = classifier.nn_search.construct(X)
+            self.Y = Y
+
+        @staticmethod
+        def _R_d_1(Y):
+            return np.sum(Y[:, None, :] == Y, axis=-1)
+
+        @staticmethod
+        def _R_d_2(Y):
+            p = np.sum(Y, axis=0)/len(Y)
+
+            both = np.minimum(Y[:, None, :], Y)
+            either = np.maximum(Y[:, None, :], Y)
+            neither = 1 - either
+            xeither = either - both
+
+            numerator = both * (1 - p) + neither * p
+            divisor = numerator + xeither * 0.5
+            return np.sum(numerator, axis=-1)/np.sum(divisor, axis=-1)
+
+        def query(self, X):
+            X = X.copy() / self.scale
+            neighbours, distances = self.index.query(X, self.k)
+            R = np.maximum(1 - distances, 0)
+            if self.Q_type == 1:
+                Q = self._Q_1(neighbours, R)
+            elif self.Q_type == 2:
+                Q = self._Q_2(neighbours, R)
+            else:
+                Q = self._Q_1(neighbours, R) + self._Q_2(neighbours, R)
+            Q_max = np.max(Q, axis=-1, keepdims=True)
+            Q = Q == Q_max
+            return np.sum(np.minimum(self.Y, Q[..., None]), axis=1) / np.sum(Q, axis=-1, keepdims=True)
+
+        def _Q_1(self, neighbours, R):
+            return self.weights.soft_min(np.minimum(1 - R[..., None] + self.R_d[neighbours, :] - 1, 1), axis=1)
+
+        def _Q_2(self, neighbours, R):
+            return self.weights.soft_max(np.maximum(R[..., None] + self.R_d[neighbours, :] - 1, 0), axis=1)

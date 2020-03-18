@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from sklearn.datasets import load_iris
 
-from frlearn.ensembles import FRNN, FROVOCO
+from frlearn.ensembles import FRNN, FRONEC, FROVOCO
 
 
 @pytest.fixture
@@ -31,3 +31,16 @@ def test_frovoco(data):
     y_pred = model.query(X)
     assert y_pred.shape == (X.shape[0], 3)
 
+
+def test_fronec(data):
+    X, y = data
+    Y = (y[:, None] == np.arange(3)).astype(int)
+    Y[[109, 117, 131], 2] = 0
+    Y[((X[:, 0] >= 6) & (y == 1)), 2] = 1
+    Y[((X[:, 0] <= 6) & (y == 2)), 1] = 1
+
+    clf = FRONEC()
+    model = clf.construct(X, Y)
+
+    y_pred = model.query(X)
+    assert y_pred.shape == (X.shape[0], 3)

@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn import datasets
 
-from frlearn.base import discretise_scores
+from frlearn.base import select_class
 from frlearn.ensembles import FROVOCO
 
 # import example data and reduce to 2 dimensions
@@ -40,7 +40,7 @@ y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
 xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
                      np.arange(y_min, y_max, h))
 Z = model.query(np.c_[xx.ravel(), yy.ravel()])
-Z = discretise_scores(Z, labels=model.classes)
+Z = select_class(Z, labels=model.classes)
 
 # Put the result into a color plot
 Z = Z.reshape(xx.shape)

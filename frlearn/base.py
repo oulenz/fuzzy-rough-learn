@@ -48,10 +48,7 @@ class Classifier(ABC):
 
     class Model(ABC):
 
-        @abstractmethod
-        def __init__(self, classifier, X, y, *args, **kwargs):
-            self.classes = np.unique(y)
-            self.n_classes = len(self.classes)
+        def __init__(self, classifier, X, *args, **kwargs):
             self.n_attributes = X.shape[-1]
 
         @abstractmethod
@@ -65,7 +62,26 @@ class Classifier(ABC):
             return other
 
 
-def discretise_scores(scores, abstention_threshold: float = -1, labels=None):
+class MultiClassClassifier(Classifier):
+
+    class Model(Classifier.Model):
+
+        def __init__(self, classifier, X, y):
+            super().__init__(classifier, X)
+            self.classes = np.unique(y)
+            self.n_classes = len(self.classes)
+
+
+class MultiLabelClassifier(Classifier):
+
+    class Model(Classifier.Model):
+
+        def __init__(self, classifier, X, Y):
+            super().__init__(classifier, X)
+            self.n_classes = Y.shape[1]
+
+
+def select_class(scores, abstention_threshold: float = -1, labels=None):
     """
     Convert an array of class scores into class predictions, by selecting the class with the highest score.
     If none of the scores is greater than `abstention_threshold`, a generic `other` class will be predicted.
@@ -93,6 +109,27 @@ def discretise_scores(scores, abstention_threshold: float = -1, labels=None):
     if labels is not None:
         predictions = labels[predictions]
     return predictions
+
+
+def discretise(scores, threshold: float = 0.5, ):
+    """
+    Discretise an array of label scores in `[0, 1]` into discrete predictions in `{0, 1}`,
+    by selecting all labels that score higher than `threshold`.
+
+    Parameters
+    ----------
+    scores : array shape=(n_instances, n_classes, )
+        Array of class scores. Scores should be values in `[0, 1]`
+    threshold : float=0.5
+        Threshold to use for selecting labels.
+
+    Returns
+    -------
+    predictions : array shape=(n_instances, )
+        Class label for each query instance.
+
+    """
+    return scores >= threshold
 
 
 def probabilities_from_scores(scores):
@@ -165,7 +202,7 @@ class FitPredictClassifier(BaseEstimator, ClassifierMixin, ):
             Class label for each query instance.
         """
         scores = self.model_.query(X)
-        return discretise_scores(scores, self.model_.classes)
+        return select_class(scores, self.model_.classes)
 
     def predict_proba(self, X):
         """
