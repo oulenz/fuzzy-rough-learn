@@ -27,6 +27,17 @@ Nearest Neighbour Search
    neighbours.neighbour_search.BallTree
    neighbours.neighbour_search.KDTree
 
+Preprocessors
+-------------
+
+.. currentmodule:: frlearn
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   neighbours.preprocessors.FRPS
+
 Ensembles
 =========
 

@@ -13,6 +13,7 @@ New algorithms
 
 * :class:`ensembles.FRONEC`
 * :class:`ensembles.FROVOCO`
+* :class:`neighbours.FRPS`
 
 API changes
 ~~~~~~~~~~~

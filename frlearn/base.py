@@ -81,6 +81,17 @@ class MultiLabelClassifier(Classifier):
             self.n_classes = Y.shape[1]
 
 
+class Preprocessor(ABC):
+
+    @abstractmethod
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def process(self, X, y):
+        pass
+
+
 def select_class(scores, abstention_threshold: float = -1, labels=None):
     """
     Convert an array of class scores into class predictions, by selecting the class with the highest score.

@@ -169,3 +169,8 @@ def div_or(x, y, fallback=np.nan):
         z = x / y
         z[np.isnan(z)] = fallback
     return z
+
+
+def remove_diagonal(a):
+    #TODO: parametrise dimensions
+    return a[~np.eye(a.shape[0], dtype=bool)].reshape(a.shape[0], -1)
