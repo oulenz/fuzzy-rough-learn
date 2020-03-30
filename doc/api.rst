@@ -36,6 +36,7 @@ Preprocessors
    :toctree: generated/
    :template: class.rst
 
+   neighbours.preprocessors.FRFS
    neighbours.preprocessors.FRPS
 
 Ensembles
