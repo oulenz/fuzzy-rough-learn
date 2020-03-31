@@ -185,12 +185,14 @@ class FROVOCO(MultiClassClassifier):
             return (approximation_vals + 1 - co_approximation_vals) / 2
 
         def _wv(self, additive_vals, exponential_vals):
-            vals = np.where(self.ovo_ir > 9, additive_vals[..., None], exponential_vals[..., None])
+            # Subtract from 1 because we're using lower approximations.
+            vals = 1 - np.where(self.ovo_ir > 9, additive_vals[..., None], exponential_vals[..., None])
             tot_vals = vals + vals.transpose(0, 2, 1)
             vals = div_or(vals, tot_vals, 0.5)
             # Exclude comparisons of a class with itself.
             vals[:, range(self.n_classes), range(self.n_classes)] = 0
-            return np.sum(vals, axis=2)
+            # Sum along axis 1 (rather than 2) because we're using lower approximations.
+            return np.sum(vals, axis=1)
 
 
 class FRONEC(MultiLabelClassifier):
