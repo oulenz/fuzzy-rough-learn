@@ -209,7 +209,7 @@ class FRONEC(MultiLabelClassifier):
         R_d^1 is simple Hamming similarity. R_d^2 is similar, but takes the prior label probabilities into account.
     k : int, default=20
         Number of neighbours to consider for neighbourhood consensus.
-    weights: OWAOperator, default=additive()
+    owa_weights: OWAOperator, default=additive()
         OWA weights to use for calculation of soft maximum and/or minimum.
     nn_search : NNSearch, default=KDTree()
         Nearest neighbour search algorithm to use.
@@ -225,11 +225,11 @@ class FRONEC(MultiLabelClassifier):
     """
 
     def __init__(self, Q_type: int = 2, R_d_type: int = 1,
-                 k: int = 20, weights: OWAOperator = additive(), nn_search: NNSearch = KDTree()):
+                 k: int = 20, owa_weights: OWAOperator = additive(), nn_search: NNSearch = KDTree()):
         self.Q_type = Q_type
         self.R_d_type = R_d_type
         self.k = k
-        self.weights = weights
+        self.owa_weights = owa_weights
         self.nn_search = nn_search
 
     class Model(MultiLabelClassifier.Model):
@@ -242,7 +242,7 @@ class FRONEC(MultiLabelClassifier):
             self.Q_type = classifier.Q_type
             self.R_d = self._R_d_2(Y) if classifier.R_d_type == 2 else self._R_d_1(Y)
             self.k = classifier.k
-            self.weights = classifier.weights
+            self.owa_weights = classifier.owa_weights
             self.index = classifier.nn_search.construct(X)
             self.Y = Y
 
@@ -278,7 +278,7 @@ class FRONEC(MultiLabelClassifier):
             return np.sum(np.minimum(self.Y, Q[..., None]), axis=1) / np.sum(Q, axis=-1, keepdims=True)
 
         def _Q_1(self, neighbours, R):
-            return self.weights.soft_min(np.minimum(1 - R[..., None] + self.R_d[neighbours, :] - 1, 1), axis=1)
+            return self.owa_weights.soft_min(np.minimum(1 - R[..., None] + self.R_d[neighbours, :] - 1, 1), axis=1)
 
         def _Q_2(self, neighbours, R):
-            return self.weights.soft_max(np.maximum(R[..., None] + self.R_d[neighbours, :] - 1, 0), axis=1)
+            return self.owa_weights.soft_max(np.maximum(R[..., None] + self.R_d[neighbours, :] - 1, 0), axis=1)
