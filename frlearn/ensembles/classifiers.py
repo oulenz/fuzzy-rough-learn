@@ -52,13 +52,17 @@ class FRNN(FuzzyRoughEnsemble):
 
     Parameters
     ----------
-    upper_weights : OWAOperator, default=additive(20)
-        OWA operator to use in calculation of upper approximation of
-        decision classes.
+    upper_weights : OWAOperator, default=additive()
+        OWA weights to use in calculation of upper approximation of decision classes.
 
-    lower_weights : OWAOperator, default=None
-        OWA operator to use in calculation of lower approximation of
-        decision classes.
+    upper_k : int, default = 20
+        Effective length of upper weights vector (number of nearest neighbours to consider).
+
+    lower_weights : OWAOperator, default=additive()
+        OWA weights to use in calculation of lower approximation of decision classes.
+
+    lower_k : int, default = 20
+        Effective length of lower weights vector (number of nearest neighbours to consider).
 
     nn_search : NNSearch, default=KDTree()
         Nearest neighbour search algorithm to use.
