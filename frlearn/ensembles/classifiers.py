@@ -170,10 +170,11 @@ class FROVOCO(MultiClassClassifier):
             mem = self._mem(additive_vals_X, exponential_vals_X, co_vals_X)
 
             mse = np.mean((mem[:, None, :] - self.sig) ** 2, axis=-1)
+            mse_n = mse/np.sum(mse, axis=-1, keepdims=True)
 
             wv = self._wv(additive_vals_X, exponential_vals_X)
 
-            return (wv + mem)/2 - mse/self.n_classes
+            return (wv + mem)/2 - mse_n/self.n_classes
 
         def _mem(self, additive_vals, exponential_vals, co_approximation_vals):
             approximation_vals = np.where(self.ova_ir > 9, additive_vals, exponential_vals)
@@ -183,6 +184,8 @@ class FROVOCO(MultiClassClassifier):
             vals = np.where(self.ovo_ir > 9, additive_vals[..., None], exponential_vals[..., None])
             tot_vals = vals + vals.transpose(0, 2, 1)
             vals = div_or(vals, tot_vals, 0.5)
+            # Exclude comparisons of a class with itself.
+            vals[:, range(self.n_classes), range(self.n_classes)] = 0
             return np.sum(vals, axis=2)
 
 
