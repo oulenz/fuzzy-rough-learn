@@ -27,11 +27,11 @@ class FRFS(Preprocessor):
         Number of features to select. If None, will continue to add features until positive region size becomes maximal.
     owa_weights: OWAOperator, default=deltaquadsigmoid(0.2, 1)
         OWA weights to use for calculation of the soft minimum in the positive regions.
-    T_norm : (ndarray, int, ) -> ndarray, default=lukasiewicz
+    t_norm : (ndarray, int, ) -> ndarray, default=lukasiewicz
         Function that takes an ndarray and a keyword argument `axis`,
         and returns an ndarray with the corresponding axis removed.
         Used to define the similarity relation `R` from the per-attribute similarities.
-        Should be a T-norm, or else the size of the positive region may decrease as features are added.
+        Should be a t-norm, or else the size of the positive region may decrease as features are added.
 
 
     References
@@ -45,10 +45,10 @@ class FRFS(Preprocessor):
        <https://link.springer.com/chapter/10.1007/978-3-642-16248-0_16>`_
     """
 
-    def __init__(self, n_features=None, owa_weights: OWAOperator = deltaquadsigmoid(0.2, 1), T_norm=lukasiewicz):
+    def __init__(self, n_features=None, owa_weights: OWAOperator = deltaquadsigmoid(0.2, 1), t_norm=lukasiewicz):
         self.n_features = n_features
         self.owa_weights = owa_weights
-        self.T_norm = T_norm
+        self.t_norm = t_norm
 
     def process(self, X, y):
         X_scaled = X / np.std(X, axis=0)
@@ -72,7 +72,7 @@ class FRFS(Preprocessor):
         return X[:, selected_attributes], y
 
     def _POS_size(self, R_a):
-        R = self.T_norm(R_a, axis=-1)
+        R = self.t_norm(R_a, axis=-1)
         return np.sum(self.owa_weights.soft_min(1 - R, axis=-1))
 
 
