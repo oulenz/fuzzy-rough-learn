@@ -29,7 +29,7 @@ class NNApproximator(Approximator):
                 self.k = len(index)
             else:
                 self.k = k
-            self.neighbours, self.distances = index.query_self(self.k + 1 if k else len(index) - 1)
+            self.neighbours, self.distances = index.query_self(self.k if k else len(index) - 1)
 
         def query(self, X):
             q_neighbours, q_distances = self.index.query(X, self.k)
@@ -43,11 +43,11 @@ class NNApproximator(Approximator):
             other = super().copy(**attribute_values)
             if 'k' not in attribute_values:
                 return other
-            if other.k + 1 > other.neighbours.shape[-1]:
-                other.neighbours, other.distances = other.index.query_self(other.k + 1)
+            if other.k > other.neighbours.shape[-1]:
+                other.neighbours, other.distances = other.index.query_self(other.k)
             else:
-                other.neighbours = other.neighbours[..., :other.k + 1]
-                other.distances = other.distances[..., :other.k + 1]
+                other.neighbours = other.neighbours[..., :other.k]
+                other.distances = other.distances[..., :other.k]
             return other
 
 
