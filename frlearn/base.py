@@ -213,7 +213,7 @@ class FitPredictClassifier(BaseEstimator, ClassifierMixin, ):
             Class label for each query instance.
         """
         scores = self.model_.query(X)
-        return select_class(scores, self.model_.classes)
+        return select_class(scores, labels=self.model_.classes)
 
     def predict_proba(self, X):
         """
