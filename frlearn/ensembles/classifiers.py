@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from ..base import Approximator, MultiClassClassifier, MultiLabelClassifier
-from ..neighbours.approximators import ComplementedDistance
+from ..base import Descriptor, MultiClassClassifier, MultiLabelClassifier
+from ..neighbours.descriptors import ComplementedDistance
 from ..neighbours.neighbour_search import KDTree, NNSearch
 from ..utils.np_utils import div_or
 from ..utils.owa_operators import OWAOperator, additive, exponential
@@ -13,8 +13,8 @@ from ..utils.owa_operators import OWAOperator, additive, exponential
 class FuzzyRoughEnsemble(MultiClassClassifier):
     def __init__(
             self,
-            upper_approximator: Approximator = ComplementedDistance(),
-            lower_approximator: Approximator = ComplementedDistance(),
+            upper_approximator: Descriptor = ComplementedDistance(),
+            lower_approximator: Descriptor = ComplementedDistance(),
             nn_search: NNSearch = KDTree(),
     ):
         self.upper_approximator = upper_approximator

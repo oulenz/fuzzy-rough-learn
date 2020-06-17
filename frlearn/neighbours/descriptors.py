@@ -1,4 +1,4 @@
-"""Nearest neighbour approximators"""
+"""Nearest neighbour data descriptors"""
 from __future__ import annotations
 
 from abc import abstractmethod
@@ -6,23 +6,23 @@ from typing import Union
 
 import numpy as np
 
-from ..base import Approximator
+from ..base import Descriptor
 from ..utils.owa_operators import OWAOperator, trimmed
 
 
-class NNApproximator(Approximator):
+class NNDescriptor(Descriptor):
 
     @abstractmethod
     def __init__(self, k: Union[int, float, None], owa: OWAOperator, *args, **kwargs):
         self.k = k
         self.owa = owa
 
-    class Approximation(Approximator.Approximation):
+    class Description(Descriptor.Description):
 
-        def __init__(self, approximator, index):
+        def __init__(self, descriptor, index):
             self.index = index
-            self.owa = approximator.owa
-            k = approximator.k
+            self.owa = descriptor.owa
+            k = descriptor.k
             if k and 0 < k < 1:
                 self.k = max(int(k * len(index)), 1)
             elif not k:
@@ -51,12 +51,12 @@ class NNApproximator(Approximator):
             return other
 
 
-class ComplementedDistance(NNApproximator):
+class ComplementedDistance(NNDescriptor):
 
     def __init__(self, k: Union[int, float, None] = 40, owa: OWAOperator = trimmed):
         super().__init__(k=k, owa=owa)
 
-    class Approximation(NNApproximator.Approximation):
+    class Description(NNDescriptor.Description):
 
         def _query(self, q_neighbours, q_distances):
             indiscernibilities = np.maximum(0, 1 - q_distances)

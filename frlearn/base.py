@@ -11,19 +11,19 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 
-class Approximator(ABC):
+class Descriptor(ABC):
 
     @abstractmethod
     def __init__(self):
         pass
 
     def construct(self, *args, **kwargs):
-        return self.Approximation(self, *args, **kwargs)
+        return self.Description(self, *args, **kwargs)
 
-    class Approximation(ABC):
+    class Description(ABC):
 
         @abstractmethod
-        def __init__(self, approximator, *args, **kwargs):
+        def __init__(self, descriptor, *args, **kwargs):
             pass
 
         @abstractmethod
