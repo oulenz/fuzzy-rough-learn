@@ -2,7 +2,7 @@ import pytest
 
 from sklearn.utils.estimator_checks import check_estimator
 
-from frlearn.ensembles import FRNN, FROVOCO
+from frlearn.neighbours import FRNN, FROVOCO
 
 
 @pytest.mark.parametrize(

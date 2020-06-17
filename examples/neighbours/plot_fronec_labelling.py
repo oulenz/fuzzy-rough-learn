@@ -23,7 +23,7 @@ from matplotlib.colors import BoundaryNorm, ListedColormap
 from sklearn import datasets
 
 from frlearn.base import discretise
-from frlearn.ensembles import FRONEC
+from frlearn.neighbours import FRONEC
 
 # Import example data, reduce to 2 dimensions and manipulate to create multilabel problem.
 iris = datasets.load_iris()

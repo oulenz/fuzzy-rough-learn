@@ -14,8 +14,7 @@ from matplotlib.colors import ListedColormap
 from sklearn import datasets
 
 from frlearn.base import select_class
-from frlearn.ensembles import FRNN
-from frlearn.neighbours import KDTree
+from frlearn.neighbours import FRNN, KDTree
 from frlearn.utils.owa_operators import additive, strict
 
 n_neighbors = 15

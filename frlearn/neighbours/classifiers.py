@@ -1,13 +1,13 @@
-"""Ensemble classifiers"""
+"""Nearest neighbour classifiers"""
 from __future__ import annotations
 
 import numpy as np
 
-from ..base import Descriptor, MultiClassClassifier, MultiLabelClassifier
-from ..neighbours.descriptors import ComplementedDistance
-from ..neighbours.neighbour_search import KDTree, NNSearch
-from ..utils.np_utils import div_or
-from ..utils.owa_operators import OWAOperator, additive, exponential
+from frlearn.base import Descriptor, MultiClassClassifier, MultiLabelClassifier
+from frlearn.neighbours.descriptors import ComplementedDistance
+from frlearn.neighbours.neighbour_search import KDTree, NNSearch
+from frlearn.utils.np_utils import div_or
+from frlearn.utils.owa_operators import OWAOperator, additive, exponential
 
 
 class FuzzyRoughEnsemble(MultiClassClassifier):

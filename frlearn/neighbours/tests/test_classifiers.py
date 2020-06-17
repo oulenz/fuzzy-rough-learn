@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from sklearn.datasets import load_iris
 
-from frlearn.ensembles import FRNN, FRONEC, FROVOCO
+from frlearn.neighbours import FRNN, FRONEC, FROVOCO
 
 
 @pytest.fixture

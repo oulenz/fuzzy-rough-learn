@@ -14,7 +14,7 @@ from matplotlib.colors import ListedColormap
 from sklearn import datasets
 
 from frlearn.base import select_class
-from frlearn.ensembles import FROVOCO
+from frlearn.neighbours import FROVOCO
 
 # import example data and reduce to 2 dimensions
 iris = datasets.load_iris()

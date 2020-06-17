@@ -14,6 +14,19 @@ Neighbours
 
 .. currentmodule:: frlearn
 
+Classifiers
+-----------
+
+.. currentmodule:: frlearn
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   neighbours.classifiers.FRNN
+   neighbours.classifiers.FROVOCO
+   neighbours.classifiers.FRONEC
+
 Nearest Neighbour Search
 ------------------------
 
@@ -38,28 +51,6 @@ Preprocessors
 
    neighbours.preprocessors.FRFS
    neighbours.preprocessors.FRPS
-
-Ensembles
-=========
-
-.. automodule:: frlearn.ensembles
-    :no-members:
-    :no-inherited-members:
-
-.. currentmodule:: frlearn
-
-Classifiers
------------
-
-.. currentmodule:: frlearn
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   ensembles.classifiers.FRNN
-   ensembles.classifiers.FROVOCO
-   ensembles.classifiers.FRONEC
 
 Utils
 =====

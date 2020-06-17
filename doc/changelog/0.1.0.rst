@@ -6,19 +6,19 @@ Version 0.1
 Changelog
 ---------
 
-Adds range of existing fuzzy rough set algorithms.
+Adds number of existing fuzzy rough set algorithms.
 
 New algorithms
 ~~~~~~~~~~~~~~
 
-* :class:`ensembles.FRONEC`
-* :class:`ensembles.FROVOCO`
-* :class:`ensembles.FRFS`
+* :class:`neighbours.FRFS`
+* :class:`neighbours.FRONEC`
+* :class:`neighbours.FROVOCO`
 * :class:`neighbours.FRPS`
 
 API changes
 ~~~~~~~~~~~
-* :class:`neighbours.FRNNClassifier` replaced by :class:`ensembles.FRNN`.
+* :class:`neighbours.FRNNClassifier` replaced by :class:`neighbours.FRNN`.
 * Classifiers give confidence scores; absolute class predictions can be obtained with utility functions.
 * Classifiers follow construct/query pattern; scikit-learn fit/predict pattern can be obtained with utility class.
 * :mod:`neighbours.owa_operators` moved to :mod:`utils.owa_operators`.
