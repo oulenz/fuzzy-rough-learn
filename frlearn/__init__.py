@@ -1,5 +1,5 @@
 """
-A package of tools for fuzzy rough machine learning.
+A library of tools for fuzzy rough machine learning.
 
 Subpackages
 -----------

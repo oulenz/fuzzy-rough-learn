@@ -279,7 +279,7 @@ man_pages = [
 texinfo_documents = [
   ('index', 'fuzzy-rough-learn', 'fuzzy-rough-learn Documentation',
    'Oliver Urs Lenz', 'fuzzy-rough-learn',
-   'A package of tools for fuzzy rough machine learning.',
+   'A library of tools for fuzzy rough machine learning.',
    'Miscellaneous'),
 ]
 

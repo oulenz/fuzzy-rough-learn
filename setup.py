@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-"""A package of tools for fuzzy rough machine learning."""
+"""A library of tools for fuzzy rough machine learning."""
 
 import codecs
 import os
@@ -12,7 +12,7 @@ with open(ver_file) as f:
     exec(f.read())
 
 DISTNAME = 'fuzzy-rough-learn'
-DESCRIPTION = 'A package of tools for fuzzy rough machine learning.'
+DESCRIPTION = 'A library of tools for fuzzy rough machine learning.'
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
 MAINTAINER = 'Oliver Urs Lenz'
