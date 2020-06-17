@@ -22,7 +22,33 @@
 fuzzy-rough-learn
 =================
 
-**fuzzy-rough-learn** is a package of scikit-learn_ extensions for fuzzy rough machine learning.
+**fuzzy-rough-learn** is a library of fuzzy rough machine learning algorithms, extending scikit-learn_.
+
+
+Contents
+--------
+
+At present, fuzzy-rough-learn contains the following algorithms:
+
+Classifiers
+...........
+
+* Fuzzy Rough Nearest Neighbours (FRNN; multiclass)
+* Fuzzy Rough OVO COmbination (FROVOCO; muliclass, suitable for imbalanced data)
+* Fuzzy ROugh NEighbourhood Consensus (FRONEC; multilabel)
+
+Preprocessors
+.............
+
+* Fuzzy Rough Feature Selection (FRFS)
+* Fuzzy Rough Prototype Selection (FRPS)
+
+Utilities
+.........
+
+* OWA operator class
+* Nearest Neighbour search algorithm class
+
 
 Documentation
 -------------
