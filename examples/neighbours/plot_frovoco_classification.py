@@ -1,10 +1,14 @@
 """
-====================================================
-FROVOCO Classification
-====================================================
+======================
+FROVOCO classification
+======================
 
 Sample usage of FROVOCO classification.
-It will plot the decision boundaries for each class.
+
+The figures contain the training instances within a section of the selected feature space.
+The training instances are coloured according to their true labels,
+while the feature space is coloured according to predictions on the basis of the training instances,
+making the decision boundaries visible.
 """
 print(__doc__)
 
@@ -16,43 +20,47 @@ from sklearn import datasets
 from frlearn.base import select_class
 from frlearn.neighbours import FROVOCO
 
-# import example data and reduce to 2 dimensions
+# Import example data, reduce to 2 dimensions, and create imbalanced selection.
 iris = datasets.load_iris()
 X = iris.data[:, :2]
 y = iris.target
 X = np.concatenate([X[:5], X[50:67], X[100:]], axis=0)
 y = np.concatenate([y[:5], y[50:67], y[100:]], axis=0)
 
-h = .02  # step size in the mesh
-
-# Create color maps
+# Define color maps.
 cmap_light = ListedColormap(['#FFAAAA', '#AAFFAA', '#AAAAFF'])
 cmap_bold = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
 
-# create an instance of the FROVOCO Classifier and construct the model.
+# Create an instance of the FROVOCO classifier and construct the model.
 clf = FROVOCO()
 model = clf.construct(X, y)
 
-# Plot the decision boundary. For that, we will assign a color to each
-# point in the mesh [x_min, x_max]x[y_min, y_max].
+# Create a mesh of points in the attribute space.
+step_size = .02
 x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
 y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                     np.arange(y_min, y_max, h))
+xx, yy = np.meshgrid(np.arange(x_min, x_max, step_size), np.arange(y_min, y_max, step_size))
+
+# Query mesh points to obtain class values and select highest valued class.
 Z = model.query(np.c_[xx.ravel(), yy.ravel()])
 Z = select_class(Z, labels=model.classes)
 
-# Put the result into a color plot
-Z = Z.reshape(xx.shape)
+# Initialise figure.
 plt.figure()
+
+# Plot mesh.
+Z = Z.reshape(xx.shape)
 plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
 
-# Plot also the training points
+# Plot training instances.
 plt.scatter(X[:, 0], X[:, 1], c=y, cmap=cmap_bold,
             edgecolor='k', s=20)
+
+# Set plot dimensions.
 plt.xlim(xx.min(), xx.max())
 plt.ylim(yy.min(), yy.max())
-plt.title('3-Class classification with FROVOCO')
+
+plt.title('FROVOCO applied to an imbalanced selection of iris dataset')
 
 plt.show()
 

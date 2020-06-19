@@ -1,6 +1,6 @@
 """
 ==================
-FRPS Preprocessing
+FRPS preprocessing
 ==================
 
 Sample usage of FRPS preprocessing, demonstrated in combination with (strict) FRNN classification.
@@ -36,11 +36,13 @@ x_min, x_max = X_orig[:, 0].min() - 1, X_orig[:, 0].max() + 1
 y_min, y_max = X_orig[:, 1].min() - 1, X_orig[:, 1].max() + 1
 xx, yy = np.meshgrid(np.arange(x_min, x_max, step_size), np.arange(y_min, y_max, step_size))
 
-# Define color maps
+# Define color maps.
 cmap_light = ListedColormap(['#FFAAAA', '#AAFFAA', '#AAAAFF'])
 cmap_bold = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
 
+# Initialise figure.
 plt.figure()
+
 for i, (aggr_name, aggr_R) in enumerate([('mean', np.mean), ('Łukasiewicz', lukasiewicz), ('min', np.amin)]):
     for j, quality_measure in enumerate(['upper', 'lower', 'both']):
         axes = plt.subplot(3, 3, i*3 + j + 1)
@@ -74,5 +76,5 @@ for i, (aggr_name, aggr_R) in enumerate([('mean', np.mean), ('Łukasiewicz', luk
         if axes.is_first_row():
             plt.title(quality_measure)
 
-plt.suptitle('FRPS preprocessing followed by strict FRNN', fontsize=14)
+plt.suptitle('FRNN applied to instances of iris dataset selected by FRPS', fontsize=14)
 plt.show()

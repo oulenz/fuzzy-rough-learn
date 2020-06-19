@@ -1,6 +1,6 @@
 """
 ==================
-FRFS Preprocessing
+FRFS preprocessing
 ==================
 
 Sample usage of FRFS preprocessing, demonstrated in combination with (strict) FRNN classification.
@@ -24,16 +24,18 @@ from frlearn.base import select_class
 from frlearn.neighbours import FRFS, FRNN
 from frlearn.utils.owa_operators import strict
 
-# Import example data and reduce to 2 dimensions.
+# Import example data.
 iris = datasets.load_iris()
 X_orig = iris.data
 y_orig = iris.target
 
-# Define color maps
+# Define color maps.
 cmap_light = ListedColormap(['#FFAAAA', '#AAFFAA', '#AAAAFF'])
 cmap_bold = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
 
-plt.figure()
+# Initialise figure with wide aspect for two side-by-side subfigures.
+plt.figure(figsize=(8, 4))
+
 for i, use_frfs in enumerate([False, True]):
     axes = plt.subplot(1, 2, i + 1)
 
@@ -67,12 +69,15 @@ for i, use_frfs in enumerate([False, True]):
     # Plot training instances.
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap=cmap_bold, edgecolor='k', s=20)
 
+    # Set subplot aspect to standard aspect ratio.
+    axes.set_aspect(1.0 / axes.get_data_ratio() * .75)
+
     # Set plot dimensions.
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
 
     # Describe the subfigures.
-    plt.title('...2 features selected by FRFS' if use_frfs else '...first 2 features')
+    plt.title('...two features selected by FRFS' if use_frfs else '...first two features')
 
-plt.suptitle('Strict FRNN with dataset reduced to...', fontsize=14)
+plt.suptitle('FRNN applied to iris dataset with ...', fontsize=14)
 plt.show()
