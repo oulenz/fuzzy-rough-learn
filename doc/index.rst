@@ -1,8 +1,3 @@
-.. fuzzy-rough-learn documentation master file, created by
-   sphinx-quickstart on Mon Jan 18 14:44:12 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to the documentation of fuzzy-rough-learn!
 ==================================================
 
@@ -41,3 +36,31 @@ A series of examples.
 ------------------------------
 
 Release history of fuzzy-rough-learn.
+
+Citing fuzzy-rough-learn
+------------------------
+
+If you use or refer to fuzzy-rough-learn in a scientific publication, please cite `this paper <https://link.springer.com/chapter/10.1007%2F978-3-030-52705-1_36>`_:
+
+.. code-block:: text
+
+  Lenz OU, Peralta D, Cornelis C (2020).
+  fuzzy-rough-learn 0.1: a Python library for machine learning with fuzzy rough sets.
+  IJCRS 2020: Proceedings of the International Joint Conference on Rough Sets, pp 491–499.
+  Lecture Notes in Artificial Intelligence, vol 12179, Springer.
+  doi: 10.1007/978-3-030-52705-1_36
+
+Bibtex entry:
+
+.. code-block:: text
+
+  @inproceedings{lenz20fuzzyroughlearn,
+    title={{f}uzzy-rough-learn 0.1: a {P}ython library for machine learning with fuzzy rough sets},
+    author={Lenz, Oliver Urs and Peralta, Daniel and Cornelis, Chris},
+    booktitle={{IJCRS} 2020: Proceedings of the International Joint Conference on Rough Sets},
+    pages={491--499},
+    year={2020},
+    series={Lecture Notes in Artificial Intelligence},
+    volume={12179},
+    publisher={Springer}
+  }
