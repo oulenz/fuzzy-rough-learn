@@ -77,7 +77,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'fuzzy-rough-learn'
-copyright = '2019, Oliver Urs Lenz'
+copyright = '2019–2020, Oliver Urs Lenz'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
