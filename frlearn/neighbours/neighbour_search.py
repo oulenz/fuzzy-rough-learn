@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Callable, Union
 
 from sklearn.neighbors._unsupervised import NearestNeighbors
 
@@ -52,11 +53,12 @@ class NNSearch(ABC):
             self._X = X
             self._len = len(X)
 
-        def query_self(self, k):
+        def query_self(self, k: Union[int, float, None]):
+            if callable(k):
+                k = k(len(self) - 1)
             return [a[:, 1:] for a in self.query(self._X, k + 1)]
 
-        @abstractmethod
-        def query(self, X, k: int):
+        def query(self, X, k: Union[int, Callable[[int], int]]):
             """
             Identify the k nearest neighbours for each of the instances in X.
 
@@ -65,8 +67,9 @@ class NNSearch(ABC):
             X : array shape=(n_instances, n_features, )
                 Query instances.
 
-            k : int
-                Number of neighbours to return
+            k : int or (int -> int)
+                Number of neighbours to return. Should be either a positive integer not larger than the index size,
+                or a function that takes the size of the index and returns such an integer.
 
             Returns
             -------
@@ -78,6 +81,12 @@ class NNSearch(ABC):
                 Distances to the k nearest neighbours among the construction
                 instances for each query instance.
             """
+            if callable(k):
+                k = k(len(self))
+            return self._query(X, k)
+
+        @abstractmethod
+        def _query(self, X, k: int):
             pass
 
         def __len__(self):
@@ -116,7 +125,7 @@ class BallTree(NNSearch):
             super().__init__(search, X)
             self.tree = NearestNeighbors(**search.construction_params).fit(X)
 
-        def query(self, X, k: int):
+        def _query(self, X, k: int):
             return self.tree.kneighbors(X, n_neighbors=k)[::-1]
 
 
@@ -152,5 +161,5 @@ class KDTree(NNSearch):
             super().__init__(search, X)
             self.tree = NearestNeighbors(**search.construction_params).fit(X)
 
-        def query(self, X, k: int):
+        def _query(self, X, k: int):
             return self.tree.kneighbors(X, n_neighbors=k)[::-1]
