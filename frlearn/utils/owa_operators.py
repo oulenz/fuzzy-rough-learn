@@ -173,6 +173,9 @@ class strict(OWAOperator):
         f = lambda k: np.append(np.ones(1), np.zeros(k - 1))
         super().__init__(f=f, name='strict')
 
+    def _apply(self, a, axis, flavour: str):
+        return a.take(indices=0, axis=axis)
+
 
 class additive(OWAOperator):
     def __init__(self):
@@ -202,6 +205,9 @@ class trimmed(OWAOperator):
     def __init__(self):
         f = lambda k: np.append(np.zeros(k - 1), np.ones(1))
         super().__init__(f=f, name='trimmed')
+
+    def _apply(self, a, axis, flavour: str):
+        return a.take(indices=-1, axis=axis)
 
 class deltaquadsigmoid(OWAOperator):
     def __init__(self, alpha, beta):
