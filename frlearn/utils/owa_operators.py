@@ -216,12 +216,5 @@ class deltaquadsigmoid(OWAOperator):
                             np.where(a >= beta, 1,
                                      np.where(a <= (alpha + beta) / 2, 2 * (a - alpha) ** 2 / (beta - alpha) ** 2,
                                               1 - 2 * (a - beta) ** 2 / (beta - alpha) ** 2)))
-            if a <= alpha:
-                return 0
-            if a >= beta:
-                return 1
-            if a <= (alpha + beta) / 2:
-                return 2 * (a - alpha) ** 2 / (beta - alpha) ** 2
-            return 1 - 2 * (a - beta) ** 2 / (beta - alpha) ** 2
         f = lambda k: Q(np.arange(1, k+1) / k) - Q(np.arange(k) / k)
         super().__init__(f=f, name='vague_quantifier_{}_{}'.format(alpha, beta))
