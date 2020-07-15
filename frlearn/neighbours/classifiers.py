@@ -4,17 +4,17 @@ from __future__ import annotations
 import numpy as np
 
 from frlearn.base import Descriptor, MultiClassClassifier, MultiLabelClassifier
-from frlearn.neighbours.descriptors import ComplementedDistance
+from frlearn.neighbours.descriptors import NND
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
-from frlearn.utils.np_utils import div_or, fractional_k
+from frlearn.utils.np_utils import div_or, fractional_k, truncated_complement
 from frlearn.utils.owa_operators import OWAOperator, additive, exponential
 
 
 class FuzzyRoughEnsemble(MultiClassClassifier):
     def __init__(
             self,
-            upper_approximator: Descriptor = ComplementedDistance(),
-            lower_approximator: Descriptor = ComplementedDistance(),
+            upper_approximator: Descriptor = NND(k=40, owa=additive(), proximity=truncated_complement),
+            lower_approximator: Descriptor = NND(k=40, owa=additive(), proximity=truncated_complement),
             nn_search: NNSearch = KDTree(),
     ):
         self.upper_approximator = upper_approximator
@@ -98,8 +98,8 @@ class FRNN(FuzzyRoughEnsemble):
     def __init__(self, *, upper_weights: OWAOperator = additive(), upper_k: int = 20,
                  lower_weights: OWAOperator = additive(), lower_k: int = 20,
                  nn_search: NNSearch = KDTree()):
-        upper_approximator = ComplementedDistance(owa=upper_weights, k=upper_k) if upper_weights else None
-        lower_approximator = ComplementedDistance(owa=lower_weights, k=lower_k) if lower_weights else None
+        upper_approximator = NND(owa=upper_weights, k=upper_k, proximity=truncated_complement) if upper_weights else None
+        lower_approximator = NND(owa=lower_weights, k=lower_k, proximity=truncated_complement) if lower_weights else None
         super().__init__(upper_approximator, lower_approximator, nn_search)
 
 
@@ -126,8 +126,8 @@ class FROVOCO(MultiClassClassifier):
             self,
             nn_search: NNSearch = KDTree(),
     ):
-        self.exponential_approximator = ComplementedDistance(owa=exponential(), k=None)
-        self.additive_approximator = ComplementedDistance(owa=additive(), k=.1)
+        self.exponential_approximator = NND(owa=exponential(), k=fractional_k(1), proximity=truncated_complement)
+        self.additive_approximator = NND(owa=additive(), k=fractional_k(.1), proximity=truncated_complement)
         self.nn_search = nn_search
 
     class Model(MultiClassClassifier.Model):

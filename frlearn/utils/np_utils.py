@@ -210,3 +210,39 @@ def div_or(x, y, fallback=np.nan):
 def remove_diagonal(a):
     #TODO: parametrise dimensions
     return a[~np.eye(a.shape[0], dtype=bool)].reshape(a.shape[0], -1)
+
+
+def shifted_reciprocal(x):
+    """
+    Order-reversing function from [0, ∞) to [0, 1] that sends `x` to `1/(1 + x)`.
+    Strictly order-reversing, but does not preserve absolute differences.
+
+    Parameters
+    ----------
+    x : float
+        Input value. Should be in `[0, ∞)`.
+
+    Returns
+    -------
+    y : float
+        Output value in [0, 1].
+    """
+    return 1/(1 + x)
+
+
+def truncated_complement(x):
+    """
+    Order-reversing function from [0, ∞) to [0, 1] that sends `x` to `max(0, 1 - x)`.
+    Preserves absolute differences for values under 1, but discards all differences for larger values.
+
+    Parameters
+    ----------
+    x : float
+        Input value. Should be in `[0, ∞)`.
+
+    Returns
+    -------
+    y : float
+        Output value in [0, 1].
+    """
+    return np.maximum(0, 1 - x)
