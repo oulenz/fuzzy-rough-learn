@@ -6,7 +6,7 @@ import numpy as np
 from frlearn.base import Descriptor, MultiClassClassifier, MultiLabelClassifier
 from frlearn.neighbours.descriptors import ComplementedDistance
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
-from frlearn.utils.np_utils import div_or
+from frlearn.utils.np_utils import div_or, fractional_k
 from frlearn.utils.owa_operators import OWAOperator, additive, exponential
 
 
@@ -278,7 +278,9 @@ class FRONEC(MultiLabelClassifier):
             return np.sum(np.minimum(self.Y, Q[..., None]), axis=1) / np.sum(Q, axis=-1, keepdims=True)
 
         def _Q_1(self, neighbours, R):
-            return self.owa_weights.soft_min(np.minimum(1 - R[..., None] + self.R_d[neighbours, :] - 1, 1), axis=1)
+            vals = np.minimum(1 - R[..., None] + self.R_d[neighbours, :] - 1, 1)
+            return self.owa_weights.soft_min(vals, k=fractional_k(1), axis=1)
 
         def _Q_2(self, neighbours, R):
-            return self.owa_weights.soft_max(np.maximum(R[..., None] + self.R_d[neighbours, :] - 1, 0), axis=1)
+            vals = np.maximum(R[..., None] + self.R_d[neighbours, :] - 1, 0)
+            return self.owa_weights.soft_max(vals, k=fractional_k(1), axis=1)

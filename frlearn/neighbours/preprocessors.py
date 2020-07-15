@@ -5,7 +5,7 @@ import numpy as np
 
 from frlearn.base import Preprocessor
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
-from frlearn.utils.np_utils import remove_diagonal
+from frlearn.utils.np_utils import fractional_k, remove_diagonal
 from frlearn.utils.owa_operators import OWAOperator, invadd, deltaquadsigmoid
 from frlearn.utils.t_norms import lukasiewicz
 
@@ -198,9 +198,13 @@ class FRPS(Preprocessor):
         return X_unscaled[Q >= best_tau], y[Q >= best_tau]
 
     def _upper(self, Cs):
-        return np.concatenate([self.owa.soft_max(remove_diagonal(
-            self.aggr_R(1 - np.abs(C[:, None, :] - C), axis=-1)), axis=-1) for C in Cs], axis=0)
+        return np.concatenate([self.owa.soft_max(
+            remove_diagonal(self.aggr_R(1 - np.abs(C[:, None, :] - C), axis=-1)),
+            k=fractional_k(1), axis=-1
+        ) for C in Cs], axis=0)
 
     def _lower(self, Cs, co_Cs):
         return np.concatenate([self.owa.soft_min(
-            self.aggr_R(np.abs(C[:, None, :] - co_C), axis=-1), axis=-1) for C, co_C in zip(Cs, co_Cs)], axis=0)
+            self.aggr_R(np.abs(C[:, None, :] - co_C), axis=-1),
+            k=fractional_k(1), axis=-1
+        ) for C, co_C in zip(Cs, co_Cs)], axis=0)
