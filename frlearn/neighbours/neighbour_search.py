@@ -4,19 +4,21 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Callable, Union
 
+import numpy as np
 from sklearn.neighbors._unsupervised import NearestNeighbors
 
 
 class NNSearch(ABC):
     """
     Abstract base class for nearest neighbour searches. Subclasses must
-    implement __init__ and Index.
+    implement __init__, construct and Index.query.
     """
 
     @abstractmethod
     def __init__(self, **kwargs):
         pass
 
+    @abstractmethod
     def construct(self, X) -> Index:
         """
         Construct the index based on the data X.
@@ -31,27 +33,15 @@ class NNSearch(ABC):
         I : Index
             Constructed index
         """
-        return self.Index(self, X)
+        index = self.Index.__new__(self.Index)
+        index._X = X
+        index._len = len(X)
+        return index
 
     class Index(ABC):
 
-        """
-        Abstract base class for the index object created by NNSearch.construct.
-        Subclasses must implement __init__ and query.
-
-        Parameters
-        ----------
-        search : NNSearch
-            The search object that contains all the relevant parametre values.
-
-        X : array shape=(n_instances, n_features, )
-            Construction instances.
-        """
-
-        @abstractmethod
-        def __init__(self, search: NNSearch, X):
-            self._X = X
-            self._len = len(X)
+        _X: np.array
+        _len: int
 
         def query_self(self, k: Union[int, float, None]):
             if callable(k):
@@ -119,11 +109,14 @@ class BallTree(NNSearch):
             'n_jobs': n_jobs,
         }
 
+    def construct(self, X) -> Index:
+        index = super().construct(X)
+        index.tree = NearestNeighbors(**self.construction_params).fit(X)
+        return index
+
     class Index(NNSearch.Index):
 
-        def __init__(self, search: BallTree, X):
-            super().__init__(search, X)
-            self.tree = NearestNeighbors(**search.construction_params).fit(X)
+        tree: NearestNeighbors
 
         def _query(self, X, k: int):
             return self.tree.kneighbors(X, n_neighbors=k)[::-1]
@@ -155,11 +148,14 @@ class KDTree(NNSearch):
             'n_jobs': n_jobs,
         }
 
+    def construct(self, X) -> Index:
+        index = super().construct(X)
+        index.tree = NearestNeighbors(**self.construction_params).fit(X)
+        return index
+
     class Index(NNSearch.Index):
 
-        def __init__(self, search: KDTree, X):
-            super().__init__(search, X)
-            self.tree = NearestNeighbors(**search.construction_params).fit(X)
+        tree: NearestNeighbors
 
         def _query(self, X, k: int):
             return self.tree.kneighbors(X, n_neighbors=k)[::-1]
