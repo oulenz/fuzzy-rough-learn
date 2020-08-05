@@ -17,24 +17,15 @@ class Descriptor(ABC):
     def __init__(self):
         pass
 
-    def construct(self, *args, **kwargs):
-        return self.Description(self, *args, **kwargs)
+    @abstractmethod
+    def construct(self, X):
+        return self.Description.__new__(self.Description)
 
     class Description(ABC):
 
         @abstractmethod
-        def __init__(self, descriptor, *args, **kwargs):
-            pass
-
-        @abstractmethod
         def query(self, X):
             pass
-
-        def copy(self, **attribute_values):
-            other = copy(self)
-            for a, v in attribute_values.items():
-                setattr(other, a, v)
-            return other
 
 
 class Classifier(ABC):

@@ -6,6 +6,7 @@ from typing import Callable, Union
 
 import numpy as np
 
+from .neighbour_search import KDTree, NNSearch
 from ..base import Descriptor
 from ..utils.np_utils import div_or, shifted_reciprocal
 from ..utils.owa_operators import OWAOperator, trimmed
@@ -14,14 +15,22 @@ from ..utils.owa_operators import OWAOperator, trimmed
 class NNDescriptor(Descriptor):
 
     @abstractmethod
-    def __init__(self, k: Union[int, Callable[[int], int]], *args, **kwargs):
+    def __init__(self, nn_search: NNSearch, k: Union[int, Callable[[int], int]], *args, **kwargs):
+        self.nn_search = nn_search
         self.k = k
+
+    @abstractmethod
+    def construct(self, X):
+        description = super().construct(X)
+        index = self.nn_search.construct(X)
+        description.index = index
+        description.k = self.k(len(index)) if callable(self.k) else self.k
+        return description
 
     class Description(Descriptor.Description):
 
-        def __init__(self, descriptor, index):
-            self.k = descriptor.k(len(index)) if callable(descriptor.k) else descriptor.k
-            self.index = index
+        index: NNSearch.Index
+        k: int
 
         def query(self, X):
             q_neighbours, q_distances = self.index.query(X, self.k)
@@ -74,20 +83,25 @@ class NND(NNDescriptor):
 
     def __init__(
             self,
+            nn_search: NNSearch = KDTree(),
             k: Union[int, Callable[[int], int]] = 1,
             proximity: Callable[[float], float] = shifted_reciprocal,
             owa: OWAOperator = trimmed(),
     ):
-        super().__init__(k=k)
+        super().__init__(nn_search=nn_search, k=k)
         self.proximity = proximity
         self.owa = owa
 
+    def construct(self, X):
+        description: NND.Description = super().construct(X)
+        description.proximity = self.proximity
+        description.owa = self.owa
+        return description
+
     class Description(NNDescriptor.Description):
 
-        def __init__(self, descriptor, index):
-            super().__init__(descriptor, index)
-            self.proximity = descriptor.proximity
-            self.owa = descriptor.owa
+        proximity: Callable[[float], float]
+        owa: OWAOperator
 
         def _query(self, q_neighbours, q_distances):
             proximities = self.proximity(q_distances)
@@ -126,15 +140,18 @@ class LNND(NNDescriptor):
        <https://link.springer.com/chapter/10.1007/BFb0033283>`_
     """
 
-    def __init__(self, k: Union[int, Callable[[int], int]] = 1):
-        super().__init__(k=k)
+    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
+        super().__init__(nn_search=nn_search, k=k)
+
+    def construct(self, X):
+        description: LNND.Description = super().construct(X)
+        _, distances = description.index.query_self(description.k)
+        description.distances = distances[:, -1]
+        return description
 
     class Description(NNDescriptor.Description):
 
-        def __init__(self, descriptor, index):
-            super().__init__(descriptor, index)
-            _, distances = index.query_self(self.k)
-            self.distances = distances[:, self.k-1]
+        distances: np.ndarray
 
         def _query(self, q_neighbours, q_distances):
             # if both distances are zero, default to 1
@@ -170,16 +187,20 @@ class LOF(NNDescriptor):
        <https://dl.acm.org/doi/abs/10.1145/342009.335388>`_
     """
 
-    def __init__(self, k: Union[int, Callable[[int], int]] = 1):
-        super().__init__(k=k)
+    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
+        super().__init__(nn_search=nn_search, k=k)
+
+    def construct(self, X):
+        description: LOF.Description = super().construct(X)
+        neighbours, distances = description.index.query_self(description.k)
+        description.distances = distances[:, -1]
+        description.lrd = description._get_lrd(neighbours, distances)
+        return description
 
     class Description(NNDescriptor.Description):
 
-        def __init__(self, model, index):
-            super().__init__(model, index)
-            neighbours, distances = index.query_self(self.k)
-            self.distances = distances[:, self.k-1]
-            self.lrd = self._get_lrd(neighbours, distances)
+        distances: np.ndarray
+        lrd: np.ndarray
 
         def _get_lrd(self, q_neighbours, q_distances):
             r_distances = np.maximum(q_distances, self.distances[q_neighbours])

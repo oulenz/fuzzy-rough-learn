@@ -15,23 +15,19 @@ class FuzzyRoughEnsemble(MultiClassClassifier):
             self,
             upper_approximator: Descriptor = NND(k=40, owa=additive(), proximity=truncated_complement),
             lower_approximator: Descriptor = NND(k=40, owa=additive(), proximity=truncated_complement),
-            nn_search: NNSearch = KDTree(),
     ):
         self.upper_approximator = upper_approximator
         self.lower_approximator = lower_approximator
-        self.nn_search = nn_search
 
     class Model(MultiClassClassifier.Model):
         def __init__(self, classifier, X, y):
             super().__init__(classifier, X, y)
 
             Cs = [X[np.where(y == c)] for c in self.classes]
-            indices = [classifier.nn_search.construct(C) for C in Cs]
-            self.upper_approximations = [classifier.upper_approximator.construct(index) for index in indices]
+            self.upper_approximations = [classifier.upper_approximator.construct(C) for C in Cs]
 
             co_Cs = [X[np.where(y != c)] for c in self.classes]
-            co_indices = [classifier.nn_search.construct(co_C) for co_C in co_Cs]
-            self.lower_approximations = [classifier.lower_approximator.construct(co_index) for co_index in co_indices]
+            self.lower_approximations = [classifier.lower_approximator.construct(co_C) for co_C in co_Cs]
 
         def query(self, X):
             vals = []
@@ -98,9 +94,9 @@ class FRNN(FuzzyRoughEnsemble):
     def __init__(self, *, upper_weights: OWAOperator = additive(), upper_k: int = 20,
                  lower_weights: OWAOperator = additive(), lower_k: int = 20,
                  nn_search: NNSearch = KDTree()):
-        upper_approximator = NND(owa=upper_weights, k=upper_k, proximity=truncated_complement) if upper_weights else None
-        lower_approximator = NND(owa=lower_weights, k=lower_k, proximity=truncated_complement) if lower_weights else None
-        super().__init__(upper_approximator, lower_approximator, nn_search)
+        upper_approximator = NND(owa=upper_weights, k=upper_k, proximity=truncated_complement, nn_search=nn_search) if upper_weights else None
+        lower_approximator = NND(owa=lower_weights, k=lower_k, proximity=truncated_complement, nn_search=nn_search) if lower_weights else None
+        super().__init__(upper_approximator, lower_approximator)
 
 
 class FROVOCO(MultiClassClassifier):
@@ -126,9 +122,8 @@ class FROVOCO(MultiClassClassifier):
             self,
             nn_search: NNSearch = KDTree(),
     ):
-        self.exponential_approximator = NND(owa=exponential(), k=fractional_k(1), proximity=truncated_complement)
-        self.additive_approximator = NND(owa=additive(), k=fractional_k(.1), proximity=truncated_complement)
-        self.nn_search = nn_search
+        self.exponential_approximator = NND(owa=exponential(), k=fractional_k(1), proximity=truncated_complement, nn_search=nn_search)
+        self.additive_approximator = NND(owa=additive(), k=fractional_k(.1), proximity=truncated_complement, nn_search=nn_search)
 
     class Model(MultiClassClassifier.Model):
         def __init__(self, classifier, X, y):
@@ -145,14 +140,11 @@ class FROVOCO(MultiClassClassifier):
             self.ova_ir = np.array([c_n / (len(X) - c_n) for c_n in class_sizes])
             max_ir = np.max(self.ovo_ir, axis=1)
 
-            indices = [classifier.nn_search.construct(C) for C in Cs]
-            co_indices = [classifier.nn_search.construct(co_C) for co_C in co_Cs]
-
             add_construct = classifier.additive_approximator.construct
             exp_construct = classifier.exponential_approximator.construct
-            self.add_approx = [add_construct(index) if ir > 9 else None for ir, index in zip(max_ir, indices)]
-            self.exp_approx = [exp_construct(index) if ir <= 9 else None for ir, index in zip(self.ova_ir, indices)]
-            self.co_approx = [add_construct(co_index) if 1/ir > 9 else exp_construct(co_index) for ir, co_index in zip(self.ova_ir, co_indices)]
+            self.add_approx = [add_construct(C) if ir > 9 else None for ir, C in zip(max_ir, Cs)]
+            self.exp_approx = [exp_construct(C) if ir <= 9 else None for ir, C in zip(self.ova_ir, Cs)]
+            self.co_approx = [(add_construct if 1/ir > 9 else exp_construct)(co_C) for ir, co_C in zip(self.ova_ir, co_Cs)]
 
             self.sig = np.array([self._sig(C) for C in Cs])
 
