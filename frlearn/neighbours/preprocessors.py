@@ -73,7 +73,7 @@ class FRFS(Preprocessor):
 
     def _POS_size(self, R_a):
         R = self.t_norm(R_a, axis=-1)
-        return np.sum(self.owa_weights.soft_min(1 - R, axis=-1))
+        return np.sum(self.owa_weights.soft_min(1 - R, k=fractional_k(1), axis=-1))
 
 
 class FRPS(Preprocessor):
