@@ -34,42 +34,45 @@ class Classifier(ABC):
     def __init__(self):
         pass
 
-    def construct(self, X, y, *args, **kwargs):
-        return self.Model(self, X, y, *args, **kwargs)
+    @abstractmethod
+    def construct(self, X, _):
+        model = self.Model.__new__(self.Model)
+        model.n_attributes = X.shape[-1]
+        return model
 
     class Model(ABC):
 
-        def __init__(self, classifier, X, *args, **kwargs):
-            self.n_attributes = X.shape[-1]
+        n_attributes: int
 
         @abstractmethod
         def query(self, X):
             pass
 
-        def copy(self, **attribute_values):
-            other = copy(self)
-            for a, v in attribute_values.items():
-                setattr(other, a, v)
-            return other
-
 
 class MultiClassClassifier(Classifier):
 
+    def construct(self, X, y):
+        model = super().construct(X, y)
+        model.classes = np.unique(y)
+        model.n_classes = len(model.classes)
+        return model
+
     class Model(Classifier.Model):
 
-        def __init__(self, classifier, X, y):
-            super().__init__(classifier, X)
-            self.classes = np.unique(y)
-            self.n_classes = len(self.classes)
+        classes: np.array
+        n_classes: int
 
 
 class MultiLabelClassifier(Classifier):
 
+    def construct(self, X, Y):
+        model = super().construct(X, Y)
+        model.n_classes = Y.shape[1]
+        return model
+
     class Model(Classifier.Model):
 
-        def __init__(self, classifier, X, Y):
-            super().__init__(classifier, X)
-            self.n_classes = Y.shape[1]
+        n_classes: int
 
 
 class Preprocessor(ABC):
