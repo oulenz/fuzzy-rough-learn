@@ -20,20 +20,20 @@ class NNDescriptor(Descriptor):
         self.k = k
 
     @abstractmethod
-    def construct(self, X):
-        description = super().construct(X)
-        index = self.nn_search.construct(X)
-        description.index = index
-        description.k = self.k(len(index)) if callable(self.k) else self.k
-        return description
+    def construct(self, X) -> Model:
+        model = super().construct(X)
+        nn_model = self.nn_search.construct(X)
+        model.nn_model = nn_model
+        model.k = self.k(len(nn_model)) if callable(self.k) else self.k
+        return model
 
-    class Description(Descriptor.Description):
+    class Model(Descriptor.Model):
 
-        index: NNSearch.Index
+        nn_model: NNSearch.Model
         k: int
 
         def query(self, X):
-            q_neighbours, q_distances = self.index.query(X, self.k)
+            q_neighbours, q_distances = self.nn_model.query(X, self.k)
             return self._query(q_neighbours, q_distances)
 
         @abstractmethod
@@ -92,13 +92,13 @@ class NND(NNDescriptor):
         self.proximity = proximity
         self.owa = owa
 
-    def construct(self, X):
-        description: NND.Description = super().construct(X)
-        description.proximity = self.proximity
-        description.owa = self.owa
-        return description
+    def construct(self, X) -> Model:
+        model: NND.Model = super().construct(X)
+        model.proximity = self.proximity
+        model.owa = self.owa
+        return model
 
-    class Description(NNDescriptor.Description):
+    class Model(NNDescriptor.Model):
 
         proximity: Callable[[float], float]
         owa: OWAOperator
@@ -143,13 +143,13 @@ class LNND(NNDescriptor):
     def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
         super().__init__(nn_search=nn_search, k=k)
 
-    def construct(self, X):
-        description: LNND.Description = super().construct(X)
-        _, distances = description.index.query_self(description.k)
-        description.distances = distances[:, -1]
-        return description
+    def construct(self, X) -> Model:
+        model: LNND.Model = super().construct(X)
+        _, distances = model.nn_model.query_self(model.k)
+        model.distances = distances[:, -1]
+        return model
 
-    class Description(NNDescriptor.Description):
+    class Model(NNDescriptor.Model):
 
         distances: np.ndarray
 
@@ -190,14 +190,14 @@ class LOF(NNDescriptor):
     def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
         super().__init__(nn_search=nn_search, k=k)
 
-    def construct(self, X):
-        description: LOF.Description = super().construct(X)
-        neighbours, distances = description.index.query_self(description.k)
-        description.distances = distances[:, -1]
-        description.lrd = description._get_lrd(neighbours, distances)
-        return description
+    def construct(self, X) -> Model:
+        model: LOF.Model = super().construct(X)
+        neighbours, distances = model.nn_model.query_self(model.k)
+        model.distances = distances[:, -1]
+        model.lrd = model._get_lrd(neighbours, distances)
+        return model
 
-    class Description(NNDescriptor.Description):
+    class Model(NNDescriptor.Model):
 
         distances: np.ndarray
         lrd: np.ndarray

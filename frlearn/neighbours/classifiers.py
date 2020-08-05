@@ -21,8 +21,8 @@ class FuzzyRoughEnsemble(MultiClassClassifier):
         self.upper_approximator = upper_approximator
         self.lower_approximator = lower_approximator
 
-    def construct(self, X, y):
-        model = super().construct(X, y)
+    def construct(self, X, y) -> Model:
+        model: FuzzyRoughEnsemble.Model = super().construct(X, y)
         Cs = [X[np.where(y == c)] for c in model.classes]
         model.upper_approximations = [self.upper_approximator.construct(C) for C in Cs]
         co_Cs = [X[np.where(y != c)] for c in model.classes]
@@ -31,8 +31,8 @@ class FuzzyRoughEnsemble(MultiClassClassifier):
 
     class Model(MultiClassClassifier.Model):
 
-        upper_approximations: List[Descriptor.Description]
-        lower_approximations: List[Descriptor.Description]
+        upper_approximations: List[Descriptor.Model]
+        lower_approximations: List[Descriptor.Model]
 
         def query(self, X):
             vals = []
@@ -130,10 +130,10 @@ class FROVOCO(MultiClassClassifier):
         self.exponential_approximator = NND(owa=exponential(), k=fractional_k(1), proximity=truncated_complement, nn_search=nn_search)
         self.additive_approximator = NND(owa=additive(), k=fractional_k(.1), proximity=truncated_complement, nn_search=nn_search)
 
-    def construct(self, X, y):
-        model = super().construct(X, y)
+    def construct(self, X, y) -> Model:
+        model: FROVOCO.Model = super().construct(X, y)
 
-        model.scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.n_attributes
+        model.scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.m
         X = X.copy() / model.scale
 
         Cs = [X[np.where(y == c)] for c in model.classes]
@@ -159,9 +159,9 @@ class FROVOCO(MultiClassClassifier):
         scale: np.array
         ovo_ir: np.array
         ova_ir: np.array
-        add_approx: List[Optional[Descriptor.Description]]
-        exp_approx: List[Optional[Descriptor.Description]]
-        co_approx: List[Descriptor.Description]
+        add_approx: List[Optional[Descriptor.Model]]
+        exp_approx: List[Optional[Descriptor.Model]]
+        co_approx: List[Descriptor.Model]
         sig: np.array
 
         def _sig(self, C):
@@ -240,18 +240,17 @@ class FRONEC(MultiLabelClassifier):
         self.owa_weights = owa_weights
         self.nn_search = nn_search
 
-    def construct(self, X, Y):
-        model = super().construct(X, Y)
-        model.scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.n_attributes
+    def construct(self, X, Y) -> Model:
+        model: FRONEC.Model = super().construct(X, Y)
+        model.scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.m
         X = X.copy() / model.scale
         model.Q_type = self.Q_type
         model.R_d = model._R_d_2(Y) if self.R_d_type == 2 else model._R_d_1(Y)
         model.k = self.k
         model.owa_weights = self.owa_weights
-        model.index = self.nn_search.construct(X)
+        model.nn_model = self.nn_search.construct(X)
         model.Y = Y
         return model
-
 
     class Model(MultiLabelClassifier.Model):
 
@@ -260,7 +259,7 @@ class FRONEC(MultiLabelClassifier):
         R_d: np.array
         k: int
         owa_weights: OWAOperator
-        index: NNSearch.Index
+        nn_model: NNSearch.Model
         Y: np.array
 
         @staticmethod
@@ -282,7 +281,7 @@ class FRONEC(MultiLabelClassifier):
 
         def query(self, X):
             X = X.copy() / self.scale
-            neighbours, distances = self.index.query(X, self.k)
+            neighbours, distances = self.nn_model.query(X, self.k)
             R = np.maximum(1 - distances, 0)
             if self.Q_type == 1:
                 Q = self._Q_1(neighbours, R)

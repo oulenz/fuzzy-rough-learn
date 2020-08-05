@@ -184,11 +184,11 @@ class FRPS(Preprocessor):
         for tau in np.unique(Q):
             if np.sum(Q >= tau) <= 1:
                 continue
-            index = self.nn_search.construct(X[Q >= tau])
-            neighbours = index.query(X[Q >= tau], k=2)[0][:, 1]
+            nn_model = self.nn_search.construct(X[Q >= tau])
+            neighbours = nn_model.query(X[Q >= tau], k=2)[0][:, 1]
             deselected = X[Q < tau]
             if len(deselected) >= 1:
-                neighbours = np.concatenate([neighbours, index.query(deselected, k=1)[0][:, 0]])
+                neighbours = np.concatenate([neighbours, nn_model.query(deselected, k=1)[0][:, 0]])
             S_y = y[Q >= tau]
             y_neighbours = S_y[neighbours]
             acc = np.sum(y_neighbours == np.concatenate([y[Q >= tau], y[Q < tau]]))

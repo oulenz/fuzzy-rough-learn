@@ -11,45 +11,41 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 
-class Descriptor(ABC):
+class ModelFactory(ABC):
 
     @abstractmethod
-    def __init__(self):
-        pass
-
-    @abstractmethod
-    def construct(self, X):
-        return self.Description.__new__(self.Description)
-
-    class Description(ABC):
-
-        @abstractmethod
-        def query(self, X):
-            pass
-
-
-class Classifier(ABC):
-
-    @abstractmethod
-    def __init__(self):
-        pass
-
-    @abstractmethod
-    def construct(self, X, _):
+    def construct(self, X, *args, **kwargs) -> ModelFactory.Model:
         model = self.Model.__new__(self.Model)
-        model.n_attributes = X.shape[-1]
+        model.n, model.m = X.shape
         return model
 
     class Model(ABC):
 
-        n_attributes: int
+        n: int
+        m: int
+
+        @abstractmethod
+        def query(self, X, *args, **kwargs):
+            pass
+
+        def __len__(self):
+            return self.n
+
+
+class Descriptor(ModelFactory):
+
+    @abstractmethod
+    def construct(self, X):
+        return super().construct(X)
+
+    class Model(ModelFactory.Model):
 
         @abstractmethod
         def query(self, X):
             pass
 
 
-class MultiClassClassifier(Classifier):
+class MultiClassClassifier(ModelFactory):
 
     def construct(self, X, y):
         model = super().construct(X, y)
@@ -57,22 +53,30 @@ class MultiClassClassifier(Classifier):
         model.n_classes = len(model.classes)
         return model
 
-    class Model(Classifier.Model):
+    class Model(ModelFactory.Model):
 
         classes: np.array
         n_classes: int
 
+        @abstractmethod
+        def query(self, X):
+            pass
 
-class MultiLabelClassifier(Classifier):
+
+class MultiLabelClassifier(ModelFactory):
 
     def construct(self, X, Y):
         model = super().construct(X, Y)
-        model.n_classes = Y.shape[1]
+        model.n_labels = Y.shape[1]
         return model
 
-    class Model(Classifier.Model):
+    class Model(ModelFactory.Model):
 
-        n_classes: int
+        n_labels: int
+
+        @abstractmethod
+        def query(self, X):
+            pass
 
 
 class Preprocessor(ABC):
@@ -93,7 +97,7 @@ def select_class(scores, abstention_threshold: float = -1, labels=None):
     
     Parameters
     ----------
-    scores : array shape=(n_instances, n_classes, )
+    scores : array shape=(n, n_classes, )
         Array of class scores. Scores should be values in `[0, 1]`
     abstention_threshold : float=-1
         Threshold to use for predicting one of the classes.
@@ -104,7 +108,7 @@ def select_class(scores, abstention_threshold: float = -1, labels=None):
 
     Returns
     -------
-    predictions : array shape=(n_instances, )
+    predictions : array shape=(n, )
         Class label for each query instance.
     
     """
@@ -123,14 +127,14 @@ def discretise(scores, threshold: float = 0.5, ):
 
     Parameters
     ----------
-    scores : array shape=(n_instances, n_classes, )
+    scores : array shape=(n, n_classes, )
         Array of class scores. Scores should be values in `[0, 1]`
     threshold : float=0.5
         Threshold to use for selecting labels.
 
     Returns
     -------
-    predictions : array shape=(n_instances, )
+    predictions : array shape=(n, )
         Class label for each query instance.
 
     """
@@ -144,12 +148,12 @@ def probabilities_from_scores(scores):
 
     Parameters
     ----------
-    scores : array shape=(n_instances, n_classes, )
+    scores : array shape=(n, n_classes, )
         Array of class scores.
 
     Returns
     -------
-    probabilities : array shape=(n_instances, n_classes, )
+    probabilities : array shape=(n, n_classes, )
         Array of class probabilities.
 
     """
@@ -164,14 +168,20 @@ class FitPredictClassifier(BaseEstimator, ClassifierMixin, ):
 
     Parameters
     ----------
-    classifier_or_class : {type, Classifier}
-        Either an initialised Classifier, or a Classifier subclass. If a Classifier subclass, will be initialised with
+    classifier_or_class : type or MultiClassClassifier or MultiLabelClassifier}
+        Either an initialised classifier, or a classifier class. If a class, will be initialised with
         all remaining positional and keyword arguments.
     """
 
-    def __init__(self, classifier_or_class: Union[type(Classifier), Classifier], *args, **kwargs):
+    def __init__(
+            self,
+            classifier_or_class: Union[
+                type(Union[MultiClassClassifier, MultiLabelClassifier]),
+                Union[MultiClassClassifier, MultiLabelClassifier]
+            ],
+            *args, **kwargs):
         super().__init__()
-        if isinstance(classifier_or_class, Classifier):
+        if isinstance(classifier_or_class, ModelFactory):
             self.classifier = classifier_or_class
         self.classifier = classifier_or_class(*args, **kwargs)
 

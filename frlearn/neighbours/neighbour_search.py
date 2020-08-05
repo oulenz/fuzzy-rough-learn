@@ -7,45 +7,40 @@ from typing import Callable, Union
 import numpy as np
 from sklearn.neighbors._unsupervised import NearestNeighbors
 
+from frlearn.base import ModelFactory
 
-class NNSearch(ABC):
+
+class NNSearch(ModelFactory):
     """
     Abstract base class for nearest neighbour searches. Subclasses must
-    implement __init__, construct and Index.query.
+    implement Model._query (and typically __init__ and construct).
     """
 
-    @abstractmethod
-    def __init__(self, **kwargs):
-        pass
-
-    @abstractmethod
-    def construct(self, X) -> Index:
+    def construct(self, X) -> Model:
         """
-        Construct the index based on the data X.
+        Construct the model based on the data X.
 
         Parameters
         ----------
-        X : array shape=(n_instances, n_features, )
+        X : array shape=(n, m, )
             Construction instances.
 
         Returns
         -------
-        I : Index
-            Constructed index
+        M : Model
+            Constructed model
         """
-        index = self.Index.__new__(self.Index)
-        index._X = X
-        index._len = len(X)
-        return index
+        model = super().construct(X)
+        model._X = X
+        return model
 
-    class Index(ABC):
+    class Model(ModelFactory.Model):
 
         _X: np.array
-        _len: int
 
         def query_self(self, k: Union[int, float, None]):
             if callable(k):
-                k = k(len(self) - 1)
+                k = k(self.n - 1)
             return [a[:, 1:] for a in self.query(self._X, k + 1)]
 
         def query(self, X, k: Union[int, Callable[[int], int]]):
@@ -54,33 +49,30 @@ class NNSearch(ABC):
 
             Parameters
             ----------
-            X : array shape=(n_instances, n_features, )
+            X : array shape=(n, m, )
                 Query instances.
 
             k : int or (int -> int)
-                Number of neighbours to return. Should be either a positive integer not larger than the index size,
-                or a function that takes the size of the index and returns such an integer.
+                Number of neighbours to return. Should be either a positive integer not larger than the model size,
+                or a function that takes the size of the model and returns such an integer.
 
             Returns
             -------
-            I : array shape=(n_instances, k, )
+            I : array shape=(n, k, )
                 Indices of the k nearest neighbours among the construction
                 instances for each query instance.
 
-            D : array shape=(n_instances, k, )
+            D : array shape=(n, k, )
                 Distances to the k nearest neighbours among the construction
                 instances for each query instance.
             """
             if callable(k):
-                k = k(len(self))
+                k = k(self.n)
             return self._query(X, k)
 
         @abstractmethod
         def _query(self, X, k: int):
             pass
-
-        def __len__(self):
-            return self._len
 
 
 class BallTree(NNSearch):
@@ -109,12 +101,12 @@ class BallTree(NNSearch):
             'n_jobs': n_jobs,
         }
 
-    def construct(self, X) -> Index:
-        index = super().construct(X)
-        index.tree = NearestNeighbors(**self.construction_params).fit(X)
-        return index
+    def construct(self, X) -> Model:
+        model = super().construct(X)
+        model.tree = NearestNeighbors(**self.construction_params).fit(X)
+        return model
 
-    class Index(NNSearch.Index):
+    class Model(NNSearch.Model):
 
         tree: NearestNeighbors
 
@@ -148,12 +140,12 @@ class KDTree(NNSearch):
             'n_jobs': n_jobs,
         }
 
-    def construct(self, X) -> Index:
-        index = super().construct(X)
-        index.tree = NearestNeighbors(**self.construction_params).fit(X)
-        return index
+    def construct(self, X) -> Model:
+        model = super().construct(X)
+        model.tree = NearestNeighbors(**self.construction_params).fit(X)
+        return model
 
-    class Index(NNSearch.Index):
+    class Model(NNSearch.Model):
 
         tree: NearestNeighbors
 
