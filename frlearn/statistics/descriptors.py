@@ -1,3 +1,6 @@
+"""Statistical data descriptors"""
+from __future__ import annotations
+
 import numpy as np
 from scipy import linalg
 from scipy.stats import chi2
@@ -23,7 +26,7 @@ class MD(Descriptor):
        <http://insa.nic.in/writereaddata/UpLoadedFiles/PINSA/Vol02_1936_1_Art05.pdf>`_
     """
 
-    def construct(self, X):
+    def construct(self, X) -> Model:
         model: MD.Model = super().construct(X)
         model.mean = X.mean(axis=0)
         model.covar_inv = linalg.pinvh(np.cov(X.T, bias=True))
