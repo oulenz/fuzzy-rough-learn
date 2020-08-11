@@ -212,9 +212,9 @@ def remove_diagonal(a):
     return a[~np.eye(a.shape[0], dtype=bool)].reshape(a.shape[0], -1)
 
 
-def shifted_reciprocal(x):
+def shifted_reciprocal(x, c: float = 1):
     """
-    Order-reversing function from [0, ∞) to [0, 1] that sends `x` to `1/(1 + x)`.
+    Order-reversing function from [0, ∞) to [0, 1] that sends `x` to `1/(1 + x/c)`.
     Strictly order-reversing, but does not preserve absolute differences.
 
     Parameters
@@ -222,12 +222,15 @@ def shifted_reciprocal(x):
     x : float
         Input value. Should be in `[0, ∞)`.
 
+    c : float = 1
+        The 'central' value that is sent to 0.5. Should be in `(0, ∞)`.
+
     Returns
     -------
     y : float
         Output value in [0, 1].
     """
-    return 1/(1 + x)
+    return 1/(1 + x/c)
 
 
 def truncated_complement(x):
