@@ -15,8 +15,8 @@ from frlearn.utils.owa_operators import OWAOperator, additive, exponential
 class FuzzyRoughEnsemble(MultiClassClassifier):
     def __init__(
             self,
-            upper_approximator: Descriptor = NND(k=40, owa=additive(), proximity=truncated_complement),
-            lower_approximator: Descriptor = NND(k=40, owa=additive(), proximity=truncated_complement),
+            upper_approximator: Optional[Descriptor] = NND(k=40, owa=additive(), proximity=truncated_complement),
+            lower_approximator: Optional[Descriptor] = NND(k=40, owa=additive(), proximity=truncated_complement),
     ):
         self.upper_approximator = upper_approximator
         self.lower_approximator = lower_approximator
@@ -24,15 +24,15 @@ class FuzzyRoughEnsemble(MultiClassClassifier):
     def construct(self, X, y) -> Model:
         model: FuzzyRoughEnsemble.Model = super().construct(X, y)
         Cs = [X[np.where(y == c)] for c in model.classes]
-        model.upper_approximations = [self.upper_approximator.construct(C) for C in Cs]
+        model.upper_approximations = self.upper_approximator and [self.upper_approximator.construct(C) for C in Cs]
         co_Cs = [X[np.where(y != c)] for c in model.classes]
-        model.lower_approximations = [self.lower_approximator.construct(co_C) for co_C in co_Cs]
+        model.lower_approximations = self.lower_approximator and [self.lower_approximator.construct(co_C) for co_C in co_Cs]
         return model
 
     class Model(MultiClassClassifier.Model):
 
-        upper_approximations: List[Descriptor.Model]
-        lower_approximations: List[Descriptor.Model]
+        upper_approximations: Optional[List[Descriptor.Model]]
+        lower_approximations: Optional[List[Descriptor.Model]]
 
         def query(self, X):
             vals = []
@@ -53,19 +53,21 @@ class FRNN(FuzzyRoughEnsemble):
 
     Parameters
     ----------
-    upper_weights : OWAOperator, default=additive()
+    upper_weights : OWAOperator or None = additive()
         OWA weights to use in calculation of upper approximation of decision classes.
+        `upper_weights` and `lower_weights` cannot both be None.
 
-    upper_k : int, default = 20
+    upper_k : int = 20
         Effective length of upper weights vector (number of nearest neighbours to consider).
 
-    lower_weights : OWAOperator, default=additive()
+    lower_weights : OWAOperator or None = additive()
         OWA weights to use in calculation of lower approximation of decision classes.
+        `upper_weights` and `lower_weights` cannot both be None.
 
-    lower_k : int, default = 20
+    lower_k : int = 20
         Effective length of lower weights vector (number of nearest neighbours to consider).
 
-    nn_search : NNSearch, default=KDTree()
+    nn_search : NNSearch = KDTree()
         Nearest neighbour search algorithm to use.
 
     Notes
@@ -96,12 +98,33 @@ class FRNN(FuzzyRoughEnsemble):
        doi: 10.1109/TFUZZ.2014.2371472
        <https://ieeexplore.ieee.org/document/6960859>`_
     """
-    def __init__(self, *, upper_weights: OWAOperator = additive(), upper_k: int = 20,
-                 lower_weights: OWAOperator = additive(), lower_k: int = 20,
-                 nn_search: NNSearch = KDTree()):
-        upper_approximator = NND(owa=upper_weights, k=upper_k, proximity=truncated_complement, nn_search=nn_search) if upper_weights else None
-        lower_approximator = NND(owa=lower_weights, k=lower_k, proximity=truncated_complement, nn_search=nn_search) if lower_weights else None
+    def __init__(
+            self, *,
+            upper_weights: Optional[OWAOperator] = additive(),
+            upper_k: int = 20,
+            lower_weights: Optional[OWAOperator] = additive(),
+            lower_k: int = 20,
+            nn_search: NNSearch = KDTree(metric='manhattan')
+    ):
+        upper_approximator = upper_weights and NND(owa=upper_weights, k=upper_k, proximity=truncated_complement, nn_search=nn_search)
+        lower_approximator = lower_weights and NND(owa=lower_weights, k=lower_k, proximity=truncated_complement, nn_search=nn_search)
         super().__init__(upper_approximator, lower_approximator)
+
+    def construct(self, X, y) -> Model:
+        scale = (np.max(X, axis=0) - np.min(X, axis=0)) * X.shape[1]
+        scale = np.where(scale == 0, 1, scale)
+        X = X.copy() / scale
+        model = super().construct(X, y)
+        model.scale = scale
+        return model
+
+    class Model(FuzzyRoughEnsemble.Model):
+
+        scale: np.array
+
+        def query(self, X):
+            X = X.copy() / self.scale
+            return super().query(X)
 
 
 class FROVOCO(MultiClassClassifier):
