@@ -51,7 +51,9 @@ class FRFS(Preprocessor):
         self.t_norm = t_norm
 
     def process(self, X, y):
-        X_scaled = X / np.std(X, axis=0)
+        scale = np.std(X, axis=0)
+        scale = np.where(scale == 0, 1, scale)
+        X_scaled = X / scale
         R_a = np.minimum(np.maximum(1 - np.abs(X_scaled[:, None, :] - X_scaled), 0), y[:, None, None] != y[:, None])
         POS_A_size = self._POS_size(R_a)
         selected_attributes = np.full(X.shape[-1], False)
@@ -165,6 +167,7 @@ class FRPS(Preprocessor):
         Cs = [X[np.where(y == c)] for c in classes]
         X_unscaled = np.concatenate(Cs, axis=0)
         scale = np.amax(X_unscaled, axis=0) - np.amin(X_unscaled, axis=0)
+        scale = np.where(scale == 0, 1, scale)
         X = X_unscaled/scale
         Cs = [C/scale for C in Cs]
 

@@ -156,8 +156,10 @@ class FROVOCO(MultiClassClassifier):
     def construct(self, X, y) -> Model:
         model: FROVOCO.Model = super().construct(X, y)
 
-        model.scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.m
-        X = X.copy() / model.scale
+        scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.m
+        scale = np.where(scale == 0, 1, scale)
+        X = X.copy() / scale
+        model.scale = scale
 
         Cs = [X[np.where(y == c)] for c in model.classes]
         co_Cs = [X[np.where(y != c)] for c in model.classes]
@@ -265,8 +267,10 @@ class FRONEC(MultiLabelClassifier):
 
     def construct(self, X, Y) -> Model:
         model: FRONEC.Model = super().construct(X, Y)
-        model.scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.m
-        X = X.copy() / model.scale
+        scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.m
+        scale = np.where(scale == 0, 1, scale)
+        X = X.copy() / scale
+        model.scale = scale
         model.Q_type = self.Q_type
         model.R_d = model._R_d_2(Y) if self.R_d_type == 2 else model._R_d_1(Y)
         model.k = self.k
