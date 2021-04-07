@@ -175,15 +175,13 @@ class FitPredictClassifier(BaseEstimator, ClassifierMixin, ):
 
     def __init__(
             self,
-            classifier_or_class: Union[
-                type(Union[MultiClassClassifier, MultiLabelClassifier]),
-                Union[MultiClassClassifier, MultiLabelClassifier]
-            ],
+            classifier_or_class: type[MultiClassClassifier] | type[MultiLabelClassifier] | MultiClassClassifier | MultiLabelClassifier,
             *args, **kwargs):
         super().__init__()
         if isinstance(classifier_or_class, ModelFactory):
             self.classifier = classifier_or_class
-        self.classifier = classifier_or_class(*args, **kwargs)
+        else:
+            self.classifier = classifier_or_class(*args, **kwargs)
 
     def fit(self, X, y):
         """
@@ -217,7 +215,11 @@ class FitPredictClassifier(BaseEstimator, ClassifierMixin, ):
             Class label for each query instance.
         """
         scores = self.model_.query(X)
-        return select_class(scores, labels=self.model_.classes)
+
+        if isinstance(self.classifier, MultiClassClassifier):
+            return select_class(scores, labels=self.model_.classes)
+        else:
+            return discretise(scores)
 
     def predict_proba(self, X):
         """
