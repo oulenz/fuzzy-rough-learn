@@ -16,13 +16,14 @@ class ModelFactory(ABC):
     @abstractmethod
     def construct(self, X, *args, **kwargs) -> ModelFactory.Model:
         model = self.Model.__new__(self.Model)
-        model.n, model.m = X.shape
+        model.n, model.m = model.shape = X.shape
         return model
 
     class Model(ABC):
 
         n: int
         m: int
+        shape: tuple[int, ...]
 
         @abstractmethod
         def query(self, X, *args, **kwargs):
