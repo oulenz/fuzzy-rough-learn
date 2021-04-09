@@ -41,6 +41,111 @@ class NNDescriptor(Descriptor):
             pass
 
 
+class LNND(NNDescriptor):
+    """
+    Implementation of the Localised Nearest Neighbour Distance (LNND) data descriptor [1]_[2]_.
+
+    Parameters
+    ----------
+    k : int or (int -> int) = 1
+        Which nearest neighbour to consider.
+        Should be either a positive integer not larger than the target class size,
+        or a function that takes the size of the target class and returns such an integer.
+
+    Notes
+    -----
+    The scores are derived with 1/(1 + l_distances).
+
+    References
+    ----------
+
+    .. [1] `de Ridder D, Tax DMJ, Duin RPW (1998).
+       An experimental comparison of one-class classification methods.
+       ASCI`98: Proceedings of the Fourth Annual Conference of the Advanced School for Computing and Imaging, 213–218.
+       ASCI.
+       <http://rduin.nl/papers/asci_98.html>`_
+    .. [2] `Tax DMJ, Duin RPW (1998).
+       Outlier detection using classifier instability.
+       SSPR/SPR 1998: Joint IAPR International Workshops on Statistical Techniques in Pattern Recognition and Structural and Syntactic Pattern Recognition, 593--601.
+       Springer.
+       doi: 10.1007/BFb0033283
+       <https://link.springer.com/chapter/10.1007/BFb0033283>`_
+    """
+
+    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
+        super().__init__(nn_search=nn_search, k=k)
+
+    def construct(self, X) -> Model:
+        model: LNND.Model = super().construct(X)
+        _, distances = model.nn_model.query_self(model.k)
+        model.distances = distances[:, -1]
+        return model
+
+    class Model(NNDescriptor.Model):
+
+        distances: np.ndarray
+
+        def _query(self, q_neighbours, q_distances):
+            # if both distances are zero, default to 1
+            l_distances = div_or(q_distances[:, self.k-1], self.distances[q_neighbours[:, self.k-1]], 1)
+            # replace infinites with very large numbers, but keep nans (which shouldn't be here) to flag problems
+            l_distances = np.nan_to_num(l_distances, nan=np.nan)
+            return shifted_reciprocal(l_distances)
+
+
+class LOF(NNDescriptor):
+    """
+    Implementation of the Local Outlier Factor (LOF) data descriptor [1]_.
+
+    Parameters
+    ----------
+    k : int or (int -> int) = 1
+        How many nearest neighbours to consider.
+        Should be either a positive integer not larger than the target class size,
+        or a function that takes the size of the target class and returns such an integer.
+
+    Notes
+    -----
+    The scores are derived with 1/(1 + lof).
+
+    References
+    ----------
+
+    .. [1] `Breunig MM, Kriegel H-P, Ng RT, Sander J (2000).
+       LOF: identifying density-based local outliers.
+       SIGMOD 2000: ACM international conference on Management of data, 93–104.
+       ACM.
+       doi: 10.1145/342009.335388
+       <https://dl.acm.org/doi/abs/10.1145/342009.335388>`_
+    """
+
+    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
+        super().__init__(nn_search=nn_search, k=k)
+
+    def construct(self, X) -> Model:
+        model: LOF.Model = super().construct(X)
+        neighbours, distances = model.nn_model.query_self(model.k)
+        model.distances = distances[:, -1]
+        model.lrd = model._get_lrd(neighbours, distances)
+        return model
+
+    class Model(NNDescriptor.Model):
+
+        distances: np.ndarray
+        lrd: np.ndarray
+
+        def _get_lrd(self, q_neighbours, q_distances):
+            r_distances = np.maximum(q_distances, self.distances[q_neighbours])
+            return 1/np.mean(r_distances, axis=-1)
+
+        def _query(self, q_neighbours, q_distances):
+            q_lrd = self._get_lrd(q_neighbours, q_distances)
+            lof = np.mean(self.lrd[q_neighbours], axis=-1) / q_lrd
+            # handle nan, which comes from inf/inf
+            lof[np.isnan(lof)] = 1
+            return shifted_reciprocal(lof)
+
+
 class NND(NNDescriptor):
     """
     Implementation of the Nearest Neighbour Distance (NND) data descriptor, which goes back to at least [1]_.
@@ -107,108 +212,3 @@ class NND(NNDescriptor):
             proximities = self.proximity(q_distances)
             score = self.owa.soft_max(proximities, self.k)
             return score
-
-
-class LNND(NNDescriptor):
-    """
-    Implementation of the Localised Nearest Neighbour Distance (LNND) data descriptor [1]_[2]_.
-
-    Parameters
-    ----------
-    k : int or (int -> int) = 1
-        Which nearest neighbour to consider.
-        Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer.
-
-    Notes
-    -----
-    The scores are derived with 1/(1 + l_distances).
-
-    References
-    ----------
-
-    .. [1] `de Ridder D, Tax DMJ, Duin RPW (1998).
-       An experimental comparison of one-class classification methods.
-       ASCI`98: Proceedings of the Fourth Annual Conference of the Advanced School for Computing and Imaging, 213–218.
-       ASCI.
-       <http://rduin.nl/papers/asci_98.html>`_
-    .. [2] `Tax DMJ, Duin RPW (1998).
-       Outlier detection using classifier instability.
-       SSPR/SPR 1998: Joint IAPR International Workshops on Statistical Techniques in Pattern Recognition and Structural and Syntactic Pattern Recognition, 593--601.
-       Springer.
-       doi: 10.1007/BFb0033283
-       <https://link.springer.com/chapter/10.1007/BFb0033283>`_
-    """
-
-    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
-        super().__init__(nn_search=nn_search, k=k)
-
-    def construct(self, X) -> Model:
-        model: LNND.Model = super().construct(X)
-        _, distances = model.nn_model.query_self(model.k)
-        model.distances = distances[:, -1]
-        return model
-
-    class Model(NNDescriptor.Model):
-
-        distances: np.ndarray
-
-        def _query(self, q_neighbours, q_distances):
-            # if both distances are zero, default to 1
-            l_distances = div_or(q_distances[:, self.k-1], self.distances[q_neighbours[:, self.k-1]], 1)
-            # replace infinites with very large numbers, but keep nans (which shouldn't be here) to flag problems
-            l_distances = np.nan_to_num(l_distances, nan=np.nan)
-            return shifted_reciprocal(l_distances)
-
-
-class LOF(NNDescriptor):
-    """
-    Implementation of the Localised Outlier Factor (LOF) data descriptor [1]_.
-
-    Parameters
-    ----------
-    k : int or (int -> int) = 1
-        How many nearest neighbours to consider.
-        Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer.
-
-    Notes
-    -----
-    The scores are derived with 1/(1 + lof).
-
-    References
-    ----------
-
-    .. [1] `Breunig MM, Kriegel H-P, Ng RT, Sander J (2000).
-       LOF: identifying density-based local outliers.
-       SIGMOD 2000: ACM international conference on Management of data, 93–104.
-       ACM.
-       doi: 10.1145/342009.335388
-       <https://dl.acm.org/doi/abs/10.1145/342009.335388>`_
-    """
-
-    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
-        super().__init__(nn_search=nn_search, k=k)
-
-    def construct(self, X) -> Model:
-        model: LOF.Model = super().construct(X)
-        neighbours, distances = model.nn_model.query_self(model.k)
-        model.distances = distances[:, -1]
-        model.lrd = model._get_lrd(neighbours, distances)
-        return model
-
-    class Model(NNDescriptor.Model):
-
-        distances: np.ndarray
-        lrd: np.ndarray
-
-        def _get_lrd(self, q_neighbours, q_distances):
-            r_distances = np.maximum(q_distances, self.distances[q_neighbours])
-            return 1/np.mean(r_distances, axis=-1)
-
-        def _query(self, q_neighbours, q_distances):
-            q_lrd = self._get_lrd(q_neighbours, q_distances)
-            lof = np.mean(self.lrd[q_neighbours], axis=-1) / q_lrd
-            # handle nan, which comes from inf/inf
-            lof[np.isnan(lof)] = 1
-            return shifted_reciprocal(lof)
