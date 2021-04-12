@@ -146,7 +146,7 @@ class LNND(NNDescriptor):
 
     Parameters
     ----------
-    k : int or (int -> int) = 1
+    k : int or (int -> int) = 3.4 * log n
         Which nearest neighbour to consider.
         Should be either a positive integer not larger than the target class size,
         or a function that takes the size of the target class and returns such an integer.
@@ -154,10 +154,11 @@ class LNND(NNDescriptor):
     Notes
     -----
     The scores are derived with 1/(1 + l_distances).
+    `k` is the principal hyperparameter that can be tuned to increase performance.
+    Its default value is based on the empirical evaluation in [3]_.
 
     References
     ----------
-
     .. [1] `de Ridder D, Tax DMJ, Duin RPW (1998).
        An experimental comparison of one-class classification methods.
        ASCI`98: Proceedings of the Fourth Annual Conference of the Advanced School for Computing and Imaging, 213–218.
@@ -169,9 +170,13 @@ class LNND(NNDescriptor):
        Springer.
        doi: 10.1007/BFb0033283
        <https://link.springer.com/chapter/10.1007/BFb0033283>`_
+    .. [3] `Lenz OU, Peralta D, Cornelis C (2021).
+       Average Localised Proximity: a new data descriptor with good default one-class classification performance.
+       Pattern Recognition, to appear.
+       <https://arxiv.org/abs/2101.11037>`_
     """
 
-    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
+    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_based_k(3.4)):
         super().__init__(nn_search=nn_search, k=k)
 
     def construct(self, X) -> Model:
@@ -198,7 +203,7 @@ class LOF(NNDescriptor):
 
     Parameters
     ----------
-    k : int or (int -> int) = 1
+    k : int or (int -> int) = 2.5 * log n
         How many nearest neighbours to consider.
         Should be either a positive integer not larger than the target class size,
         or a function that takes the size of the target class and returns such an integer.
@@ -206,19 +211,24 @@ class LOF(NNDescriptor):
     Notes
     -----
     The scores are derived with 1/(1 + lof).
+    `k` is the principal hyperparameter that can be tuned to increase performance.
+    Its default value is based on the empirical evaluation in [2]_.
 
     References
     ----------
-
     .. [1] `Breunig MM, Kriegel H-P, Ng RT, Sander J (2000).
        LOF: identifying density-based local outliers.
        SIGMOD 2000: ACM international conference on Management of data, 93–104.
        ACM.
        doi: 10.1145/342009.335388
        <https://dl.acm.org/doi/abs/10.1145/342009.335388>`_
+    .. [2] `Lenz OU, Peralta D, Cornelis C (2021).
+       Average Localised Proximity: a new data descriptor with good default one-class classification performance.
+       Pattern Recognition, to appear.
+       <https://arxiv.org/abs/2101.11037>`_
     """
 
-    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = 1):
+    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_based_k(2.5)):
         super().__init__(nn_search=nn_search, k=k)
 
     def construct(self, X) -> Model:
@@ -268,9 +278,13 @@ class NND(NNDescriptor):
         How to aggregate the proximity values from the `k` nearest neighbours.
         The default is to only consider the kth nearest neighbour distance.
 
+    Notes
+    -----
+    `k` is the principal hyperparameter that can be tuned to increase performance.
+    Its default value is based on the empirical evaluation in [3]_.
+
     References
     ----------
-
     .. [1] `Knorr EM, Ng RT (1997).
        A Unified Notion of Outliers: Properties and Computation.
        KDD-97: Proceedings of the Third International Conference on Knowledge Discovery and Data Mining, pp 219–222.
@@ -283,6 +297,10 @@ class NND(NNDescriptor):
        Springer, Lecture Notes in Artificial Intelligence 6401.
        doi: 10.1007/978-3-642-16248-0_16
        <https://link.springer.com/chapter/10.1007/978-3-642-16248-0_16>`_
+    .. [3] `Lenz OU, Peralta D, Cornelis C (2021).
+       Average Localised Proximity: a new data descriptor with good default one-class classification performance.
+       Pattern Recognition, to appear.
+       <https://arxiv.org/abs/2101.11037>`_
     """
 
     def __init__(
