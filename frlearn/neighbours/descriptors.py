@@ -8,8 +8,8 @@ import numpy as np
 
 from .neighbour_search import KDTree, NNSearch
 from ..base import Descriptor
-from ..utils.np_utils import div_or, shifted_reciprocal
-from ..utils.owa_operators import OWAOperator, trimmed
+from ..utils.np_utils import div_or, log_based_k, shifted_reciprocal
+from ..utils.owa_operators import OWAOperator, additive, trimmed
 
 
 class NNDescriptor(Descriptor):
@@ -39,6 +39,105 @@ class NNDescriptor(Descriptor):
         @abstractmethod
         def _query(self, q_neighbours, q_distances):
             pass
+
+
+class ALP(NNDescriptor):
+    """
+    Implementation of the Average Localised Proximity (ALP) data descriptor [1]_.
+    Expresses the proximity of a query instance to the target data,
+    by localising its nearest neighbour distances against the local nearest neighbour distances in the target data.
+
+    Parameters
+    ----------
+    k : int or (int -> int) = 5.5 * log n
+        How many nearest neighbour distances / localised proximities to consider.
+        Corresponds to the scale at which proximity is evaluated.
+        Should be either a positive integer not larger than the target class size,
+        or a function that takes the size of the target class and returns such an integer.
+
+    l : int or (int -> int) = 6 * log n
+        How many nearest neighbours to use for determining the local ith nearest neighbour distance, for each `i <= k`.
+        Lower values correspond to more localisation.
+        Should be either a positive integer not larger than the target class size,
+        or a function that takes the size of the target class and returns such an integer.
+
+    scale_weights : OWAOperator = additive()
+        Weights to use for calculating the soft maximum of localised proximities.
+        Determines to which extent scales with high localised proximity are emphasised.
+
+    localisation_weights : OWAOperator = additive()
+        Weights to use for calculating the local ith nearest neighbour distance, for each `i <= k`.
+        Determines to which extent nearer neighbours dominate.
+
+    max_array_size : int = 2**26
+        Maximum array size to use. For a query set of size `q`,
+        calculating local distances requires an array of size `[q, l, k]`,
+        which can be too large to fit in memory. If the size of this array is larger than `max_array_size`,
+        a query set is batch-processed, which is slower.
+        TODO: determine maximum array size dynamically, investigate lowering float precision
+
+    Notes
+    -----
+    `k` and `l` are the two principal hyperparameters that can be tuned to increase performance.
+    Its default values are based on the empirical evaluation in [1]_.
+
+    References
+    ----------
+    .. [1] `Lenz OU, Peralta D, Cornelis C (2021).
+       Average Localised Proximity: a new data descriptor with good default one-class classification performance.
+       Pattern Recognition, to appear.
+       <https://arxiv.org/abs/2101.11037>`_
+    """
+
+    def __init__(
+            self,
+            k: int | Callable[[int], int] = log_based_k(5.5),
+            l: int | Callable[[int], int] = log_based_k(6),
+            scale_weights: OWAOperator = additive(),
+            localisation_weights: OWAOperator = additive(),
+            nn_search: NNSearch = KDTree(),
+            max_array_size: int = 2**26,
+    ):
+        super().__init__(nn_search=nn_search, k=k, )
+        self.l = l
+        self.scale_weights = scale_weights
+        self.localisation_weights = localisation_weights
+        self.max_array_size = max_array_size
+
+    def construct(self, X):
+        model: ALP.Model = super().construct(X)
+        model.l = self.l(len(model.nn_model)) if callable(self.l) else self.l
+        model._kl = max(model.k, model.l)
+        _, model.distances = model.nn_model.query_self(model._kl)
+        model.scale_weights = self.scale_weights
+        model.localisation_weights = self.localisation_weights
+        return model
+
+    class Model(NNDescriptor.Model):
+
+        l: int
+        _kl: int
+        distances: np.ndarray
+        scale_weights: OWAOperator
+        localisation_weights: OWAOperator
+
+        def query(self, X):
+            q_neighbours, q_distances = self.nn_model.query(X, self._kl)
+            return self._query(q_neighbours[..., :self.l], q_distances[..., :self.k])
+
+        def _query(self, q_neighbours, q_distances):
+            batch_size = 2**26 // (self.k * self.l)
+            local_distances = []
+            for i in range(0, q_neighbours.shape[0], batch_size):
+                local_distances.append(self.localisation_weights.soft_head(
+                    self.distances[q_neighbours[i:i+batch_size], :self.k], self.l, axis=-2
+                ))
+            local_distances = np.concatenate(local_distances, axis=0)
+            
+            # if both distances are zero, default to 1
+            localised_distances = div_or(q_distances, local_distances, 1)
+            localised_proximities = shifted_reciprocal(localised_distances)
+            return self.scale_weights.soft_max(localised_proximities, self.k)
 
 
 class LNND(NNDescriptor):
