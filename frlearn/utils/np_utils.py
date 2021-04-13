@@ -147,9 +147,9 @@ def greatest(a, k: Union[int, Callable[[int], int]], axis: int = -1):
     return a
 
 
-def fractional_k(a):
+def fraction(a):
     """
-    Creates a function that calculates a positive integer `k` as a fraction of some maximum.
+    Creates a function that calculates a positive integer as a fraction of some maximum.
 
     Parameters
     ----------
@@ -164,14 +164,14 @@ def fractional_k(a):
     return lambda x: min(max(1, int(a * x)), x)
 
 
-def log_based_k(a):
+def log_units(a):
     """
-    Creates a function that calculates a positive integer `k` based on the logarithm of some maximum.
+    Creates a function that calculates a positive integer as a multiple of the logarithm of some maximum.
 
     Parameters
     ----------
     a : float
-        Coefficient with which to multiply the logarithm of the maximum. Should be in `[0, ∞)`.
+        The multiple to be used. Should be in `[0, ∞)`.
 
     Returns
     -------

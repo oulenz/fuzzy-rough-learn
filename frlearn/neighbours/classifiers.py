@@ -8,7 +8,7 @@ import numpy as np
 from frlearn.base import Descriptor, MultiClassClassifier, MultiLabelClassifier
 from frlearn.neighbours.descriptors import NND
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
-from frlearn.utils.np_utils import div_or, fractional_k, truncated_complement
+from frlearn.utils.np_utils import div_or, fraction, truncated_complement
 from frlearn.utils.owa_operators import OWAOperator, additive, exponential
 
 
@@ -150,8 +150,8 @@ class FROVOCO(MultiClassClassifier):
             self,
             nn_search: NNSearch = KDTree(),
     ):
-        self.exponential_approximator = NND(owa=exponential(), k=fractional_k(1), proximity=truncated_complement, nn_search=nn_search)
-        self.additive_approximator = NND(owa=additive(), k=fractional_k(.1), proximity=truncated_complement, nn_search=nn_search)
+        self.exponential_approximator = NND(owa=exponential(), k=fraction(1), proximity=truncated_complement, nn_search=nn_search)
+        self.additive_approximator = NND(owa=additive(), k=fraction(.1), proximity=truncated_complement, nn_search=nn_search)
 
     def construct(self, X, y) -> Model:
         model: FROVOCO.Model = super().construct(X, y)
@@ -322,8 +322,8 @@ class FRONEC(MultiLabelClassifier):
 
         def _Q_1(self, neighbours, R):
             vals = np.minimum(1 - R[..., None] + self.R_d[neighbours, :] - 1, 1)
-            return self.owa_weights.soft_min(vals, k=fractional_k(1), axis=1)
+            return self.owa_weights.soft_min(vals, k=fraction(1), axis=1)
 
         def _Q_2(self, neighbours, R):
             vals = np.maximum(R[..., None] + self.R_d[neighbours, :] - 1, 0)
-            return self.owa_weights.soft_max(vals, k=fractional_k(1), axis=1)
+            return self.owa_weights.soft_max(vals, k=fraction(1), axis=1)

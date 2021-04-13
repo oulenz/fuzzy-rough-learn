@@ -5,7 +5,7 @@ import numpy as np
 
 from frlearn.base import Preprocessor
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
-from frlearn.utils.np_utils import fractional_k, remove_diagonal
+from frlearn.utils.np_utils import fraction, remove_diagonal
 from frlearn.utils.owa_operators import OWAOperator, invadd, deltaquadsigmoid
 from frlearn.utils.t_norms import lukasiewicz
 
@@ -75,7 +75,7 @@ class FRFS(Preprocessor):
 
     def _POS_size(self, R_a):
         R = self.t_norm(R_a, axis=-1)
-        return np.sum(self.owa_weights.soft_min(1 - R, k=fractional_k(1), axis=-1))
+        return np.sum(self.owa_weights.soft_min(1 - R, k=fraction(1), axis=-1))
 
 
 class FRPS(Preprocessor):
@@ -203,11 +203,11 @@ class FRPS(Preprocessor):
     def _upper(self, Cs):
         return np.concatenate([self.owa.soft_max(
             remove_diagonal(self.aggr_R(1 - np.abs(C[:, None, :] - C), axis=-1)),
-            k=fractional_k(1), axis=-1
+            k=fraction(1), axis=-1
         ) for C in Cs], axis=0)
 
     def _lower(self, Cs, co_Cs):
         return np.concatenate([self.owa.soft_min(
             self.aggr_R(np.abs(C[:, None, :] - co_C), axis=-1),
-            k=fractional_k(1), axis=-1
+            k=fraction(1), axis=-1
         ) for C, co_C in zip(Cs, co_Cs)], axis=0)

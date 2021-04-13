@@ -8,7 +8,7 @@ import numpy as np
 
 from .neighbour_search import KDTree, NNSearch
 from ..base import Descriptor
-from ..utils.np_utils import div_or, log_based_k, shifted_reciprocal
+from ..utils.np_utils import div_or, log_units, shifted_reciprocal
 from ..utils.owa_operators import OWAOperator, additive, trimmed
 
 
@@ -91,8 +91,8 @@ class ALP(NNDescriptor):
 
     def __init__(
             self,
-            k: int | Callable[[int], int] = log_based_k(5.5),
-            l: int | Callable[[int], int] = log_based_k(6),
+            k: int | Callable[[int], int] = log_units(5.5),
+            l: int | Callable[[int], int] = log_units(6),
             scale_weights: OWAOperator = additive(),
             localisation_weights: OWAOperator = additive(),
             nn_search: NNSearch = KDTree(),
@@ -176,7 +176,7 @@ class LNND(NNDescriptor):
        <https://arxiv.org/abs/2101.11037>`_
     """
 
-    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_based_k(3.4)):
+    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_units(3.4)):
         super().__init__(nn_search=nn_search, k=k)
 
     def construct(self, X) -> Model:
@@ -228,7 +228,7 @@ class LOF(NNDescriptor):
        <https://arxiv.org/abs/2101.11037>`_
     """
 
-    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_based_k(2.5)):
+    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_units(2.5)):
         super().__init__(nn_search=nn_search, k=k)
 
     def construct(self, X) -> Model:
