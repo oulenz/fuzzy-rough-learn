@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Union
 
 import numpy as np
 
@@ -24,19 +23,27 @@ class ModelFactory(ABC):
         m: int
         shape: tuple[int, ...]
 
-        @abstractmethod
-        def query(self, X, *args, **kwargs):
-            pass
-
         def __len__(self):
             return self.n
 
 
-class Descriptor(ModelFactory):
+class Unsupervised(ModelFactory):
 
-    @abstractmethod
-    def construct(self, X):
-        return super().construct(X)
+    def construct(self, X, ) -> Unsupervised.Model:
+        model = super().construct(X)
+        return model
+
+
+class Supervised(ModelFactory):
+
+    def construct(self, X, y) -> Supervised.Model:
+        model = super().construct(X)
+        model.classes = np.unique(y)
+        model.n_classes = len(model.classes)
+        return model
+
+
+class Descriptor(Unsupervised, ModelFactory):
 
     class Model(ModelFactory.Model):
 
@@ -45,13 +52,7 @@ class Descriptor(ModelFactory):
             pass
 
 
-class MultiClassClassifier(ModelFactory):
-
-    def construct(self, X, y):
-        model = super().construct(X, y)
-        model.classes = np.unique(y)
-        model.n_classes = len(model.classes)
-        return model
+class MultiClassClassifier(Supervised, ModelFactory):
 
     class Model(ModelFactory.Model):
 
@@ -65,7 +66,7 @@ class MultiClassClassifier(ModelFactory):
 
 class MultiLabelClassifier(ModelFactory):
 
-    def construct(self, X, Y):
+    def construct(self, X, Y) -> MultiLabelClassifier.Model:
         model = super().construct(X, Y)
         model.n_labels = Y.shape[1]
         return model
@@ -79,14 +80,33 @@ class MultiLabelClassifier(ModelFactory):
             pass
 
 
-class Preprocessor(ABC):
+class FeaturePreprocessor(ModelFactory):
+
+    class Model(ModelFactory.Model):
+
+        @abstractmethod
+        def transform(self, X):
+            pass
+
+
+class FeatureSelector(FeaturePreprocessor):
+
+    class Model(FeaturePreprocessor.Model):
+
+        selection: np.array
+
+        def transform(self, X):
+            return X[:, self.selection]
+
+
+class SupervisedInstancePreprocessor(ABC):
 
     @abstractmethod
     def __init__(self):
         pass
 
     @abstractmethod
-    def process(self, X, y):
+    def transform(self, X, y):
         pass
 
 

@@ -3,14 +3,14 @@ from __future__ import annotations
 
 import numpy as np
 
-from frlearn.base import Preprocessor
+from frlearn.base import FeatureSelector, Supervised, SupervisedInstancePreprocessor
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
 from frlearn.utils.np_utils import fraction, remove_diagonal
 from frlearn.utils.owa_operators import OWAOperator, invadd, deltaquadsigmoid
 from frlearn.utils.t_norms import lukasiewicz
 
 
-class FRFS(Preprocessor):
+class FRFS(Supervised, FeatureSelector):
     """
     Implementation of the Fuzzy Rough Feature Selection (FRFS) preprocessor.
 
@@ -50,7 +50,8 @@ class FRFS(Preprocessor):
         self.owa_weights = owa_weights
         self.t_norm = t_norm
 
-    def process(self, X, y):
+    def construct(self, X, y):
+        model = super().construct(X, y)
         scale = np.std(X, axis=0)
         scale = np.where(scale == 0, 1, scale)
         X_scaled = X / scale
@@ -71,14 +72,15 @@ class FRFS(Preprocessor):
                     new_attribute = i
             selected_attributes[new_attribute] = True
             remaining_attributes.remove(new_attribute)
-        return X[:, selected_attributes], y
+        model.selection = selected_attributes
+        return model
 
     def _POS_size(self, R_a):
         R = self.t_norm(R_a, axis=-1)
         return np.sum(self.owa_weights.soft_min(1 - R, k=fraction(1), axis=-1))
 
 
-class FRPS(Preprocessor):
+class FRPS(SupervisedInstancePreprocessor):
     """
     Implementation of the Fuzzy Rough Prototype Selection (FRPS) preprocessor.
 
@@ -162,7 +164,7 @@ class FRPS(Preprocessor):
         self.aggr_R = aggr_R
         self.quality_measure = quality_measure
 
-    def process(self, X, y):
+    def transform(self, X, y):
         classes = np.unique(y)
         Cs = [X[np.where(y == c)] for c in classes]
         X_unscaled = np.concatenate(Cs, axis=0)

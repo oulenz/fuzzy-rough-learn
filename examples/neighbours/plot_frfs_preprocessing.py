@@ -27,7 +27,7 @@ from frlearn.utils.owa_operators import strict
 # Import example data.
 iris = datasets.load_iris()
 X_orig = iris.data
-y_orig = iris.target
+y = iris.target
 
 # Define color maps.
 cmap_light = ListedColormap(['#FFAAAA', '#AAFFAA', '#AAAAFF'])
@@ -42,11 +42,11 @@ for i, use_frfs in enumerate([False, True]):
     if use_frfs:
         # Create an instance of the FRFS preprocessor and process the data.
         preprocessor = FRFS(n_features=2)
-        X, y = preprocessor.process(X_orig, y_orig)
+        model = preprocessor.construct(X_orig, y)
+        X = model.transform(X_orig)
     else:
         # Select first two features.
         X = X_orig[:, :2]
-        y = y_orig
 
     # Create an instance of the FRNN classifier and construct the model.
     clf = FRNN(upper_weights=strict(), lower_weights=strict(), upper_k=1, lower_k=1)

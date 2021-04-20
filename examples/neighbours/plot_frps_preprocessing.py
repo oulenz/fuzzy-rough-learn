@@ -49,7 +49,7 @@ for i, (aggr_name, aggr_R) in enumerate([('mean', np.mean), ('Łukasiewicz', luk
 
         # Create an instance of the FRPS preprocessor and process the data.
         preprocessor = FRPS(aggr_R=aggr_R, quality_measure=quality_measure)
-        X, y = preprocessor.process(X_orig, y_orig)
+        X, y = preprocessor.transform(X_orig, y_orig)
 
         # Create an instance of the FRNN classifier and construct the model.
         clf = FRNN(upper_weights=strict(), lower_weights=strict(), upper_k=1, lower_k=1)
