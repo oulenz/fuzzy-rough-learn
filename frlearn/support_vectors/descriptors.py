@@ -42,9 +42,10 @@ class SVM(Descriptor):
        MSR-TR-99-87, Microsoft Research.
        <https://www.microsoft.com/en-us/research/publication/estimating-the-support-of-a-high-dimensional-distribution/>`_
     .. [2] `Lenz OU, Peralta D, Cornelis C (2021).
-       Average Localised Proximity: a new data descriptor with good default one-class classification performance.
-       Pattern Recognition, to appear.
-       <https://arxiv.org/abs/2101.11037>`_
+       Average Localised Proximity: A new data descriptor with good default one-class classification performance.
+       Pattern Recognition, vol 118, no 107991.
+       doi: 10.1016/j.patcog.2021.107991
+       <https://www.sciencedirect.com/science/article/abs/pii/S0031320321001783>`_
     """
 
     def __init__(

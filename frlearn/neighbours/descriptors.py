@@ -84,9 +84,10 @@ class ALP(NNDescriptor):
     References
     ----------
     .. [1] `Lenz OU, Peralta D, Cornelis C (2021).
-       Average Localised Proximity: a new data descriptor with good default one-class classification performance.
-       Pattern Recognition, to appear.
-       <https://arxiv.org/abs/2101.11037>`_
+       Average Localised Proximity: A new data descriptor with good default one-class classification performance.
+       Pattern Recognition, vol 118, no 107991.
+       doi: 10.1016/j.patcog.2021.107991
+       <https://www.sciencedirect.com/science/article/abs/pii/S0031320321001783>`_
     """
 
     def __init__(
@@ -171,9 +172,10 @@ class LNND(NNDescriptor):
        doi: 10.1007/BFb0033283
        <https://link.springer.com/chapter/10.1007/BFb0033283>`_
     .. [3] `Lenz OU, Peralta D, Cornelis C (2021).
-       Average Localised Proximity: a new data descriptor with good default one-class classification performance.
-       Pattern Recognition, to appear.
-       <https://arxiv.org/abs/2101.11037>`_
+       Average Localised Proximity: A new data descriptor with good default one-class classification performance.
+       Pattern Recognition, vol 118, no 107991.
+       doi: 10.1016/j.patcog.2021.107991
+       <https://www.sciencedirect.com/science/article/abs/pii/S0031320321001783>`_
     """
 
     def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_units(3.4)):
@@ -223,9 +225,10 @@ class LOF(NNDescriptor):
        doi: 10.1145/342009.335388
        <https://dl.acm.org/doi/abs/10.1145/342009.335388>`_
     .. [2] `Lenz OU, Peralta D, Cornelis C (2021).
-       Average Localised Proximity: a new data descriptor with good default one-class classification performance.
-       Pattern Recognition, to appear.
-       <https://arxiv.org/abs/2101.11037>`_
+       Average Localised Proximity: A new data descriptor with good default one-class classification performance.
+       Pattern Recognition, vol 118, no 107991.
+       doi: 10.1016/j.patcog.2021.107991
+       <https://www.sciencedirect.com/science/article/abs/pii/S0031320321001783>`_
     """
 
     def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_units(2.5)):
@@ -298,9 +301,10 @@ class NND(NNDescriptor):
        doi: 10.1007/978-3-642-16248-0_16
        <https://link.springer.com/chapter/10.1007/978-3-642-16248-0_16>`_
     .. [3] `Lenz OU, Peralta D, Cornelis C (2021).
-       Average Localised Proximity: a new data descriptor with good default one-class classification performance.
-       Pattern Recognition, to appear.
-       <https://arxiv.org/abs/2101.11037>`_
+       Average Localised Proximity: A new data descriptor with good default one-class classification performance.
+       Pattern Recognition, vol 118, no 107991.
+       doi: 10.1016/j.patcog.2021.107991
+       <https://www.sciencedirect.com/science/article/abs/pii/S0031320321001783>`_
     """
 
     def __init__(
