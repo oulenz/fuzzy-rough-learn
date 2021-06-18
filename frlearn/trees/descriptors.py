@@ -63,7 +63,7 @@ class EIF(Descriptor):
         try:
             import eif
         except ImportError:
-            raise ImportError('EIF data descriptor requires the eif library.')
+            raise ImportError('EIF data descriptor requires the eif library.') from None
         self.psi = psi
         self.t = t
         self.random_state = random_state
