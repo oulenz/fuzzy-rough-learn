@@ -1,10 +1,16 @@
 """
-A library of tools for fuzzy rough machine learning.
+A library of fuzzy rough machine learning algorithms and data descriptors.
 
 Subpackages
 -----------
 neighbours
-    Fuzzy rough nearest neighbour algorithms.
+    Nearest neighbour algorithms.
+networks
+    Neural network algorithms.
+statistics
+    Statistical algorithms.
+support_vectors
+    Support vector algorithms.
 utils
     Utility functions used in the other modules.
 """

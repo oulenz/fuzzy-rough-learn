@@ -22,7 +22,7 @@
 fuzzy-rough-learn
 =================
 
-**fuzzy-rough-learn** is a library of fuzzy rough machine learning algorithms, extending scikit-learn_.
+**fuzzy-rough-learn** is a library of machine learning algorithms involving fuzzy rough sets, as well as data descriptors that can be used for one-class classification / novelty detection. It builds on scikit-learn_, but uses a slightly different api.
 
 
 Contents
@@ -37,11 +37,25 @@ Classifiers
 * Fuzzy Rough OVO COmbination (FROVOCO; muliclass, suitable for imbalanced data)
 * Fuzzy ROugh NEighbourhood Consensus (FRONEC; multilabel)
 
+Data descriptors
+................
+
+* Average Localised Proximity (ALP)
+* Centre Distance (CD)
+* Extended Isolation Forest (EIF)
+* Isolation Forest (IF)
+* Local Outlier Factor (LOF)
+* Localised Nearest Neighbour Distance (LNND)
+* Mahalanobis Distance (MD)
+* Nearest Neighbour Distance (NND)
+* Support Vector Machine (SVM)
+
 Preprocessors
 .............
 
 * Fuzzy Rough Feature Selection (FRFS)
 * Fuzzy Rough Prototype Selection (FRPS)
+* Shrink Autoencoder (SAE; unsupervised)
 
 Utilities
 .........
@@ -66,6 +80,11 @@ fuzzy-rough-learn requires python 3.7+ and the following packages:
 * scipy >= 1.1.0
 * numpy >=1.16.0
 * scikit-learn >=0.22.0
+
+In addition, some algorithms require optional dependencies:
+
+* eif >= 2.0.0 (EIF)
+* tensorflow >= 2.2.0 (SAE)
 
 Citing fuzzy-rough-learn
 ------------------------

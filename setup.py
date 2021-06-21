@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-"""A library of tools for fuzzy rough machine learning."""
+"""A library of fuzzy rough machine learning algorithms and data descriptors."""
 
 import codecs
 import os
@@ -12,7 +12,7 @@ with open(ver_file) as f:
     exec(f.read())
 
 DISTNAME = 'fuzzy-rough-learn'
-DESCRIPTION = 'A library of tools for fuzzy rough machine learning.'
+DESCRIPTION = 'A library of fuzzy rough machine learning algorithms and data descriptors.'
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
 MAINTAINER = 'Oliver Urs Lenz'
@@ -32,6 +32,9 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Operating System :: Unix',
                'Programming Language :: Python :: 3.7']
 EXTRAS_REQUIRE = {
+    'full': [
+        'tensorflow>=2.2.0',
+        'eif>=2.0.0'],
     'tests': [
         'pytest',
         'pytest-cov'],

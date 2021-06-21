@@ -21,7 +21,8 @@ from matplotlib.colors import ListedColormap
 from sklearn import datasets
 
 from frlearn.base import select_class
-from frlearn.neighbours import FRFS, FRNN
+from frlearn.classifiers import FRNN
+from frlearn.preprocessors import FRFS
 from frlearn.utils.owa_operators import strict
 
 # Import example data.

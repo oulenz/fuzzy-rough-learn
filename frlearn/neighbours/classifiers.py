@@ -6,7 +6,7 @@ from typing import List, Optional
 import numpy as np
 
 from frlearn.base import Descriptor, MultiClassClassifier, MultiLabelClassifier
-from frlearn.neighbours.descriptors import NND
+from frlearn.neighbours.data_descriptors import NND
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
 from frlearn.utils.np_utils import div_or, fraction, truncated_complement
 from frlearn.utils.owa_operators import OWAOperator, additive, exponential

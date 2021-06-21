@@ -18,7 +18,7 @@ from matplotlib.colors import ListedColormap
 from sklearn import datasets
 
 from frlearn.base import select_class
-from frlearn.neighbours import FROVOCO
+from frlearn.classifiers import FROVOCO
 
 # Import example data, reduce to 2 dimensions, and create imbalanced selection.
 iris = datasets.load_iris()
