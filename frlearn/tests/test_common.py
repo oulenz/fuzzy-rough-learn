@@ -71,6 +71,9 @@ def test_supervised_feature_selector(data, cls):
     assert X.shape[1] <= X_orig.shape[1]
 
 
+# TODO: add test for SAE (but SAE takes a long time to run)
+
+
 @pytest.mark.parametrize(
     'cls',
     [FRPS],
