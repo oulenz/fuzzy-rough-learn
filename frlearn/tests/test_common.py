@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.datasets import load_iris
 
 from frlearn.classifiers import FRNN, FRONEC, FROVOCO
+from frlearn.data_descriptors import ALP, CD, EIF, IF, LNND, LOF, MD, NND, SVM
 from frlearn.preprocessors import FRFS, FRPS
 
 
@@ -41,6 +42,19 @@ def test_multilabel_classifier(data, cls):
 
     scores = model.query(X)
     assert scores.shape == (X.shape[0], 3)
+
+
+@pytest.mark.parametrize(
+    'cls',
+    [ALP, CD, EIF, IF, LNND, LOF, MD, NND, SVM],
+)
+def test_data_descriptor(data, cls):
+    X, y = data
+    descriptor = cls()
+    model = descriptor.construct(X[y == 0])
+
+    scores = model.query(X)
+    assert scores.shape == (X.shape[0], )
 
 
 @pytest.mark.parametrize(
