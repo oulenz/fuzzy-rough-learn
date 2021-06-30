@@ -17,12 +17,45 @@
 .. |ReadTheDocs| image:: https://readthedocs.org/projects/fuzzy-rough-learn/badge/?version=latest
 .. _ReadTheDocs: https://fuzzy-rough-learn.readthedocs.io/en/latest/?badge=latest
 
-.. _scikit-learn: https://scikit-learn.org
-
 fuzzy-rough-learn
 =================
 
-**fuzzy-rough-learn** is a library of machine learning algorithms involving fuzzy rough sets, as well as data descriptors that can be used for one-class classification / novelty detection. It builds on scikit-learn_, but uses a slightly different api.
+**fuzzy-rough-learn** is a library of machine learning algorithms involving fuzzy rough sets, as well as data descriptors that can be used for one-class classification / novelty detection. It builds on scikit-learn_, but uses a slightly different api, best illustrated with a concrete example::
+
+    from sklearn import datasets
+    from sklearn.metrics import accuracy_score, roc_auc_score
+    from sklearn.model_selection import train_test_split
+
+    from frlearn.base import probabilities_from_scores, select_class
+    from frlearn.classifiers import FRNN
+    from frlearn.feature_preprocessors import RangeNormaliser
+
+    # Import example data.
+    iris = datasets.load_iris()
+    X = iris.data
+    y = iris.target
+
+    # Split into train and test sets.
+    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=0)
+
+    # Create an instance of the FRNN classifier, construct the model, and query on the test set.
+    clf = FRNN(preprocessors=(RangeNormaliser(), ))
+    model = clf(X_train, y_train)
+    scores = model(X_test)
+
+    # Convert scores to probabilities and calculate the AUROC.
+    probabilities = probabilities_from_scores(scores)
+    auroc = roc_auc_score(y_test, probabilities, multi_class='ovo')
+    print('AUROC:', auroc)
+
+    # Select classes with the highest scores and calculate the accuracy.
+    classes = select_class(scores)
+    accuracy = accuracy_score(y_test, classes)
+    print('accuracy:', accuracy)
+
+Both classifiers and feature preprocessors are functions that take training data and output a model. Models are functions that take data and output something else. Classifier models output class scores, preprocessor models output a transformation of the data. Preprocessors can be added as a keyword argument when initialising a classifier, which automatically creates a preprocessor model on the basis of the training data and applies it to the training and the test data.
+
+.. _scikit-learn: https://scikit-learn.org
 
 
 Contents
@@ -30,7 +63,7 @@ Contents
 
 At present, fuzzy-rough-learn contains the following algorithms:
 
-Classifiers
+Multiclass classifiers
 ...........
 
 * Fuzzy Rough Nearest Neighbours (FRNN; multiclass)
@@ -50,12 +83,23 @@ Data descriptors
 * Nearest Neighbour Distance (NND)
 * Support Vector Machine (SVM)
 
-Preprocessors
+Feature preprocessors
 .............
 
 * Fuzzy Rough Feature Selection (FRFS)
-* Fuzzy Rough Prototype Selection (FRPS)
+* Linear normaliser, in particular:
+
+    * Interquartile range (IQR) normaliser
+    * Maximum absolute value (MaxAbs) normaliser
+    * Range normaliser
+    * Standardiser
+
 * Shrink Autoencoder (SAE; unsupervised)
+
+Instance preprocessors
+.............
+
+* Fuzzy Rough Prototype Selection (FRPS)
 
 Utilities
 .........

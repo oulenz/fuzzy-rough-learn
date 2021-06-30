@@ -5,11 +5,12 @@ from typing import Callable
 
 from sklearn.svm import OneClassSVM
 
-from ..base import Descriptor
+from ..base import DataDescriptor
+from frlearn.statistics.feature_preprocessors import IQRNormaliser
 from ..utils.np_utils import contract, fraction
 
 
-class SVM(Descriptor):
+class SVM(DataDescriptor):
     """
     Wrapper for the Support Vector Machine (SVM) data descriptor [1]_ with gaussian kernel, implemented in scikit-learn.
     Expresses the signed distance to the separating hyperplane, scaled to `[0, 1]`.
@@ -27,8 +28,12 @@ class SVM(Descriptor):
         Should be either a positive float
         or a function that takes the dimensionality of the target class and returns such a float.
 
+    preprocessors : iterable = (IQRNormaliser(), )
+        Preprocessors to apply. The default interquartile range normaliser rescales all features
+        to ensure that they all have the same interquartile range.
+
     sklearn_params
-        additional keyword parameters will be passed on as-is to scikit-learn's OneClassSVM constructor.
+        Additional keyword parameters will be passed on as-is to scikit-learn's OneClassSVM constructor.
 
     Notes
     -----
@@ -52,26 +57,28 @@ class SVM(Descriptor):
             self,
             nu: float = 0.20,
             c: float | Callable[[int], float] = fraction(0.25),
+            preprocessors=(IQRNormaliser(), ),
             **sklearn_params,
     ):
+        super().__init__(preprocessors=preprocessors)
         self.nu = nu
         self.c = c
         self.sklearn_params = sklearn_params
 
-    def construct(self, X, ):
-        model = super().construct(X)
+    def _construct(self, X, ):
+        model = super()._construct(X)
         model.nu = self.nu
         model.c = self.c(X.shape[1]) if callable(self.c) else self.c
         model.svm = OneClassSVM(nu=model.nu, gamma=1/model.c, **self.sklearn_params).fit(X)
         return model
 
-    class Model(Descriptor.Model):
+    class Model(DataDescriptor.Model):
 
         nu: float
         c: float
         svm: OneClassSVM
 
-        def query(self, X):
+        def _query(self, X):
             signed_distance = self.svm.decision_function(X)
             # scale signed distance from [-∞, ∞] to (0, 1)
             score = contract(signed_distance)

@@ -1,19 +1,16 @@
 """
-Preprocessors in fuzzy-rough-learn.
+Instance preprocessors in fuzzy-rough-learn.
 """
 
 import importlib
 
-from .neighbours.preprocessors import FRFS, FRPS
-try:
-    from .networks.preprocessors import SAE
-except ImportError:
-    pass
+from .neighbours.instance_preprocessors import FRPS
 
-__all__ = ['FRFS', 'FRPS', 'SAE']
+__all__ = [
+    'FRPS',
+]
 
 dependencies = {
-    'SAE': 'tensorflow',
 }
 
 

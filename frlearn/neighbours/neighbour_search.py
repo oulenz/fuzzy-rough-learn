@@ -13,10 +13,10 @@ from frlearn.base import ModelFactory
 class NNSearch(ModelFactory):
     """
     Abstract base class for nearest neighbour searches. Subclasses must
-    implement Model._query (and typically __init__ and construct).
+    implement Model._query (and typically __init__ and _construct).
     """
 
-    def construct(self, X) -> Model:
+    def __call__(self, X) -> Model:
         """
         Construct the model based on the data X.
 
@@ -30,7 +30,10 @@ class NNSearch(ModelFactory):
         M : Model
             Constructed model
         """
-        model = super().construct(X)
+        return super().__call__(X)
+
+    def _construct(self, X) -> Model:
+        model = super()._construct(X)
         model._X = X
         return model
 
@@ -41,9 +44,9 @@ class NNSearch(ModelFactory):
         def query_self(self, k: Union[int, float, None]):
             if callable(k):
                 k = k(self.n - 1)
-            return [a[:, 1:] for a in self.query(self._X, k + 1)]
+            return [a[:, 1:] for a in self(self._X, k + 1)]
 
-        def query(self, X, k: Union[int, Callable[[int], int]]):
+        def __call__(self, X, k: Union[int, Callable[[int], int]]):
             """
             Identify the k nearest neighbours for each of the instances in X.
 
@@ -70,6 +73,10 @@ class NNSearch(ModelFactory):
                 k = k(self.n)
             return self._query(X, k)
 
+        @property
+        def query(self):
+            return self.__call__
+
         @abstractmethod
         def _query(self, X, k: int):
             pass
@@ -93,7 +100,8 @@ class BallTree(NNSearch):
     """
 
     def __init__(self, *, metric: str = 'manhattan', leaf_size: int = 30,
-                 n_jobs: int = 1):
+                 n_jobs: int = 1, preprocessors=()):
+        super().__init__(preprocessors=preprocessors)
         self.construction_params = {
             'algorithm': 'ball_tree',
             'metric': metric,
@@ -101,8 +109,8 @@ class BallTree(NNSearch):
             'n_jobs': n_jobs,
         }
 
-    def construct(self, X) -> Model:
-        model = super().construct(X)
+    def _construct(self, X) -> Model:
+        model = super()._construct(X)
         model.tree = NearestNeighbors(**self.construction_params).fit(X)
         return model
 
@@ -132,7 +140,8 @@ class KDTree(NNSearch):
     """
 
     def __init__(self, *, metric: str = 'manhattan', leaf_size: int = 30,
-                 n_jobs: int = 1):
+                 n_jobs: int = 1, preprocessors=()):
+        super().__init__(preprocessors=preprocessors)
         self.construction_params = {
             'algorithm': 'kd_tree',
             'metric': metric,
@@ -140,8 +149,8 @@ class KDTree(NNSearch):
             'n_jobs': n_jobs,
         }
 
-    def construct(self, X) -> Model:
-        model = super().construct(X)
+    def _construct(self, X) -> Model:
+        model = super()._construct(X)
         model.tree = NearestNeighbors(**self.construction_params).fit(X)
         return model
 

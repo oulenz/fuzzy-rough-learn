@@ -56,10 +56,10 @@ for i, R_d_type in enumerate([1, 2]):
 
         # Create an instance of the FRONEC classifier and construct the model.
         clf = FRONEC(k=10, Q_type=Q_type, R_d_type=R_d_type)
-        model = clf.construct(X, Y)
+        model = clf(X, Y)
 
         # Query mesh points to obtain label values and convert into discrete predictions.
-        Z = model.query(np.c_[xx.ravel(), yy.ravel()])
+        Z = model(np.c_[xx.ravel(), yy.ravel()])
         Z = discretise(Z)
 
         # Encode label combinations as unique numbers, reshape into mesh and plot with light colour map.

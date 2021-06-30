@@ -22,7 +22,7 @@ from sklearn import datasets
 
 from frlearn.base import select_class
 from frlearn.classifiers import FRNN
-from frlearn.preprocessors import FRFS
+from frlearn.feature_preprocessors import FRFS
 from frlearn.utils.owa_operators import strict
 
 # Import example data.
@@ -43,15 +43,15 @@ for i, use_frfs in enumerate([False, True]):
     if use_frfs:
         # Create an instance of the FRFS preprocessor and process the data.
         preprocessor = FRFS(n_features=2)
-        model = preprocessor.construct(X_orig, y)
-        X = model.transform(X_orig)
+        model = preprocessor(X_orig, y)
+        X = model(X_orig)
     else:
         # Select first two features.
         X = X_orig[:, :2]
 
     # Create an instance of the FRNN classifier and construct the model.
     clf = FRNN(upper_weights=strict(), lower_weights=strict(), upper_k=1, lower_k=1)
-    model = clf.construct(X, y)
+    model = clf(X, y)
 
     # Create a mesh of points in the attribute space.
     step_size = .02
@@ -60,7 +60,7 @@ for i, use_frfs in enumerate([False, True]):
     xx, yy = np.meshgrid(np.arange(x_min, x_max, step_size), np.arange(y_min, y_max, step_size))
 
     # Query mesh points to obtain class values and select highest valued class.
-    Z = model.query(np.c_[xx.ravel(), yy.ravel()])
+    Z = model(np.c_[xx.ravel(), yy.ravel()])
     Z = select_class(Z, labels=model.classes)
 
     # Plot mesh.

@@ -5,9 +5,10 @@ from typing import List, Optional
 
 import numpy as np
 
-from frlearn.base import Descriptor, MultiClassClassifier, MultiLabelClassifier
+from frlearn.base import DataDescriptor, MultiClassClassifier, MultiLabelClassifier
 from frlearn.neighbours.data_descriptors import NND
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
+from frlearn.statistics.feature_preprocessors import RangeNormaliser
 from frlearn.utils.np_utils import div_or, fraction, truncated_complement
 from frlearn.utils.owa_operators import OWAOperator, additive, exponential
 
@@ -15,32 +16,34 @@ from frlearn.utils.owa_operators import OWAOperator, additive, exponential
 class FuzzyRoughEnsemble(MultiClassClassifier):
     def __init__(
             self,
-            upper_approximator: Optional[Descriptor] = NND(k=40, owa=additive(), proximity=truncated_complement),
-            lower_approximator: Optional[Descriptor] = NND(k=40, owa=additive(), proximity=truncated_complement),
+            upper_approximator: Optional[DataDescriptor] = NND(k=40, owa=additive(), proximity=truncated_complement),
+            lower_approximator: Optional[DataDescriptor] = NND(k=40, owa=additive(), proximity=truncated_complement),
+            preprocessors=()
     ):
+        super().__init__(preprocessors=preprocessors)
         self.upper_approximator = upper_approximator
         self.lower_approximator = lower_approximator
 
-    def construct(self, X, y) -> Model:
-        model: FuzzyRoughEnsemble.Model = super().construct(X, y)
+    def _construct(self, X, y) -> Model:
+        model: FuzzyRoughEnsemble.Model = super()._construct(X, y)
         Cs = [X[np.where(y == c)] for c in model.classes]
-        model.upper_approximations = self.upper_approximator and [self.upper_approximator.construct(C) for C in Cs]
+        model.upper_approximations = self.upper_approximator and [self.upper_approximator(C) for C in Cs]
         co_Cs = [X[np.where(y != c)] for c in model.classes]
-        model.lower_approximations = self.lower_approximator and [self.lower_approximator.construct(co_C) for co_C in co_Cs]
+        model.lower_approximations = self.lower_approximator and [self.lower_approximator(co_C) for co_C in co_Cs]
         return model
 
     class Model(MultiClassClassifier.Model):
 
-        upper_approximations: Optional[List[Descriptor.Model]]
-        lower_approximations: Optional[List[Descriptor.Model]]
+        upper_approximations: Optional[List[DataDescriptor.Model]]
+        lower_approximations: Optional[List[DataDescriptor.Model]]
 
-        def query(self, X):
+        def _query(self, X):
             vals = []
             if self.upper_approximations:
-                vals.append(np.stack([approximation.query(X) for approximation in self.upper_approximations], axis=1))
+                vals.append(np.stack([approximation(X) for approximation in self.upper_approximations], axis=1))
             if self.lower_approximations:
                 vals.append(
-                    1 - np.stack([approximation.query(X) for approximation in self.lower_approximations], axis=1))
+                    1 - np.stack([approximation(X) for approximation in self.lower_approximations], axis=1))
             if len(vals) == 2:
                 return sum(vals) / 2
             return vals[0]
@@ -69,6 +72,10 @@ class FRNN(FuzzyRoughEnsemble):
 
     nn_search : NNSearch = KDTree()
         Nearest neighbour search algorithm to use.
+
+    preprocessors : iterable = (RangeNormaliser(normalise_dimensionality=True), )
+        Preprocessors to apply. The default range normaliser ensures that all features have the same range,
+        and that the sum of the ranges is 1, so that we can use the Manhattan distance to obtain the mean similarity.
 
     Notes
     -----
@@ -104,27 +111,24 @@ class FRNN(FuzzyRoughEnsemble):
             upper_k: int = 20,
             lower_weights: Optional[OWAOperator] = additive(),
             lower_k: int = 20,
-            nn_search: NNSearch = KDTree(metric='manhattan')
+            nn_search: NNSearch = KDTree(metric='manhattan'),
+            preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
     ):
-        upper_approximator = upper_weights and NND(owa=upper_weights, k=upper_k, proximity=truncated_complement, nn_search=nn_search)
-        lower_approximator = lower_weights and NND(owa=lower_weights, k=lower_k, proximity=truncated_complement, nn_search=nn_search)
+        super().__init__(preprocessors=preprocessors)
+        upper_approximator = upper_weights and NND(
+            owa=upper_weights, k=upper_k, proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+        )
+        lower_approximator = lower_weights and NND(
+            owa=lower_weights, k=lower_k, proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+        )
         super().__init__(upper_approximator, lower_approximator)
 
-    def construct(self, X, y) -> Model:
-        scale = (np.max(X, axis=0) - np.min(X, axis=0)) * X.shape[1]
-        scale = np.where(scale == 0, 1, scale)
-        X = X.copy() / scale
-        model = super().construct(X, y)
-        model.scale = scale
+    def _construct(self, X, y) -> Model:
+        model = super()._construct(X, y)
         return model
 
     class Model(FuzzyRoughEnsemble.Model):
-
-        scale: np.array
-
-        def query(self, X):
-            X = X.copy() / self.scale
-            return super().query(X)
+        pass
 
 
 class FROVOCO(MultiClassClassifier):
@@ -135,6 +139,10 @@ class FROVOCO(MultiClassClassifier):
     ----------
     nn_search : NNSearch, default=KDTree()
         Nearest neighbour search algorithm to use.
+
+    preprocessors : iterable = (RangeNormaliser(normalise_dimensionality=True), )
+        Preprocessors to apply. The default range normaliser ensures that all features have the same range,
+        and that the sum of the ranges is 1, so that we can use the Manhattan distance to obtain the mean similarity.
 
     References
     ----------
@@ -149,17 +157,18 @@ class FROVOCO(MultiClassClassifier):
     def __init__(
             self,
             nn_search: NNSearch = KDTree(),
+            preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
     ):
-        self.exponential_approximator = NND(owa=exponential(), k=fraction(1), proximity=truncated_complement, nn_search=nn_search)
-        self.additive_approximator = NND(owa=additive(), k=fraction(.1), proximity=truncated_complement, nn_search=nn_search)
+        super().__init__(preprocessors=preprocessors)
+        self.exponential_approximator = NND(
+            owa=exponential(), k=fraction(1), proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+        )
+        self.additive_approximator = NND(
+            owa=additive(), k=fraction(.1), proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+        )
 
-    def construct(self, X, y) -> Model:
-        model: FROVOCO.Model = super().construct(X, y)
-
-        scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.m
-        scale = np.where(scale == 0, 1, scale)
-        X = X.copy() / scale
-        model.scale = scale
+    def _construct(self, X, y) -> Model:
+        model: FROVOCO.Model = super()._construct(X, y)
 
         Cs = [X[np.where(y == c)] for c in model.classes]
         co_Cs = [X[np.where(y != c)] for c in model.classes]
@@ -169,8 +178,8 @@ class FROVOCO(MultiClassClassifier):
         model.ova_ir = np.array([c_n / (len(X) - c_n) for c_n in class_sizes])
         max_ir = np.max(model.ovo_ir, axis=1)
 
-        add_costr = self.additive_approximator.construct
-        exp_costr = self.exponential_approximator.construct
+        add_costr = self.additive_approximator
+        exp_costr = self.exponential_approximator
         model.add_approx = [add_costr(C) if ir > 9 else None for ir, C in zip(max_ir, Cs)]
         model.exp_approx = [exp_costr(C) if ir <= 9 else None for ir, C in zip(model.ova_ir, Cs)]
         model.co_approx = [(add_costr if 1/ir > 9 else exp_costr)(co_C) for ir, co_C in zip(model.ova_ir, co_Cs)]
@@ -181,28 +190,26 @@ class FROVOCO(MultiClassClassifier):
 
     class Model(MultiClassClassifier.Model):
 
-        scale: np.array
         ovo_ir: np.array
         ova_ir: np.array
-        add_approx: List[Optional[Descriptor.Model]]
-        exp_approx: List[Optional[Descriptor.Model]]
-        co_approx: List[Descriptor.Model]
+        add_approx: List[Optional[DataDescriptor.Model]]
+        exp_approx: List[Optional[DataDescriptor.Model]]
+        co_approx: List[DataDescriptor.Model]
         sig: np.array
 
         def _sig(self, C):
             approx = [a if ir > 9 else e for ir, a, e in zip(self.ova_ir, self.add_approx, self.exp_approx)]
-            vals_C = np.array([np.mean(a.query(C)) for a in approx])
-            co_vals_C = np.array([np.mean(co_a.query(C)) for co_a in self.co_approx])
+            vals_C = np.array([np.mean(a(C)) for a in approx])
+            co_vals_C = np.array([np.mean(co_a(C)) for co_a in self.co_approx])
             return (vals_C + 1 - co_vals_C)/2
 
-        def query(self, X):
-            X = X.copy() / self.scale
+        def _query(self, X):
             # The values in the else clause are just placeholders. But we can't use `None`, because that will force
             # the dtype of the resulting array to become `object`, which will in turn lead to 0/0 producing
             # ZeroDivisionError rather than np.nan
-            additive_vals_X = np.stack(np.broadcast_arrays(*[a.query(X) if a else -np.inf for a in self.add_approx])).transpose()
-            exponential_vals_X = np.stack(np.broadcast_arrays(*[a.query(X) if a else -np.inf for a in self.exp_approx])).transpose()
-            co_vals_X = np.array([a.query(X) for a in self.co_approx]).transpose()
+            additive_vals_X = np.stack(np.broadcast_arrays(*[a(X) if a else -np.inf for a in self.add_approx])).transpose()
+            exponential_vals_X = np.stack(np.broadcast_arrays(*[a(X) if a else -np.inf for a in self.exp_approx])).transpose()
+            co_vals_X = np.array([a(X) for a in self.co_approx]).transpose()
 
             mem = self._mem(additive_vals_X, exponential_vals_X, co_vals_X)
 
@@ -237,15 +244,23 @@ class FRONEC(MultiLabelClassifier):
     Q_type : int {1, 2, 3, }, default=2
         Quality measure to use for identifying most relevant instances.
         Q^1 uses lower approximation, Q^2 uses upper approximation, Q^3 is the mean of Q^1 and Q^2.
+
     R_d_type : int {1, 2, }, default=1
         Label similarity relation to use.
         R_d^1 is simple Hamming similarity. R_d^2 is similar, but takes the prior label probabilities into account.
+
     k : int, default=20
         Number of neighbours to consider for neighbourhood consensus.
+
     owa_weights: OWAOperator, default=additive()
         OWA weights to use for calculation of soft maximum and/or minimum.
+
     nn_search : NNSearch, default=KDTree()
         Nearest neighbour search algorithm to use.
+
+    preprocessors : iterable = (RangeNormaliser(normalise_dimensionality=True), )
+        Preprocessors to apply. The default range normaliser ensures that all features have the same range,
+        and that the sum of the ranges is 1, so that we can use the Manhattan distance to obtain the mean similarity.
 
     References
     ----------
@@ -257,31 +272,30 @@ class FRONEC(MultiLabelClassifier):
        <https://www.sciencedirect.com/science/article/pii/S002002551731157X>`_
     """
 
-    def __init__(self, Q_type: int = 2, R_d_type: int = 1,
-                 k: int = 20, owa_weights: OWAOperator = additive(), nn_search: NNSearch = KDTree()):
+    def __init__(
+            self, Q_type: int = 2, R_d_type: int = 1,
+            k: int = 20, owa_weights: OWAOperator = additive(), nn_search: NNSearch = KDTree(),
+            preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
+    ):
+        super().__init__(preprocessors=preprocessors)
         self.Q_type = Q_type
         self.R_d_type = R_d_type
         self.k = k
         self.owa_weights = owa_weights
         self.nn_search = nn_search
 
-    def construct(self, X, Y) -> Model:
-        model: FRONEC.Model = super().construct(X, Y)
-        scale = (np.max(X, axis=0) - np.min(X, axis=0)) * model.m
-        scale = np.where(scale == 0, 1, scale)
-        X = X.copy() / scale
-        model.scale = scale
+    def _construct(self, X, Y) -> Model:
+        model: FRONEC.Model = super()._construct(X, Y)
         model.Q_type = self.Q_type
         model.R_d = model._R_d_2(Y) if self.R_d_type == 2 else model._R_d_1(Y)
         model.k = self.k
         model.owa_weights = self.owa_weights
-        model.nn_model = self.nn_search.construct(X)
+        model.nn_model = self.nn_search(X)
         model.Y = Y
         return model
 
     class Model(MultiLabelClassifier.Model):
 
-        scale: np.array
         Q_type: int
         R_d: np.array
         k: int
@@ -306,9 +320,8 @@ class FRONEC(MultiLabelClassifier):
             divisor = numerator + xeither * 0.5
             return np.sum(numerator, axis=-1)/np.sum(divisor, axis=-1)
 
-        def query(self, X):
-            X = X.copy() / self.scale
-            neighbours, distances = self.nn_model.query(X, self.k)
+        def _query(self, X):
+            neighbours, distances = self.nn_model(X, self.k)
             R = np.maximum(1 - distances, 0)
             if self.Q_type == 1:
                 Q = self._Q_1(neighbours, R)

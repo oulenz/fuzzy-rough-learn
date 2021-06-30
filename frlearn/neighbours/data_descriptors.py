@@ -7,33 +7,40 @@ from typing import Callable, Union
 import numpy as np
 
 from .neighbour_search import KDTree, NNSearch
-from ..base import Descriptor
+from ..base import DataDescriptor
+from frlearn.statistics.feature_preprocessors import IQRNormaliser
 from ..utils.np_utils import div_or, log_units, shifted_reciprocal
 from ..utils.owa_operators import OWAOperator, additive, trimmed
 
 
-class NNDescriptor(Descriptor):
+# TODO: consider implementing NNDescriptor as addition of NNSearch to preprocessors,
+# but have to handle k somehow (especially for ALP which also has l)
+
+class NNDataDescriptor(DataDescriptor):
 
     @abstractmethod
-    def __init__(self, nn_search: NNSearch, k: Union[int, Callable[[int], int]], *args, **kwargs):
+    def __init__(self, nn_search: NNSearch, k: Union[int, Callable[[int], int]], *args, preprocessors=()):
+        super().__init__(preprocessors=preprocessors)
         self.nn_search = nn_search
         self.k = k
 
     @abstractmethod
-    def construct(self, X) -> Model:
-        model = super().construct(X)
-        nn_model = self.nn_search.construct(X)
+    def _construct(self, X) -> Model:
+        model = super()._construct(X)
+        nn_model = self.nn_search(X)
         model.nn_model = nn_model
         model.k = self.k(len(nn_model)) if callable(self.k) else self.k
         return model
 
-    class Model(Descriptor.Model):
+    class Model(DataDescriptor.Model):
 
         nn_model: NNSearch.Model
         k: int
 
-        def query(self, X):
-            q_neighbours, q_distances = self.nn_model.query(X, self.k)
+        def __call__(self, X):
+            for preprocessing_model in self.preprocessing_models:
+                X = preprocessing_model(X)
+            q_neighbours, q_distances = self.nn_model(X, self.k)
             return self._query(q_neighbours, q_distances)
 
         @abstractmethod
@@ -41,7 +48,7 @@ class NNDescriptor(Descriptor):
             pass
 
 
-class ALP(NNDescriptor):
+class ALP(NNDataDescriptor):
     """
     Implementation of the Average Localised Proximity (ALP) data descriptor [1]_.
     Expresses the proximity of a query instance to the target data,
@@ -76,6 +83,10 @@ class ALP(NNDescriptor):
         a query set is batch-processed, which is slower.
         TODO: determine maximum array size dynamically, investigate lowering float precision
 
+    preprocessors : iterable = (IQRNormaliser(), )
+        Preprocessors to apply. The default interquartile range normaliser rescales all features
+        to ensure that they all have the same interquartile range.
+
     Notes
     -----
     `k` and `l` are the two principal hyperparameters that can be tuned to increase performance.
@@ -98,15 +109,16 @@ class ALP(NNDescriptor):
             localisation_weights: OWAOperator = additive(),
             nn_search: NNSearch = KDTree(),
             max_array_size: int = 2**26,
+            preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(nn_search=nn_search, k=k, )
+        super().__init__(nn_search=nn_search, k=k, preprocessors=preprocessors)
         self.l = l
         self.scale_weights = scale_weights
         self.localisation_weights = localisation_weights
         self.max_array_size = max_array_size
 
-    def construct(self, X):
-        model: ALP.Model = super().construct(X)
+    def _construct(self, X):
+        model: ALP.Model = super()._construct(X)
         model.l = self.l(len(model.nn_model)) if callable(self.l) else self.l
         model._kl = max(model.k, model.l)
         _, model.distances = model.nn_model.query_self(model._kl)
@@ -114,7 +126,7 @@ class ALP(NNDescriptor):
         model.localisation_weights = self.localisation_weights
         return model
 
-    class Model(NNDescriptor.Model):
+    class Model(NNDataDescriptor.Model):
 
         l: int
         _kl: int
@@ -123,7 +135,7 @@ class ALP(NNDescriptor):
         localisation_weights: OWAOperator
 
         def query(self, X):
-            q_neighbours, q_distances = self.nn_model.query(X, self._kl)
+            q_neighbours, q_distances = self.nn_model(X, self._kl)
             return self._query(q_neighbours[..., :self.l], q_distances[..., :self.k])
 
         def _query(self, q_neighbours, q_distances):
@@ -141,7 +153,7 @@ class ALP(NNDescriptor):
             return self.scale_weights.soft_max(localised_proximities, self.k)
 
 
-class LNND(NNDescriptor):
+class LNND(NNDataDescriptor):
     """
     Implementation of the Localised Nearest Neighbour Distance (LNND) data descriptor [1]_[2]_.
 
@@ -151,6 +163,10 @@ class LNND(NNDescriptor):
         Which nearest neighbour to consider.
         Should be either a positive integer not larger than the target class size,
         or a function that takes the size of the target class and returns such an integer.
+
+    preprocessors : iterable = (IQRNormaliser(), )
+        Preprocessors to apply. The default interquartile range normaliser rescales all features
+        to ensure that they all have the same interquartile range.
 
     Notes
     -----
@@ -178,16 +194,21 @@ class LNND(NNDescriptor):
        <https://www.sciencedirect.com/science/article/abs/pii/S0031320321001783>`_
     """
 
-    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_units(3.4)):
-        super().__init__(nn_search=nn_search, k=k)
+    def __init__(
+            self,
+            nn_search: NNSearch = KDTree(),
+            k: Union[int, Callable[[int], int]] = log_units(3.4),
+            preprocessors=(IQRNormaliser(), )
+    ):
+        super().__init__(nn_search=nn_search, k=k, preprocessors=preprocessors)
 
-    def construct(self, X) -> Model:
-        model: LNND.Model = super().construct(X)
+    def _construct(self, X) -> Model:
+        model: LNND.Model = super()._construct(X)
         _, distances = model.nn_model.query_self(model.k)
         model.distances = distances[:, -1]
         return model
 
-    class Model(NNDescriptor.Model):
+    class Model(NNDataDescriptor.Model):
 
         distances: np.ndarray
 
@@ -199,7 +220,7 @@ class LNND(NNDescriptor):
             return shifted_reciprocal(l_distances)
 
 
-class LOF(NNDescriptor):
+class LOF(NNDataDescriptor):
     """
     Implementation of the Local Outlier Factor (LOF) data descriptor [1]_.
 
@@ -209,6 +230,10 @@ class LOF(NNDescriptor):
         How many nearest neighbours to consider.
         Should be either a positive integer not larger than the target class size,
         or a function that takes the size of the target class and returns such an integer.
+
+    preprocessors : iterable = (IQRNormaliser(), )
+        Preprocessors to apply. The default interquartile range normaliser rescales all features
+        to ensure that they all have the same interquartile range.
 
     Notes
     -----
@@ -231,17 +256,22 @@ class LOF(NNDescriptor):
        <https://www.sciencedirect.com/science/article/abs/pii/S0031320321001783>`_
     """
 
-    def __init__(self, nn_search: NNSearch = KDTree(), k: Union[int, Callable[[int], int]] = log_units(2.5)):
-        super().__init__(nn_search=nn_search, k=k)
+    def __init__(
+            self,
+            nn_search: NNSearch = KDTree(),
+            k: Union[int, Callable[[int], int]] = log_units(2.5),
+            preprocessors=(IQRNormaliser(), )
+    ):
+        super().__init__(nn_search=nn_search, k=k, preprocessors=preprocessors)
 
-    def construct(self, X) -> Model:
-        model: LOF.Model = super().construct(X)
+    def _construct(self, X) -> Model:
+        model: LOF.Model = super()._construct(X)
         neighbours, distances = model.nn_model.query_self(model.k)
         model.distances = distances[:, -1]
         model.lrd = model._get_lrd(neighbours, distances)
         return model
 
-    class Model(NNDescriptor.Model):
+    class Model(NNDataDescriptor.Model):
 
         distances: np.ndarray
         lrd: np.ndarray
@@ -258,7 +288,7 @@ class LOF(NNDescriptor):
             return shifted_reciprocal(lof)
 
 
-class NND(NNDescriptor):
+class NND(NNDataDescriptor):
     """
     Implementation of the Nearest Neighbour Distance (NND) data descriptor, which goes back to at least [1]_.
     It has also been used to calculate upper and lower approximations of fuzzy rough sets,
@@ -280,6 +310,10 @@ class NND(NNDescriptor):
     owa : OWAOperator = trimmed()
         How to aggregate the proximity values from the `k` nearest neighbours.
         The default is to only consider the kth nearest neighbour distance.
+
+    preprocessors : iterable = (IQRNormaliser(), )
+        Preprocessors to apply. The default interquartile range normaliser rescales all features
+        to ensure that they all have the same interquartile range.
 
     Notes
     -----
@@ -313,18 +347,19 @@ class NND(NNDescriptor):
             k: Union[int, Callable[[int], int]] = 1,
             proximity: Callable[[float], float] = shifted_reciprocal,
             owa: OWAOperator = trimmed(),
+            preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(nn_search=nn_search, k=k)
+        super().__init__(nn_search=nn_search, k=k, preprocessors=preprocessors)
         self.proximity = proximity
         self.owa = owa
 
-    def construct(self, X) -> Model:
-        model: NND.Model = super().construct(X)
+    def _construct(self, X) -> Model:
+        model: NND.Model = super()._construct(X)
         model.proximity = self.proximity
         model.owa = self.owa
         return model
 
-    class Model(NNDescriptor.Model):
+    class Model(NNDataDescriptor.Model):
 
         proximity: Callable[[float], float]
         owa: OWAOperator

@@ -55,13 +55,14 @@ if LooseVersion(sphinx.__version__) < LooseVersion('1.4'):
 else:
     extensions.append('sphinx.ext.imgmath')
 
-autodoc_default_flags = ['members', 'inherited-members']
+autodoc_default_options = {'members': None, 'inherited-members': None}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 # generate autosummary even if no references
 autosummary_generate = True
+autosummary_imported_members = True
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -77,7 +78,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'fuzzy-rough-learn'
-copyright = '2019–2020, Oliver Urs Lenz'
+copyright = '2019–2021, Oliver Urs Lenz'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -323,7 +324,7 @@ issues_user_uri = 'https://github.com/{user}'
 
 def setup(app):
     # a copy button to copy snippet of code from the documentation
-    app.add_javascript('js/copybutton.js')
+    app.add_js_file('js/copybutton.js')
 
 # The following is used by sphinx.ext.linkcode to provide links to github
 linkcode_resolve = make_linkcode_resolve('frlearn',

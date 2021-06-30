@@ -5,10 +5,10 @@ from typing import Callable
 
 from sklearn.ensemble import IsolationForest
 
-from ..base import Descriptor
+from ..base import DataDescriptor
 
 
-class EIF(Descriptor):
+class EIF(DataDescriptor):
     """
     Wrapper for the Extended Isolation Forest (IF) data descriptor [1]_.
     Requires the eif library, which is not automatically installed.
@@ -31,6 +31,9 @@ class EIF(Descriptor):
 
     eif_params
         additional keyword parameters will be passed on as-is to eif's iForest constructor.
+
+    preprocessors : iterable = ()
+        Preprocessors to apply.
 
     Notes
     -----
@@ -58,8 +61,10 @@ class EIF(Descriptor):
             psi: int | Callable[[int], int] = 256,
             t: int = 100,
             random_state: int = 0,
+            preprocessors=(),
             **eif_params
     ):
+        super().__init__(preprocessors=preprocessors)
         try:
             import eif
         except ImportError:
@@ -69,9 +74,9 @@ class EIF(Descriptor):
         self.random_state = random_state
         self.eif_params = eif_params
 
-    def construct(self, X):
+    def _construct(self, X):
         import eif
-        model = super().construct(X)
+        model = super()._construct(X)
         model.psi = min(self.psi, X.shape[0])
         model.t = self.t
         model.random_state = self.random_state
@@ -82,19 +87,19 @@ class EIF(Descriptor):
         )
         return model
 
-    class Model(Descriptor.Model):
+    class Model(DataDescriptor.Model):
 
         psi: int
         t: int
         random_state: int
         forest: ...
 
-        def query(self, X):
+        def _query(self, X):
             # convert anomaly scores to normality scores
             return 1 - self.forest.compute_paths(X_in=X)
 
 
-class IF(Descriptor):
+class IF(DataDescriptor):
     """
     Wrapper for the Isolation Forest (IF) data descriptor [1]_ implemented in scikit-learn.
     Expresses the effort required to isolate a query instance from the target data
@@ -114,8 +119,11 @@ class IF(Descriptor):
     random_state : int = 0
         Random state to use.
 
+    preprocessors : iterable = ()
+        Preprocessors to apply.
+
     sklearn_params
-        additional keyword parameters will be passed on as-is to scikit-learn's IsolationForest constructor.
+        Additional keyword parameters will be passed on as-is to scikit-learn's IsolationForest constructor.
 
     Notes
     -----
@@ -138,15 +146,17 @@ class IF(Descriptor):
             psi: int | Callable[[int], int] = 256,
             t: int = 100,
             random_state: int = 0,
-            **sklearn_params
+            preprocessors=(),
+            **sklearn_params,
     ):
+        super().__init__(preprocessors=preprocessors)
         self.psi = psi
         self.t = t
         self.random_state = random_state
         self.sklearn_params = sklearn_params
 
-    def construct(self, X):
-        model = super().construct(X)
+    def _construct(self, X):
+        model = super()._construct(X)
         model.psi = min(self.psi, X.shape[0])
         model.t = self.t
         model.random_state = self.random_state
@@ -156,13 +166,13 @@ class IF(Descriptor):
         ).fit(X)
         return model
 
-    class Model(Descriptor.Model):
+    class Model(DataDescriptor.Model):
 
         psi: int
         t: int
         random_state: int
         forest: IsolationForest
 
-        def query(self, X):
+        def _query(self, X):
             # map from [-1, 0] to [0, 1]
             return 1 + self.forest.score_samples(X)

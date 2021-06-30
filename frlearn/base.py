@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from inspect import signature
 
 import numpy as np
 
@@ -11,8 +12,27 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 
 class ModelFactory(ABC):
 
+    def __init__(self, preprocessors=()):
+        self.preprocessors = preprocessors
+
     @abstractmethod
-    def construct(self, X, *args, **kwargs) -> ModelFactory.Model:
+    def __call__(self, X, **kwargs) -> ModelFactory.Model:
+        preprocessing_models = []
+        for preprocessor in self.preprocessors:
+            extra_kwargs = {k: v for k, v in kwargs.items() if k in signature(preprocessor.__call__).parameters}
+            preprocessing_model = preprocessor(X, **extra_kwargs)
+            X = preprocessing_model(X)
+            preprocessing_models.append(preprocessing_model)
+        model = self._construct(X, **kwargs)
+        model.preprocessing_models = preprocessing_models
+        return model
+
+    @property
+    def construct(self):
+        return self.__call__
+
+    @abstractmethod
+    def _construct(self, X, **kwargs) -> ModelFactory.Model:
         model = self.Model.__new__(self.Model)
         model.n, model.m = model.shape = X.shape
         return model
@@ -22,52 +42,59 @@ class ModelFactory(ABC):
         n: int
         m: int
         shape: tuple[int, ...]
+        preprocessing_models: list
 
         def __len__(self):
             return self.n
 
-
-class Unsupervised(ModelFactory):
-
-    def construct(self, X, ) -> Unsupervised.Model:
-        model = super().construct(X)
-        return model
-
-
-class Supervised(ModelFactory):
-
-    def construct(self, X, y) -> Supervised.Model:
-        model = super().construct(X)
-        model.classes = np.unique(y)
-        model.n_classes = len(model.classes)
-        return model
-
-
-class Descriptor(Unsupervised, ModelFactory):
-
-    class Model(ModelFactory.Model):
+        @abstractmethod
+        def __call__(self, X, *args, **kwargs):
+            for preprocessing_model in self.preprocessing_models:
+                X = preprocessing_model(X)
+            return self._query(X, *args, **kwargs)
 
         @abstractmethod
-        def query(self, X):
+        def _query(self, X, *args, **kwargs):
             pass
 
 
-class MultiClassClassifier(Supervised, ModelFactory):
+class Unsupervised(ModelFactory):
+
+    def __call__(self, X) -> Unsupervised.Model:
+        return super().__call__(X, )
+
+    def _construct(self, X) -> Unsupervised.Model:
+        model = super()._construct(X)
+        return model
+
+    class Model(ModelFactory.Model):
+        pass
+
+
+class ClassSupervised(ModelFactory):
+
+    def __call__(self, X, y) -> ClassSupervised.Model:
+        return super().__call__(X, y=y)
+
+    def _construct(self, X, y) -> ClassSupervised.Model:
+        model = super()._construct(X, y=y)
+        model.classes = np.unique(y)
+        model.n_classes = len(model.classes)
+        return model
 
     class Model(ModelFactory.Model):
 
         classes: np.array
         n_classes: int
 
-        @abstractmethod
-        def query(self, X):
-            pass
 
+class LabelSupervised(ModelFactory):
 
-class MultiLabelClassifier(ModelFactory):
+    def __call__(self, X, Y) -> LabelSupervised.Model:
+        return super().__call__(X, Y=Y)
 
-    def construct(self, X, Y) -> MultiLabelClassifier.Model:
-        model = super().construct(X, Y)
+    def _construct(self, X, Y) -> LabelSupervised.Model:
+        model = super()._construct(X, Y=Y)
         model.n_labels = Y.shape[1]
         return model
 
@@ -75,18 +102,48 @@ class MultiLabelClassifier(ModelFactory):
 
         n_labels: int
 
+
+class Classifier(ModelFactory):
+
+    class Model(ModelFactory.Model):
+
+        def __call__(self, X):
+            return super().__call__(X)
+
+        @property
+        def query(self):
+            return self.__call__
+
         @abstractmethod
-        def query(self, X):
+        def _query(self, X):
             pass
+
+
+class DataDescriptor(Unsupervised, Classifier):
+    class Model(Unsupervised.Model, Classifier.Model):
+        pass
+
+
+class MultiClassClassifier(ClassSupervised, Classifier):
+    class Model(ClassSupervised.Model, Classifier.Model):
+        pass
+
+
+class MultiLabelClassifier(LabelSupervised, Classifier):
+    class Model(LabelSupervised.Model, Classifier.Model):
+        pass
 
 
 class FeaturePreprocessor(ModelFactory):
 
     class Model(ModelFactory.Model):
 
-        @abstractmethod
-        def transform(self, X):
-            pass
+        def __call__(self, X):
+            return super().__call__(X)
+
+        @property
+        def transform(self):
+            return self.__call__
 
 
 class FeatureSelector(FeaturePreprocessor):
@@ -95,7 +152,7 @@ class FeatureSelector(FeaturePreprocessor):
 
         selection: np.array
 
-        def transform(self, X):
+        def _query(self, X):
             return X[:, self.selection]
 
 
@@ -106,7 +163,7 @@ class SupervisedInstancePreprocessor(ABC):
         pass
 
     @abstractmethod
-    def transform(self, X, y):
+    def __call__(self, X, y):
         pass
 
 
@@ -217,7 +274,7 @@ class FitPredictClassifier(BaseEstimator, ClassifierMixin, ):
             Target values of shape = [n_samples] or [n_samples, n_outputs]
 
         """
-        self.model_ = self.classifier.construct(X, y)
+        self.model_ = self.classifier(X, y)
         return self
 
     def predict(self, X):
@@ -234,7 +291,7 @@ class FitPredictClassifier(BaseEstimator, ClassifierMixin, ):
         y : array shape=(n_instances, )
             Class label for each query instance.
         """
-        scores = self.model_.query(X)
+        scores = self.model_(X)
 
         if isinstance(self.classifier, MultiClassClassifier):
             return select_class(scores, labels=self.model_.classes)
@@ -257,5 +314,5 @@ class FitPredictClassifier(BaseEstimator, ClassifierMixin, ):
             by lexicographic order.
         """
         # normalise membership degrees into confidence scores
-        scores = self.model_.query(X)
+        scores = self.model_(X)
         return probabilities_from_scores(scores)

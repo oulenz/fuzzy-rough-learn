@@ -2,42 +2,54 @@
 from __future__ import annotations
 
 import numpy as np
-from scipy import linalg, spatial
+from scipy import linalg
 from scipy.stats import chi2
 
-from .centres import centroid
-from ..base import Descriptor
+from frlearn.statistics.feature_preprocessors import Standardiser
+from ..base import DataDescriptor
 from ..utils.np_utils import shifted_reciprocal
 
 
-class CD(Descriptor):
+class CD(DataDescriptor):
     """
     Implementation of the Centre Distance (CD) data descriptor.
     Calculates a score based on the distance to a central point of the target data.
 
+    This is implemented as simply the norm of each element (the distance to the origin),
+    with the expectation that the given preprocessor normalises the data in such a way that
+    a suitable central value of the data is located at the origin,
+    and that all features have the same scale.
+
+    By default (standardisation) this is centroid distance.
+
     Parameters
     ----------
-    centre : ndarray -> ndarray, default=centroid
-        Central point definition to use.
-        Should be a function that takes an array of shape (n, m, )
-        and returns an array of shape (m, )
-    metric: str, default='euclidean'
-        Metric to use for distance calculations.
+    ord: float = 2
+        Order of the norm to use. Can also be `-np.inf` or `np.inf`.
+
     threshold_perc : int or None, default=80
         Threshold percentile for normal instances. Should be in (0, 100] or None.
         All distances below the distance value in the target set corresponding to this percentile
         result in a final score above 0.5. If None, 1 is used as the threshold instead.
+
+    preprocessors : iterable = (Standardiser(), )
+        Preprocessors to apply. The default standardiser places the centroid of the data at the origin,
+        and ensures that all features have the same standard deviation.
     """
 
-    def __init__(self, centre=centroid, metric: str = 'euclidean', threshold_perc: int | None = 80):
-        self.centre = centre
-        self.metric = metric
+    def __init__(
+            self,
+            ord: float = 2,
+            threshold_perc: int | None = 80,
+            preprocessors=(Standardiser(), )
+    ):
+        super().__init__(preprocessors=preprocessors)
+        self.ord = ord
         self.threshold_perc = threshold_perc
 
-    def construct(self, X) -> Model:
-        model: CD.Model = super().construct(X)
-        model.centre = self.centre(X)
-        model.metric = self.metric
+    def _construct(self, X) -> Model:
+        model: CD.Model = super()._construct(X)
+        model.ord = self.ord
         if self.threshold_perc:
             distances = model._distances(X)
             model.threshold = np.percentile(distances, self.threshold_perc)
@@ -45,22 +57,20 @@ class CD(Descriptor):
             model.threshold = 1
         return model
 
-    class Model(Descriptor.Model):
+    class Model(DataDescriptor.Model):
 
-        centre: np.ndarray
-        metric: str
+        ord: float
         threshold: float
 
-        def query(self, X):
+        def _query(self, X):
             distances = self._distances(X)
             return shifted_reciprocal(distances, self.threshold)
 
         def _distances(self, X):
-            # cdist expects two two-dimensional arrays, and returns the two-dimensional array of pairwise distances
-            return np.squeeze(spatial.distance.cdist(X, self.centre[None, :], metric=self.metric), axis=1)
+            return np.linalg.norm(X, ord=self.ord, axis=1)
 
 
-class MD(Descriptor):
+class MD(DataDescriptor):
     """
     Implementation of the Mahalanobis Distance (MD) data descriptor [1]_.
     Mahalanobis distance is the multivariate generalisation of distance to the mean in terms of σ,
@@ -68,6 +78,11 @@ class MD(Descriptor):
     and uses the pseudo-inverse of its covariance matrix to transform a vector with deviations from the mean
     in each dimension into a single distance value.
     Squared Mahalanobis distance is χ²-distributed, the corresponding p-value is the confidence score.
+
+    Parameters
+    ----------
+    preprocessors : iterable = ()
+        Preprocessors to apply.
 
     References
     ----------
@@ -78,18 +93,21 @@ class MD(Descriptor):
        <http://insa.nic.in/writereaddata/UpLoadedFiles/PINSA/Vol02_1936_1_Art05.pdf>`_
     """
 
-    def construct(self, X) -> Model:
-        model: MD.Model = super().construct(X)
+    def __init__(self, preprocessors=()):
+        super().__init__(preprocessors=preprocessors)
+
+    def _construct(self, X) -> Model:
+        model: MD.Model = super()._construct(X)
         model.mean = X.mean(axis=0)
         model.covar_inv = linalg.pinvh(np.cov(X.T, bias=True))
         return model
 
-    class Model(Descriptor.Model):
+    class Model(DataDescriptor.Model):
 
         mean: np.array
         covar_inv: np.array
 
-        def query(self, X):
+        def _query(self, X):
             d = X - self.mean
             D2 = (d[..., None, :] @ self.covar_inv @ d[..., None]).squeeze(axis=(-2, -1))
             return 1 - chi2.cdf(D2, df=self.m)

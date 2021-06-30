@@ -5,7 +5,8 @@ from sklearn.datasets import load_iris
 
 from frlearn.classifiers import FRNN, FRONEC, FROVOCO
 from frlearn.data_descriptors import ALP, CD, EIF, IF, LNND, LOF, MD, NND, SVM
-from frlearn.preprocessors import FRFS, FRPS
+from frlearn.feature_preprocessors import FRFS, IQRNormaliser, MaxAbsNormaliser, RangeNormaliser, Standardiser
+from frlearn.instance_preprocessors import FRPS
 
 
 @pytest.fixture
@@ -20,9 +21,9 @@ def data():
 def test_multiclass_classifier(data, cls):
     X, y = data
     clf = cls()
-    model = clf.construct(X, y)
+    model = clf(X, y)
 
-    scores = model.query(X)
+    scores = model(X)
     assert scores.shape == (X.shape[0], 3)
 
 
@@ -38,9 +39,9 @@ def test_multilabel_classifier(data, cls):
     Y[((X[:, 0] <= 6) & (y == 2)), 1] = 1
 
     clf = cls()
-    model = clf.construct(X, Y)
+    model = clf(X, Y)
 
-    scores = model.query(X)
+    scores = model(X)
     assert scores.shape == (X.shape[0], 3)
 
 
@@ -51,9 +52,9 @@ def test_multilabel_classifier(data, cls):
 def test_data_descriptor(data, cls):
     X, y = data
     descriptor = cls()
-    model = descriptor.construct(X[y == 0])
+    model = descriptor(X[y == 0])
 
-    scores = model.query(X)
+    scores = model(X)
     assert scores.shape == (X.shape[0], )
 
 
@@ -65,10 +66,23 @@ def test_supervised_feature_selector(data, cls):
     X_orig, y_orig = data
 
     preprocessor = cls()
-    model = preprocessor.construct(X_orig, y_orig)
-    X = model.transform(X_orig)
+    model = preprocessor(X_orig, y_orig)
+    X = model(X_orig)
     assert X.shape[0] == X_orig.shape[0]
     assert X.shape[1] <= X_orig.shape[1]
+
+
+@pytest.mark.parametrize(
+    'cls',
+    [IQRNormaliser, MaxAbsNormaliser, RangeNormaliser, Standardiser],
+)
+def test_unsupervised_feature_preprocessor(data, cls):
+    X_orig, y_orig = data
+
+    preprocessor = cls()
+    model = preprocessor(X_orig)
+    X = model(X_orig)
+    assert X.shape[0] == X_orig.shape[0]
 
 
 # TODO: add test for SAE (but SAE takes a long time to run)
@@ -82,7 +96,7 @@ def test_supervised_instance_selector(data, cls):
     X_orig, y_orig = data
     preprocessor = cls()
 
-    X, y = preprocessor.transform(X_orig, y_orig)
+    X, y = preprocessor(X_orig, y_orig)
     assert y.shape[0] == X.shape[0]
     assert X.shape[1] == X_orig.shape[1]
     assert X.shape[0] <= X_orig.shape[0]

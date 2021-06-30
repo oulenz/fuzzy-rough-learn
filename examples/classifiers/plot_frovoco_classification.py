@@ -33,7 +33,7 @@ cmap_bold = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
 
 # Create an instance of the FROVOCO classifier and construct the model.
 clf = FROVOCO()
-model = clf.construct(X, y)
+model = clf(X, y)
 
 # Create a mesh of points in the attribute space.
 step_size = .02
@@ -42,7 +42,7 @@ y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
 xx, yy = np.meshgrid(np.arange(x_min, x_max, step_size), np.arange(y_min, y_max, step_size))
 
 # Query mesh points to obtain class values and select highest valued class.
-Z = model.query(np.c_[xx.ravel(), yy.ravel()])
+Z = model(np.c_[xx.ravel(), yy.ravel()])
 Z = select_class(Z, labels=model.classes)
 
 # Initialise figure.

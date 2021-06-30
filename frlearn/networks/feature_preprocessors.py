@@ -1,8 +1,7 @@
-"""Neural network preprocessors"""
+"""Neural network feature preprocessors"""
 from __future__ import annotations
 
 import numpy as np
-from sklearn.preprocessing import MaxAbsScaler
 
 import tensorflow as tf
 from tensorflow import keras
@@ -10,6 +9,7 @@ from tensorflow.keras import layers
 
 from .layers import TransposedDense
 from ..base import FeaturePreprocessor, Unsupervised
+from frlearn.statistics.feature_preprocessors import MaxAbsNormaliser
 
 
 class SAE(Unsupervised, FeaturePreprocessor):
@@ -23,16 +23,25 @@ class SAE(Unsupervised, FeaturePreprocessor):
     ----------
     lambd: float = 10
         Relative weight of L2-regularisation in the learning error.
+
     learning_rate: float = 0.01
         Initial learning rate of the optimiser.
+
     num_epochs: int = 1000
         Maximum number of epochs to train for.
+
     validation_freq: int = 5
         Frequency (in epochs) of validation.
+
     validation_perc: float = 0.2
         Size of the validation set.
+
     random_state : int or None = 0
         Random state to use.
+
+    preprocessors : iterable = (MaxAbsNormaliser(), )
+        Preprocessors to apply. The default max abs normaliser rescales all features
+        to ensure that their values lie in [-1, 1].
 
     References
     ----------
@@ -57,7 +66,9 @@ class SAE(Unsupervised, FeaturePreprocessor):
             num_epochs: int = 1000,
             validation_freq: int = 5,
             validation_perc: float = 0.2,
+            preprocessors=(MaxAbsNormaliser())
     ):
+        super().__init__(preprocessors=preprocessors)
         self.random_state = random_state
         self.lambd = lambd
         self.learning_rate = learning_rate
@@ -65,9 +76,9 @@ class SAE(Unsupervised, FeaturePreprocessor):
         self.validation_freq = validation_freq
         self.validation_perc = validation_perc
 
-    def construct(self, X):
+    def _construct(self, X):
         tf.random.set_seed(self.random_state)
-        model: SAE.Model = super().construct(X)
+        model: SAE.Model = super()._construct(X)
         model.random_state = self.random_state
 
         # Network Parameters
@@ -75,9 +86,6 @@ class SAE(Unsupervised, FeaturePreprocessor):
         n_latent = int(np.sqrt(n_input)) + 1
         n_h1 = int(np.round((2*n_input + n_latent)/3))
         n_h2 = int(np.round((n_input + 2*n_latent)/3))
-
-        model.max_abs_scaler = MaxAbsScaler().fit(X)
-        X = model.max_abs_scaler.transform(X)
 
         # Training Parameters
         num_train = int((1 - self.validation_perc)*model.n)
@@ -123,9 +131,7 @@ class SAE(Unsupervised, FeaturePreprocessor):
     class Model(FeaturePreprocessor.Model):
 
         random_state: int
-        max_abs_scaler: MaxAbsScaler
         encoder: keras.Model
 
         def transform(self, X):
-            X = self.max_abs_scaler.transform(X)
             return self.encoder.predict(X)

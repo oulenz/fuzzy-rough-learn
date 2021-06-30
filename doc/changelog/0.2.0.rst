@@ -1,0 +1,41 @@
+.. _changes_0_2_0:
+
+Version 0.2
+===========
+
+Changelog
+---------
+
+Adds number of data descriptors and basic feature preprocessors, revised api.
+
+New algorithms
+~~~~~~~~~~~~~~
+
+* data descriptors:
+
+    * `ALP`
+    * `CD`
+    * `EIF` (wrapper requiring optional `eif` dependency
+    * `IF` (wrapper for scikit-learn implementation)
+    * `LNND`
+    * `LOF`
+    * `MD`
+    * `NND`
+    * `SVM` (wrapper for scikit-learn implementation)
+
+* feature preprocessors:
+
+    * `LinearNormaliser`
+
+        * `IQRNormaliser`
+        * `MaxAbsNormaliser`
+        * `RangeNormaliser`
+        * `Standardiser`
+
+    * SAE (requires optional `tensorflow` dependency
+
+API changes
+~~~~~~~~~~~
+* Uniform ModelFactory pattern: callable algorithms that create callable models.
+* Preprocessors can be included at initialisation and are applied automatically.
+* Algorithms are presented no longer by submodule (neighbours, trees, etc), but by type (classifiers, feature preprocessors, etc)

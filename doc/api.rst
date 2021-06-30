@@ -4,85 +4,120 @@ fuzzy-rough-learn API
 
 This is the full API documentation of `fuzzy-rough-learn`.
 
-
-Neighbours
-==========
-
-.. automodule:: frlearn.neighbours
-    :no-members:
-    :no-inherited-members:
-
-.. currentmodule:: frlearn
-
 Classifiers
------------
+===========
 
-.. currentmodule:: frlearn
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   neighbours.classifiers.FRNN
-   neighbours.classifiers.FROVOCO
-   neighbours.classifiers.FRONEC
-
-Nearest Neighbour Search
-------------------------
-
-.. currentmodule:: frlearn
+.. currentmodule:: frlearn.classifiers
 
 .. autosummary::
    :toctree: generated/
-   :template: class.rst
+   :nosignatures:
 
-   neighbours.neighbour_search.NNSearch
-   neighbours.neighbour_search.BallTree
-   neighbours.neighbour_search.KDTree
+   FRNN
+   FROVOCO
+   FRONEC
 
-Preprocessors
--------------
+Data descriptors
+================
 
-.. currentmodule:: frlearn
+.. currentmodule:: frlearn.data_descriptors
 
 .. autosummary::
    :toctree: generated/
-   :template: class.rst
+   :nosignatures:
 
-   neighbours.preprocessors.FRFS
-   neighbours.preprocessors.FRPS
+   ALP
+   CD
+   EIF
+   IF
+   LNND
+   LOF
+   MD
+   NND
+   SVM
 
-Utils
+Feature preprocessors
+=====================
+
+Linear normalisers
+------------------
+
+.. currentmodule:: frlearn.feature_preprocessors
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   LinearNormaliser
+   IQRNormaliser
+   MaxAbsNormaliser
+   RangeNormaliser
+   Standardiser
+
+Other
+-----
+
+.. currentmodule:: frlearn.feature_preprocessors
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   FRFS
+   SAE
+
+Instance preprocessors
+======================
+
+.. currentmodule:: frlearn.instance_preprocessors
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   FRPS
+
+Other
 =====
 
-.. automodule:: frlearn.utils
-    :no-members:
-    :no-inherited-members:
+Nearest neighbour search algorithms
+-----------------------------------
 
-.. currentmodule:: frlearn
-
-numpy utils
--------------
-
-.. currentmodule:: frlearn
+.. currentmodule:: frlearn.neighbours.neighbour_search
 
 .. autosummary::
    :toctree: generated/
-   :template: function.rst
+   :nosignatures:
+   :template: class.rst
 
-   utils.np_utils.first
-   utils.np_utils.last
-   utils.np_utils.least
-   utils.np_utils.greatest
-   utils.np_utils.div_or
+   NNSearch
+   BallTree
+   KDTree
 
 OWA Operators
 -------------
 
-.. currentmodule:: frlearn
+.. currentmodule:: frlearn.utils.owa_operators
 
 .. autosummary::
    :toctree: generated/
+   :nosignatures:
    :template: class.rst
 
-   utils.owa_operators.OWAOperator
+   OWAOperator
+
+numpy utils
+-----------
+
+.. currentmodule:: frlearn.utils.np_utils
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+   :template: function.rst
+
+   first
+   last
+   least
+   greatest
+   div_or

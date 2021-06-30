@@ -1,83 +1,12 @@
-"""Nearest neighbour preprocessors"""
+"""Nearest neighbour instance preprocessors"""
 from __future__ import annotations
 
 import numpy as np
 
-from frlearn.base import FeatureSelector, Supervised, SupervisedInstancePreprocessor
+from frlearn.base import SupervisedInstancePreprocessor
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
 from frlearn.utils.np_utils import fraction, remove_diagonal
-from frlearn.utils.owa_operators import OWAOperator, invadd, deltaquadsigmoid
-from frlearn.utils.t_norms import lukasiewicz
-
-
-class FRFS(Supervised, FeatureSelector):
-    """
-    Implementation of the Fuzzy Rough Feature Selection (FRFS) preprocessor.
-
-    Greedily selects features that induce the greatest increase in the size of the positive region,
-    until it matches the size of the positive region with all features,
-    or until the required number of features is selected.
-
-    The positive region is defined as the union of the lower approximations of the decision classes in `X`.
-    Its size is the sum of its membership values.
-
-    Parameters
-    ----------
-    n_features : int or None, default=None
-        Number of features to select. If None, will continue to add features until positive region size becomes maximal.
-    owa_weights: OWAOperator, default=deltaquadsigmoid(0.2, 1)
-        OWA weights to use for calculation of the soft minimum in the positive regions.
-    t_norm : (ndarray, int, ) -> ndarray, default=lukasiewicz
-        Function that takes an ndarray and a keyword argument `axis`,
-        and returns an ndarray with the corresponding axis removed.
-        Used to define the similarity relation `R` from the per-attribute similarities.
-        Should be a t-norm, or else the size of the positive region may decrease as features are added.
-
-
-    References
-    ----------
-
-    .. [1] `Cornelis C, Verbiest N, Jensen R (2011).
-       Ordered Weighted Average Based Fuzzy Rough Sets
-       In: Yu J, Greco S, Lingras P, Wang G, Skowron A (eds). Rough Set and Knowledge Technology. RSKT 2010.
-       Lecture Notes in Computer Science, vol 6401. Springer, Berlin, Heidelberg.
-       doi: 10.1007/978-3-642-16248-0_16
-       <https://link.springer.com/chapter/10.1007/978-3-642-16248-0_16>`_
-    """
-
-    def __init__(self, n_features=None, owa_weights: OWAOperator = deltaquadsigmoid(0.2, 1), t_norm=lukasiewicz):
-        self.n_features = n_features
-        self.owa_weights = owa_weights
-        self.t_norm = t_norm
-
-    def construct(self, X, y):
-        model = super().construct(X, y)
-        scale = np.std(X, axis=0)
-        scale = np.where(scale == 0, 1, scale)
-        X_scaled = X / scale
-        R_a = np.minimum(np.maximum(1 - np.abs(X_scaled[:, None, :] - X_scaled), 0), y[:, None, None] != y[:, None])
-        POS_A_size = self._POS_size(R_a)
-        selected_attributes = np.full(X.shape[-1], False)
-        remaining_attributes = set(range(X.shape[-1]))
-        best_size = 0
-        condition = (lambda: np.sum(selected_attributes) < self.n_features) if self.n_features else (lambda: best_size < POS_A_size)
-        while condition():
-            best_size = 0
-            for i in remaining_attributes:
-                candidate = selected_attributes.copy()
-                candidate[i] = True
-                candidate_size = self._POS_size(R_a[..., candidate])
-                if candidate_size > best_size:
-                    best_size = candidate_size
-                    new_attribute = i
-            selected_attributes[new_attribute] = True
-            remaining_attributes.remove(new_attribute)
-        model.selection = selected_attributes
-        return model
-
-    def _POS_size(self, R_a):
-        R = self.t_norm(R_a, axis=-1)
-        return np.sum(self.owa_weights.soft_min(1 - R, k=fraction(1), axis=-1))
+from frlearn.utils.owa_operators import OWAOperator, invadd
 
 
 class FRPS(SupervisedInstancePreprocessor):
@@ -98,6 +27,7 @@ class FRPS(SupervisedInstancePreprocessor):
         Either the upper approximation of the decision class of each attribute,
         the lower approximation, or the mean value of both.
         [2] recommends the lower approximation.
+
     aggr_R : (ndarray, int, ) -> ndarray, default=np.mean
         Function that takes an ndarray and a keyword argument `axis`,
         and returns an ndarray with the corresponding axis removed.
@@ -105,9 +35,11 @@ class FRPS(SupervisedInstancePreprocessor):
         [1] uses the Łukasiewicz t-norm,
         while [2] offers a choice between the Łukasiewicz t-norm, the mean and the minimum,
         and recommends the mean.
+
     owa_weights: OWAOperator, default=invadd()
         OWA weights to use for calculation of soft maximum and/or minimum in quality measure.
         [1] uses additive weights, while [2] uses inverse additive weights.
+
     nn_search : NNSearch, default=KDTree()
         Nearest neighbour search algorithm to use.
 
@@ -164,7 +96,7 @@ class FRPS(SupervisedInstancePreprocessor):
         self.aggr_R = aggr_R
         self.quality_measure = quality_measure
 
-    def transform(self, X, y):
+    def __call__(self, X, y):
         classes = np.unique(y)
         Cs = [X[np.where(y == c)] for c in classes]
         X_unscaled = np.concatenate(Cs, axis=0)
@@ -189,11 +121,11 @@ class FRPS(SupervisedInstancePreprocessor):
         for tau in np.unique(Q):
             if np.sum(Q >= tau) <= 1:
                 continue
-            nn_model = self.nn_search.construct(X[Q >= tau])
-            neighbours = nn_model.query(X[Q >= tau], k=2)[0][:, 1]
+            nn_model = self.nn_search(X[Q >= tau])
+            neighbours = nn_model(X[Q >= tau], k=2)[0][:, 1]
             deselected = X[Q < tau]
             if len(deselected) >= 1:
-                neighbours = np.concatenate([neighbours, nn_model.query(deselected, k=1)[0][:, 0]])
+                neighbours = np.concatenate([neighbours, nn_model(deselected, k=1)[0][:, 0]])
             S_y = y[Q >= tau]
             y_neighbours = S_y[neighbours]
             acc = np.sum(y_neighbours == np.concatenate([y[Q >= tau], y[Q < tau]]))
