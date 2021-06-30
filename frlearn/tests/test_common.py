@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.datasets import load_iris
 
 from frlearn.classifiers import FRNN, FRONEC, FROVOCO
-from frlearn.data_descriptors import ALP, CD, EIF, IF, LNND, LOF, MD, NND, SVM
+from frlearn.data_descriptors import ALP, CD, IF, LNND, LOF, MD, NND, SVM
 from frlearn.feature_preprocessors import FRFS, IQRNormaliser, MaxAbsNormaliser, RangeNormaliser, Standardiser
 from frlearn.instance_preprocessors import FRPS
 
@@ -47,7 +47,7 @@ def test_multilabel_classifier(data, cls):
 
 @pytest.mark.parametrize(
     'cls',
-    [ALP, CD, EIF, IF, LNND, LOF, MD, NND, SVM],
+    [ALP, CD, IF, LNND, LOF, MD, NND, SVM],
 )
 def test_data_descriptor(data, cls):
     X, y = data
