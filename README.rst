@@ -122,7 +122,7 @@ Dependencies
 fuzzy-rough-learn requires python 3.7+ and the following packages:
 
 * scipy >= 1.1.0
-* numpy >=1.16.0
+* numpy >=1.17.0
 * scikit-learn >=0.22.0
 
 In addition, some algorithms require optional dependencies:
