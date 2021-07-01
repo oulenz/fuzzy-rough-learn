@@ -38,6 +38,7 @@ class NNDataDescriptor(DataDescriptor):
         k: int
 
         def __call__(self, X):
+            # TODO: inherit from super
             for preprocessing_model in self.preprocessing_models:
                 X = preprocessing_model(X)
             q_neighbours, q_distances = self.nn_model(X, self.k)
@@ -134,7 +135,10 @@ class ALP(NNDataDescriptor):
         scale_weights: OWAOperator
         localisation_weights: OWAOperator
 
-        def query(self, X):
+        def __call__(self, X):
+            # TODO: inherit from super
+            for preprocessing_model in self.preprocessing_models:
+                X = preprocessing_model(X)
             q_neighbours, q_distances = self.nn_model(X, self._kl)
             return self._query(q_neighbours[..., :self.l], q_distances[..., :self.k])
 
