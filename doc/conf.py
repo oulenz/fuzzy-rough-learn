@@ -71,7 +71,7 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8-sig'
 
 # Generate the plots for the gallery
-plot_gallery = True
+plot_gallery = 'True'
 
 # The master toctree document.
 master_doc = 'index'
@@ -313,8 +313,12 @@ sphinx_gallery_conf = {
     'doc_module': 'frlearn',
     'backreferences_dir': os.path.join('generated'),
     'reference_url': {
-        'frlearn': None}
+        'frlearn': None},
+    'examples_dirs': ['../examples', ],
+    'gallery_dirs': ['examples', ],
+    'filename_pattern': '/',
 }
+
 
 # sphinx_issues configuration
 

@@ -13,7 +13,7 @@ Welcome to the documentation of fuzzy-rough-learn!
    :hidden:
    :caption: Examples
 
-   auto_examples/index
+   examples/index
 
 .. toctree::
    :maxdepth: 1

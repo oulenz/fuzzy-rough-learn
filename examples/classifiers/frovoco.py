@@ -1,9 +1,7 @@
 """
-======================
-FROVOCO classification
-======================
-
-Sample usage of FROVOCO classification.
+=================================================
+Imbalanced multiclass classification with FROVOCO
+=================================================
 
 The figures contain the training instances within a section of the selected feature space.
 The training instances are coloured according to their true labels,

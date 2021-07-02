@@ -1,9 +1,7 @@
 """
-================
-FRONEC labelling
-================
-
-Sample usage of FRONEC labelling.
+=====================================
+Multilabel classification with FRONEC
+=====================================
 
 The figures contain training instances within a section of the feature space.
 The training instances are coloured according to their true labels,

@@ -1,7 +1,7 @@
 """
-==================
-FRPS preprocessing
-==================
+============================
+Instance selection with FRPS
+============================
 
 Sample usage of FRPS preprocessing, demonstrated in combination with (strict) FRNN classification.
 
