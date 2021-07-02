@@ -64,7 +64,6 @@ Other
    :nosignatures:
 
    FRFS
-   SAE
 
 Instance preprocessors
 ======================
