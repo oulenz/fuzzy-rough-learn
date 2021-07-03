@@ -11,6 +11,8 @@ statistics
     Statistical algorithms.
 support_vectors
     Support vector algorithms.
+trees
+    Decision tree algorithms.
 utils
     Utility functions used in the other modules.
 """
