@@ -23,7 +23,6 @@ from sklearn import datasets
 from frlearn.base import select_class
 from frlearn.classifiers import FRNN
 from frlearn.feature_preprocessors import FRFS
-from frlearn.utils.owa_operators import strict
 
 # Import example data.
 iris = datasets.load_iris()
@@ -50,7 +49,7 @@ for i, use_frfs in enumerate([False, True]):
         X = X_orig[:, :2]
 
     # Create an instance of the FRNN classifier and construct the model.
-    clf = FRNN(upper_weights=strict(), lower_weights=strict(), upper_k=1, lower_k=1)
+    clf = FRNN(upper_weights=None, lower_weights=None, upper_k=1, lower_k=1)
     model = clf(X, y)
 
     # Create a mesh of points in the attribute space.

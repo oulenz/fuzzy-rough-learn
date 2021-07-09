@@ -2,6 +2,14 @@
 
 import numpy as np
 
+__all__ = [
+    'maximum', 'mean', 'median', 'midhinge', 'midrange', 'minimum',
+]
+
+
+def maximum(X):
+    return np.nanmax(X, axis=0)
+
 
 def mean(X):
     return np.nanmean(X, axis=0)
@@ -9,10 +17,6 @@ def mean(X):
 
 def median(X):
     return np.nanmedian(X, axis=0)
-
-
-def maximum(X):
-    return np.nanmax(X, axis=0)
 
 
 def midhinge(X):

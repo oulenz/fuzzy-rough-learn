@@ -1,13 +1,16 @@
 """Nearest neighbour feature preprocessors"""
 from __future__ import annotations
 
+from typing import Callable
+
 import numpy as np
 
-from frlearn.base import FeatureSelector, ClassSupervised, SupervisedInstancePreprocessor
+from frlearn.base import FeatureSelector, ClassSupervised
 from frlearn.statistics.feature_preprocessors import Standardiser
-from frlearn.utils.np_utils import fraction
-from frlearn.utils.owa_operators import OWAOperator, deltaquadsigmoid
-from frlearn.utils.t_norms import lukasiewicz
+from frlearn.utilities.numpy import soft_min
+from frlearn.utilities.t_norms import lukasiewicz
+from frlearn.utilities.weights import QuantifierWeights
+from frlearn.utilities.quantifiers import QuadraticSigmoid
 
 
 class FRFS(ClassSupervised, FeatureSelector):
@@ -26,7 +29,7 @@ class FRFS(ClassSupervised, FeatureSelector):
     n_features : int or None, default=None
         Number of features to select. If None, will continue to add features until positive region size becomes maximal.
 
-    owa_weights: OWAOperator, default=deltaquadsigmoid(0.2, 1)
+    owa_weights: (int -> np.array) = QuantifierWeights(QuadraticSigmoid(0.2, 1))
         OWA weights to use for calculation of the soft minimum in the positive regions.
 
     t_norm : (ndarray, int, ) -> ndarray, default=lukasiewicz
@@ -38,7 +41,6 @@ class FRFS(ClassSupervised, FeatureSelector):
 
     References
     ----------
-
     .. [1] `Cornelis C, Verbiest N, Jensen R (2011).
        Ordered Weighted Average Based Fuzzy Rough Sets
        In: Yu J, Greco S, Lingras P, Wang G, Skowron A (eds). Rough Set and Knowledge Technology. RSKT 2010.
@@ -47,7 +49,11 @@ class FRFS(ClassSupervised, FeatureSelector):
        <https://link.springer.com/chapter/10.1007/978-3-642-16248-0_16>`_
     """
 
-    def __init__(self, n_features=None, owa_weights: OWAOperator = deltaquadsigmoid(0.2, 1), t_norm=lukasiewicz, ):
+    def __init__(
+            self, n_features=None,
+            owa_weights: Callable[[int], np.array] = QuantifierWeights(QuadraticSigmoid(0.2, 1)),
+            t_norm=lukasiewicz,
+    ):
         super().__init__()
         self.n_features = n_features
         self.owa_weights = owa_weights
@@ -78,7 +84,7 @@ class FRFS(ClassSupervised, FeatureSelector):
 
     def _POS_size(self, R_a):
         R = self.t_norm(R_a, axis=-1)
-        return np.sum(self.owa_weights.soft_min(1 - R, k=fraction(1), axis=-1))
+        return np.sum(soft_min(1 - R, self.owa_weights, k=None, axis=-1))
 
     class Model(ClassSupervised.Model, FeatureSelector.Model):
         pass

@@ -8,7 +8,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 from .layers import TransposedDense
-from ..base import FeaturePreprocessor, Unsupervised
+from frlearn.base import FeaturePreprocessor, Unsupervised
 from frlearn.statistics.feature_preprocessors import MaxAbsNormaliser
 
 

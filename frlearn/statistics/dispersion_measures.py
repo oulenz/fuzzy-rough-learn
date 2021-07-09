@@ -2,6 +2,10 @@
 
 import numpy as np
 
+__all__ = [
+    'interquartile_range', 'maximum_absolute_value', 'standard_deviation', 'total_range',
+]
+
 
 def interquartile_range(X):
     quartiles = np.nanpercentile(X, [25, 75], axis=0)

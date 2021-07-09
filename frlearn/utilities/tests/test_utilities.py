@@ -2,7 +2,8 @@ import pytest
 
 import numpy as np
 
-from frlearn.utils import first, fraction, greatest, last, least
+from frlearn.numpy import first, greatest, last, least
+from frlearn.parametrisations import fraction
 
 
 @pytest.fixture

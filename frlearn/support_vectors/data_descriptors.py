@@ -5,9 +5,10 @@ from typing import Callable
 
 from sklearn.svm import OneClassSVM
 
-from ..base import DataDescriptor
+from frlearn.base import DataDescriptor
 from frlearn.statistics.feature_preprocessors import IQRNormaliser
-from ..utils.np_utils import contract, fraction
+from frlearn.utilities.parametrisations import fraction
+from frlearn.utilities.transformations import contract
 
 
 class SVM(DataDescriptor):

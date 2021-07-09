@@ -1,7 +1,7 @@
 """Nearest neighbour classifiers"""
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Callable, List
 
 import numpy as np
 
@@ -9,15 +9,17 @@ from frlearn.base import DataDescriptor, MultiClassClassifier, MultiLabelClassif
 from frlearn.neighbours.data_descriptors import NND
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
 from frlearn.statistics.feature_preprocessors import RangeNormaliser
-from frlearn.utils.np_utils import div_or, fraction, truncated_complement
-from frlearn.utils.owa_operators import OWAOperator, additive, exponential
+from frlearn.utilities.numpy import div_or, soft_max, soft_min
+from frlearn.utilities.parametrisations import fraction
+from frlearn.utilities.transformations import truncated_complement
+from frlearn.utilities.weights import ExponentialWeights, LinearWeights
 
 
 class FuzzyRoughEnsemble(MultiClassClassifier):
     def __init__(
             self,
-            upper_approximator: Optional[DataDescriptor] = NND(k=40, owa=additive(), proximity=truncated_complement),
-            lower_approximator: Optional[DataDescriptor] = NND(k=40, owa=additive(), proximity=truncated_complement),
+            upper_approximator: DataDescriptor | None,
+            lower_approximator: DataDescriptor | None,
             preprocessors=()
     ):
         super().__init__(preprocessors=preprocessors)
@@ -34,8 +36,8 @@ class FuzzyRoughEnsemble(MultiClassClassifier):
 
     class Model(MultiClassClassifier.Model):
 
-        upper_approximations: Optional[List[DataDescriptor.Model]]
-        lower_approximations: Optional[List[DataDescriptor.Model]]
+        upper_approximations: List[DataDescriptor.Model] | None
+        lower_approximations: List[DataDescriptor.Model] | None
 
         def _query(self, X):
             vals = []
@@ -56,19 +58,21 @@ class FRNN(FuzzyRoughEnsemble):
 
     Parameters
     ----------
-    upper_weights : OWAOperator or None = additive()
+    upper_weights : (int -> np.array) or None = LinearWeights()
         OWA weights to use in calculation of upper approximation of decision classes.
         `upper_weights` and `lower_weights` cannot both be None.
 
-    upper_k : int = 20
+    upper_k : int or None = 20
         Effective length of upper weights vector (number of nearest neighbours to consider).
+        If None, only the lower approximation is used.
 
-    lower_weights : OWAOperator or None = additive()
+    lower_weights : (int -> np.array) or None = LinearWeights()
         OWA weights to use in calculation of lower approximation of decision classes.
         `upper_weights` and `lower_weights` cannot both be None.
 
-    lower_k : int = 20
+    lower_k : int or None = 20
         Effective length of lower weights vector (number of nearest neighbours to consider).
+        If None, only the upper approximation is used.
 
     nn_search : NNSearch = KDTree()
         Nearest neighbour search algorithm to use.
@@ -107,21 +111,20 @@ class FRNN(FuzzyRoughEnsemble):
     """
     def __init__(
             self, *,
-            upper_weights: Optional[OWAOperator] = additive(),
-            upper_k: int = 20,
-            lower_weights: Optional[OWAOperator] = additive(),
-            lower_k: int = 20,
+            upper_weights: Callable[[int], np.array] | None = LinearWeights(),
+            upper_k: int | None = 20,
+            lower_weights: Callable[[int], np.array] | None = LinearWeights(),
+            lower_k: int | None = 20,
             nn_search: NNSearch = KDTree(metric='manhattan'),
             preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
     ):
-        super().__init__(preprocessors=preprocessors)
-        upper_approximator = upper_weights and NND(
-            owa=upper_weights, k=upper_k, proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+        upper_approximator = upper_k and NND(
+            weights=upper_weights, k=upper_k, proximity=truncated_complement, nn_search=nn_search, preprocessors=()
         )
-        lower_approximator = lower_weights and NND(
-            owa=lower_weights, k=lower_k, proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+        lower_approximator = lower_k and NND(
+            weights=lower_weights, k=lower_k, proximity=truncated_complement, nn_search=nn_search, preprocessors=()
         )
-        super().__init__(upper_approximator, lower_approximator)
+        super().__init__(upper_approximator, lower_approximator, preprocessors=preprocessors, )
 
     def _construct(self, X, y) -> Model:
         model = super()._construct(X, y)
@@ -161,10 +164,10 @@ class FROVOCO(MultiClassClassifier):
     ):
         super().__init__(preprocessors=preprocessors)
         self.exponential_approximator = NND(
-            owa=exponential(), k=fraction(1), proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+            weights=ExponentialWeights(2), k=fraction(1), proximity=truncated_complement, nn_search=nn_search, preprocessors=()
         )
-        self.additive_approximator = NND(
-            owa=additive(), k=fraction(.1), proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+        self.linear_approximator = NND(
+            weights=LinearWeights(), k=fraction(.1), proximity=truncated_complement, nn_search=nn_search, preprocessors=()
         )
 
     def _construct(self, X, y) -> Model:
@@ -178,11 +181,11 @@ class FROVOCO(MultiClassClassifier):
         model.ova_ir = np.array([c_n / (len(X) - c_n) for c_n in class_sizes])
         max_ir = np.max(model.ovo_ir, axis=1)
 
-        add_costr = self.additive_approximator
+        lin_costr = self.linear_approximator
         exp_costr = self.exponential_approximator
-        model.add_approx = [add_costr(C) if ir > 9 else None for ir, C in zip(max_ir, Cs)]
+        model.lin_approx = [lin_costr(C) if ir > 9 else None for ir, C in zip(max_ir, Cs)]
         model.exp_approx = [exp_costr(C) if ir <= 9 else None for ir, C in zip(model.ova_ir, Cs)]
-        model.co_approx = [(add_costr if 1/ir > 9 else exp_costr)(co_C) for ir, co_C in zip(model.ova_ir, co_Cs)]
+        model.co_approx = [(lin_costr if 1/ir > 9 else exp_costr)(co_C) for ir, co_C in zip(model.ova_ir, co_Cs)]
 
         model.sig = np.array([model._sig(C) for C in Cs])
         return model
@@ -192,13 +195,13 @@ class FROVOCO(MultiClassClassifier):
 
         ovo_ir: np.array
         ova_ir: np.array
-        add_approx: List[Optional[DataDescriptor.Model]]
-        exp_approx: List[Optional[DataDescriptor.Model]]
+        lin_approx: List[DataDescriptor.Model | None]
+        exp_approx: List[DataDescriptor.Model | None]
         co_approx: List[DataDescriptor.Model]
         sig: np.array
 
         def _sig(self, C):
-            approx = [a if ir > 9 else e for ir, a, e in zip(self.ova_ir, self.add_approx, self.exp_approx)]
+            approx = [a if ir > 9 else e for ir, a, e in zip(self.ova_ir, self.lin_approx, self.exp_approx)]
             vals_C = np.array([np.mean(a(C)) for a in approx])
             co_vals_C = np.array([np.mean(co_a(C)) for co_a in self.co_approx])
             return (vals_C + 1 - co_vals_C)/2
@@ -207,26 +210,26 @@ class FROVOCO(MultiClassClassifier):
             # The values in the else clause are just placeholders. But we can't use `None`, because that will force
             # the dtype of the resulting array to become `object`, which will in turn lead to 0/0 producing
             # ZeroDivisionError rather than np.nan
-            additive_vals_X = np.stack(np.broadcast_arrays(*[a(X) if a else -np.inf for a in self.add_approx])).transpose()
+            linear_vals_X = np.stack(np.broadcast_arrays(*[a(X) if a else -np.inf for a in self.lin_approx])).transpose()
             exponential_vals_X = np.stack(np.broadcast_arrays(*[a(X) if a else -np.inf for a in self.exp_approx])).transpose()
             co_vals_X = np.array([a(X) for a in self.co_approx]).transpose()
 
-            mem = self._mem(additive_vals_X, exponential_vals_X, co_vals_X)
+            mem = self._mem(linear_vals_X, exponential_vals_X, co_vals_X)
 
             mse = np.mean((mem[:, None, :] - self.sig) ** 2, axis=-1)
             mse_n = mse/np.sum(mse, axis=-1, keepdims=True)
 
-            wv = self._wv(additive_vals_X, exponential_vals_X)
+            wv = self._wv(linear_vals_X, exponential_vals_X)
 
             return (wv + mem)/2 - mse_n/self.n_classes
 
-        def _mem(self, additive_vals, exponential_vals, co_approximation_vals):
-            approximation_vals = np.where(self.ova_ir > 9, additive_vals, exponential_vals)
+        def _mem(self, linear_vals, exponential_vals, co_approximation_vals):
+            approximation_vals = np.where(self.ova_ir > 9, linear_vals, exponential_vals)
             return (approximation_vals + 1 - co_approximation_vals) / 2
 
-        def _wv(self, additive_vals, exponential_vals):
+        def _wv(self, linear_vals, exponential_vals):
             # Subtract from 1 because we're using lower approximations.
-            vals = 1 - np.where(self.ovo_ir > 9, additive_vals[..., None], exponential_vals[..., None])
+            vals = 1 - np.where(self.ovo_ir > 9, linear_vals[..., None], exponential_vals[..., None])
             tot_vals = vals + vals.transpose(0, 2, 1)
             vals = div_or(vals, tot_vals, 0.5)
             # Exclude comparisons of a class with itself.
@@ -252,7 +255,7 @@ class FRONEC(MultiLabelClassifier):
     k : int, default=20
         Number of neighbours to consider for neighbourhood consensus.
 
-    owa_weights: OWAOperator, default=additive()
+    owa_weights: (int -> np.array) = LinearWeights()
         OWA weights to use for calculation of soft maximum and/or minimum.
 
     nn_search : NNSearch, default=KDTree()
@@ -274,7 +277,7 @@ class FRONEC(MultiLabelClassifier):
 
     def __init__(
             self, Q_type: int = 2, R_d_type: int = 1,
-            k: int = 20, owa_weights: OWAOperator = additive(), nn_search: NNSearch = KDTree(),
+            k: int = 20, owa_weights: Callable[[int], np.array] | None = LinearWeights(), nn_search: NNSearch = KDTree(),
             preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
     ):
         super().__init__(preprocessors=preprocessors)
@@ -299,7 +302,7 @@ class FRONEC(MultiLabelClassifier):
         Q_type: int
         R_d: np.array
         k: int
-        owa_weights: OWAOperator
+        owa_weights: Callable[[int], np.array] | None
         nn_model: NNSearch.Model
         Y: np.array
 
@@ -335,8 +338,8 @@ class FRONEC(MultiLabelClassifier):
 
         def _Q_1(self, neighbours, R):
             vals = np.minimum(1 - R[..., None] + self.R_d[neighbours, :] - 1, 1)
-            return self.owa_weights.soft_min(vals, k=fraction(1), axis=1)
+            return soft_min(vals, self.owa_weights, k=None, axis=1)
 
         def _Q_2(self, neighbours, R):
             vals = np.maximum(R[..., None] + self.R_d[neighbours, :] - 1, 0)
-            return self.owa_weights.soft_max(vals, k=fraction(1), axis=1)
+            return soft_max(vals, self.owa_weights, k=None, axis=1)

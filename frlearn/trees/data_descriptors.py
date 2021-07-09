@@ -5,7 +5,7 @@ from typing import Callable
 
 from sklearn.ensemble import IsolationForest
 
-from ..base import DataDescriptor
+from frlearn.base import DataDescriptor
 
 
 class EIF(DataDescriptor):

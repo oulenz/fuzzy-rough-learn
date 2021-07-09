@@ -1,13 +1,17 @@
 """Nearest neighbour searches"""
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Callable, Union
 
 import numpy as np
 from sklearn.neighbors._unsupervised import NearestNeighbors
 
 from frlearn.base import ModelFactory
+
+__all__ = [
+    'NNSearch', 'BallTree', 'KDTree',
+]
 
 
 class NNSearch(ModelFactory):

@@ -7,10 +7,12 @@ from typing import Callable, Union
 import numpy as np
 
 from .neighbour_search import KDTree, NNSearch
-from ..base import DataDescriptor
-from frlearn.statistics.feature_preprocessors import IQRNormaliser
-from ..utils.np_utils import div_or, log_units, shifted_reciprocal
-from ..utils.owa_operators import OWAOperator, additive, trimmed
+from frlearn.base import DataDescriptor
+from frlearn.feature_preprocessors import IQRNormaliser
+from frlearn.numpy import div_or, soft_head, soft_max
+from frlearn.parametrisations import log_units
+from frlearn.transformations import shifted_reciprocal
+from frlearn.weights import LinearWeights
 
 
 # TODO: consider implementing NNDescriptor as addition of NNSearch to preprocessors,
@@ -69,11 +71,11 @@ class ALP(NNDataDescriptor):
         Should be either a positive integer not larger than the target class size,
         or a function that takes the size of the target class and returns such an integer.
 
-    scale_weights : OWAOperator = additive()
+    scale_weights : (int -> np.array) or None = LinearWeights()
         Weights to use for calculating the soft maximum of localised proximities.
         Determines to which extent scales with high localised proximity are emphasised.
 
-    localisation_weights : OWAOperator = additive()
+    localisation_weights : (int -> np.array) or None = LinearWeights()
         Weights to use for calculating the local ith nearest neighbour distance, for each `i <= k`.
         Determines to which extent nearer neighbours dominate.
 
@@ -106,8 +108,8 @@ class ALP(NNDataDescriptor):
             self,
             k: int | Callable[[int], int] = log_units(5.5),
             l: int | Callable[[int], int] = log_units(6),
-            scale_weights: OWAOperator = additive(),
-            localisation_weights: OWAOperator = additive(),
+            scale_weights: Callable[[int], np.array] | None = LinearWeights(),
+            localisation_weights: Callable[[int], np.array] | None = LinearWeights(),
             nn_search: NNSearch = KDTree(),
             max_array_size: int = 2**26,
             preprocessors=(IQRNormaliser(), )
@@ -132,8 +134,8 @@ class ALP(NNDataDescriptor):
         l: int
         _kl: int
         distances: np.ndarray
-        scale_weights: OWAOperator
-        localisation_weights: OWAOperator
+        scale_weights: Callable[[int], np.array]
+        localisation_weights: Callable[[int], np.array]
 
         def __call__(self, X):
             # TODO: inherit from super
@@ -146,15 +148,17 @@ class ALP(NNDataDescriptor):
             batch_size = 2**26 // (self.k * self.l)
             local_distances = []
             for i in range(0, q_neighbours.shape[0], batch_size):
-                local_distances.append(self.localisation_weights.soft_head(
-                    self.distances[q_neighbours[i:i+batch_size], :self.k], self.l, axis=-2
+                local_distances.append(soft_head(
+                    self.distances[q_neighbours[i:i+batch_size], :self.k],
+                    self.localisation_weights,
+                    self.l, axis=-2
                 ))
             local_distances = np.concatenate(local_distances, axis=0)
             
             # if both distances are zero, default to 1
             localised_distances = div_or(q_distances, local_distances, 1)
             localised_proximities = shifted_reciprocal(localised_distances)
-            return self.scale_weights.soft_max(localised_proximities, self.k)
+            return soft_max(localised_proximities, self.scale_weights, self.k)
 
 
 class LNND(NNDataDescriptor):
@@ -311,7 +315,7 @@ class NND(NNDataDescriptor):
         The function used to convert distance values to proximity values.
         It should be be an order-reversing map from `[0, ∞)` to `[0, 1]`.
 
-    owa : OWAOperator = trimmed()
+    weights : (int -> np.array) or None = None
         How to aggregate the proximity values from the `k` nearest neighbours.
         The default is to only consider the kth nearest neighbour distance.
 
@@ -350,25 +354,25 @@ class NND(NNDataDescriptor):
             nn_search: NNSearch = KDTree(),
             k: Union[int, Callable[[int], int]] = 1,
             proximity: Callable[[float], float] = shifted_reciprocal,
-            owa: OWAOperator = trimmed(),
+            weights: Callable[[int], np.array] | None = None,
             preprocessors=(IQRNormaliser(), )
     ):
         super().__init__(nn_search=nn_search, k=k, preprocessors=preprocessors)
         self.proximity = proximity
-        self.owa = owa
+        self.owa = weights
 
     def _construct(self, X) -> Model:
         model: NND.Model = super()._construct(X)
         model.proximity = self.proximity
-        model.owa = self.owa
+        model.weights = self.owa
         return model
 
     class Model(NNDataDescriptor.Model):
 
         proximity: Callable[[float], float]
-        owa: OWAOperator
+        weights: Callable[[int], np.array] | None
 
         def _query(self, q_neighbours, q_distances):
             proximities = self.proximity(q_distances)
-            score = self.owa.soft_max(proximities, self.k)
+            score = soft_max(proximities, self.weights, self.k)
             return score

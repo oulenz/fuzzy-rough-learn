@@ -6,8 +6,8 @@ from scipy import linalg
 from scipy.stats import chi2
 
 from frlearn.statistics.feature_preprocessors import Standardiser
-from ..base import DataDescriptor
-from ..utils.np_utils import shifted_reciprocal
+from frlearn.base import DataDescriptor
+from frlearn.utilities.transformations import shifted_reciprocal
 
 
 class CD(DataDescriptor):

@@ -9,7 +9,7 @@ while the feature space is coloured according to predictions on the basis of the
 making the decision boundaries visible.
 
 Two subfigures are displayed: the first represents strict FRNN (`k == 1`),
-while the second represents FRNN with additive OWA weights and `k == 20`.
+while the second represents FRNN with linear OWA weights and `k == 20`.
 """
 print(__doc__)
 
@@ -20,7 +20,7 @@ from sklearn import datasets
 
 from frlearn.base import select_class
 from frlearn.classifiers import FRNN
-from frlearn.utils.owa_operators import additive, strict
+from frlearn.weights import LinearWeights
 
 # Import example data and reduce to 2 dimensions.
 iris = datasets.load_iris()
@@ -34,7 +34,10 @@ cmap_bold = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
 # Initialise figure with wide aspect for two side-by-side subfigures.
 plt.figure(figsize=(8, 4))
 
-for i, owa_weights, k in [(1, strict(), 1), (2, additive(), 20)]:
+for i, owa_weights, k, title in [
+    (1, None, 1, 'Strict'),
+    (2, LinearWeights(), 20, 'With linear weights and k = 20')
+]:
     axes = plt.subplot(1, 2, i)
 
     # Create an instance of the FRNN classifier and construct the model.
@@ -67,7 +70,7 @@ for i, owa_weights, k in [(1, strict(), 1), (2, additive(), 20)]:
     plt.ylim(yy.min(), yy.max())
 
     # Describe the subfigures.
-    plt.title('Strict' if i == 1 else 'With {} weights and k == {}'.format(owa_weights, k))
+    plt.title(title)
 
 plt.suptitle('FRNN applied to iris dataset', fontsize=14)
 plt.show()

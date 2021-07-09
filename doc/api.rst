@@ -12,6 +12,7 @@ Classifiers
 .. autosummary::
    :toctree: generated/
    :nosignatures:
+   :template: class.rst
 
    FRNN
    FROVOCO
@@ -25,6 +26,7 @@ Data descriptors
 .. autosummary::
    :toctree: generated/
    :nosignatures:
+   :template: class.rst
 
    ALP
    CD
@@ -47,6 +49,7 @@ Linear normalisers
 .. autosummary::
    :toctree: generated/
    :nosignatures:
+   :template: class.rst
 
    LinearNormaliser
    IQRNormaliser
@@ -62,6 +65,7 @@ Other
 .. autosummary::
    :toctree: generated/
    :nosignatures:
+   :template: class.rst
 
    FRFS
 
@@ -73,11 +77,43 @@ Instance preprocessors
 .. autosummary::
    :toctree: generated/
    :nosignatures:
+   :template: class.rst
 
    FRPS
 
 Other
 =====
+
+Dispersion measures
+-------------------
+
+.. currentmodule:: frlearn.dispersion_measures
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+    interquartile_range
+    maximum_absolute_value
+    standard_deviation
+    total_range
+
+Location measures
+-----------------
+
+.. currentmodule:: frlearn.location_measures
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   maximum
+   mean
+   median
+   midhinge
+   midrange
+   minimum
+
 
 Nearest neighbour search algorithms
 -----------------------------------
@@ -93,30 +129,75 @@ Nearest neighbour search algorithms
    BallTree
    KDTree
 
-OWA Operators
--------------
+Numpy
+-----
 
-.. currentmodule:: frlearn.utils.owa_operators
+.. currentmodule:: frlearn.numpy
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   div_or
+   first
+   greatest
+   last
+   least
+   remove_diagonal
+   soft_head
+   soft_max
+   soft_min
+   soft_tail
+
+Parametrisations
+----------------
+
+.. currentmodule:: frlearn.parametrisations
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   fraction
+   log_units
+
+T-norms
+-------
+
+.. currentmodule:: frlearn.t_norms
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   lukasiewicz
+
+Transformations
+---------------
+
+.. currentmodule:: frlearn.transformations
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   contract
+   shifted_reciprocal
+   truncated_complement
+
+Weights
+-------
+
+.. currentmodule:: frlearn.weights
 
 .. autosummary::
    :toctree: generated/
    :nosignatures:
    :template: class.rst
 
-   OWAOperator
-
-numpy utils
------------
-
-.. currentmodule:: frlearn.utils.np_utils
-
-.. autosummary::
-   :toctree: generated/
-   :nosignatures:
-   :template: function.rst
-
-   first
-   last
-   least
-   greatest
-   div_or
+   Weights
+   ConstantWeights
+   ExponentialWeights
+   LinearWeights
+   QuantifierWeights
+   ReciprocallyLinearWeights

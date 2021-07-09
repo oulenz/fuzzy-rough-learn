@@ -23,8 +23,7 @@ from sklearn import datasets
 from frlearn.base import select_class
 from frlearn.classifiers import FRNN
 from frlearn.instance_preprocessors import FRPS
-from frlearn.utils.owa_operators import strict
-from frlearn.utils.t_norms import lukasiewicz
+from frlearn.utilities.t_norms import lukasiewicz
 
 # Import example data and reduce to 2 dimensions.
 iris = datasets.load_iris()
@@ -53,7 +52,7 @@ for i, (aggr_name, aggr_R) in enumerate([('mean', np.mean), ('Łukasiewicz', luk
         X, y = preprocessor(X_orig, y_orig)
 
         # Create an instance of the FRNN classifier and construct the model.
-        clf = FRNN(upper_weights=strict(), lower_weights=strict(), upper_k=1, lower_k=1)
+        clf = FRNN(upper_weights=None, lower_weights=None, upper_k=1, lower_k=1)
         model = clf(X, y)
 
         # Query mesh points to obtain class values and select highest valued class.

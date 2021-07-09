@@ -104,8 +104,14 @@ Instance preprocessors
 Utilities
 .........
 
-* OWA operator class
-* Nearest Neighbour search algorithm class
+* dispersion measures
+* location measures
+* nearest neighbour search algorithms
+* parametrisations
+* t_norms
+* transformations
+* weights
+* other array functions
 
 
 Documentation

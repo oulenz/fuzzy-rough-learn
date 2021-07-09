@@ -1,12 +1,14 @@
 """Nearest neighbour instance preprocessors"""
 from __future__ import annotations
 
+from typing import Callable
+
 import numpy as np
 
 from frlearn.base import SupervisedInstancePreprocessor
 from frlearn.neighbours.neighbour_search import KDTree, NNSearch
-from frlearn.utils.np_utils import fraction, remove_diagonal
-from frlearn.utils.owa_operators import OWAOperator, invadd
+from frlearn.utilities.numpy import remove_diagonal, soft_max, soft_min
+from frlearn.utilities.weights import ReciprocallyLinearWeights
 
 
 class FRPS(SupervisedInstancePreprocessor):
@@ -36,9 +38,9 @@ class FRPS(SupervisedInstancePreprocessor):
         while [2] offers a choice between the Łukasiewicz t-norm, the mean and the minimum,
         and recommends the mean.
 
-    owa_weights: OWAOperator, default=invadd()
+    owa_weights: OWAOperator, default=ReciprocallyLinearWeights()
         OWA weights to use for calculation of soft maximum and/or minimum in quality measure.
-        [1] uses additive weights, while [2] uses inverse additive weights.
+        [1] uses linear weights, while [2] uses reciprocally linear weights.
 
     nn_search : NNSearch, default=KDTree()
         Nearest neighbour search algorithm to use.
@@ -53,7 +55,7 @@ class FRPS(SupervisedInstancePreprocessor):
       and lower approximation membership over instances of other decision classes.
       This affects over what length the weight vector is 'stretched'.
     * In addition, [2] excludes each instance from the calculation of its own upper approximation membership.
-    * [1] uses additive weights, while [2] uses inverse additive weights.
+    * [1] uses linear weights, while [2] uses reciprocally linear weights.
     * [1] uses the Łukasiewicz t-norm to aggregate per-attribute similarities,
       while [2] recommends using the mean.
 
@@ -86,13 +88,13 @@ class FRPS(SupervisedInstancePreprocessor):
     """
     def __init__(
             self,
-            owa_weights: OWAOperator = invadd(),
+            owa_weights: Callable[[int], np.array] = ReciprocallyLinearWeights(),
             quality_measure: str = 'lower',
             aggr_R = np.mean,
             nn_search: NNSearch = KDTree(),
     ):
         self.nn_search = nn_search
-        self.owa = owa_weights
+        self.owa_weights = owa_weights
         self.aggr_R = aggr_R
         self.quality_measure = quality_measure
 
@@ -135,13 +137,13 @@ class FRPS(SupervisedInstancePreprocessor):
         return X_unscaled[Q >= best_tau], y[Q >= best_tau]
 
     def _upper(self, Cs):
-        return np.concatenate([self.owa.soft_max(
+        return np.concatenate([soft_max(
             remove_diagonal(self.aggr_R(1 - np.abs(C[:, None, :] - C), axis=-1)),
-            k=fraction(1), axis=-1
+            self.owa_weights, k=None, axis=-1
         ) for C in Cs], axis=0)
 
     def _lower(self, Cs, co_Cs):
-        return np.concatenate([self.owa.soft_min(
+        return np.concatenate([soft_min(
             self.aggr_R(np.abs(C[:, None, :] - co_C), axis=-1),
-            k=fraction(1), axis=-1
+            self.owa_weights, k=None, axis=-1
         ) for C, co_C in zip(Cs, co_Cs)], axis=0)
