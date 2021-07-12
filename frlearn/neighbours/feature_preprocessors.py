@@ -8,7 +8,7 @@ import numpy as np
 from frlearn.base import FeatureSelector, ClassSupervised
 from frlearn.statistics.feature_preprocessors import Standardiser
 from frlearn.utilities.numpy import soft_min
-from frlearn.utilities.t_norms import lukasiewicz
+from frlearn.utilities.t_norms import lukasiewicz_t_norm
 from frlearn.utilities.weights import QuantifierWeights
 from frlearn.utilities.quantifiers import QuadraticSigmoid
 
@@ -32,7 +32,7 @@ class FRFS(ClassSupervised, FeatureSelector):
     owa_weights: (int -> np.array) = QuantifierWeights(QuadraticSigmoid(0.2, 1))
         OWA weights to use for calculation of the soft minimum in the positive regions.
 
-    t_norm : (ndarray, int, ) -> ndarray, default=lukasiewicz
+    t_norm : (ndarray, int, ) -> ndarray, default=lukasiewicz_t_norm
         Function that takes an ndarray and a keyword argument `axis`,
         and returns an ndarray with the corresponding axis removed.
         Used to define the similarity relation `R` from the per-attribute similarities.
@@ -52,7 +52,7 @@ class FRFS(ClassSupervised, FeatureSelector):
     def __init__(
             self, n_features=None,
             owa_weights: Callable[[int], np.array] = QuantifierWeights(QuadraticSigmoid(0.2, 1)),
-            t_norm=lukasiewicz,
+            t_norm=lukasiewicz_t_norm,
     ):
         super().__init__()
         self.n_features = n_features

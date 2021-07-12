@@ -170,7 +170,9 @@ T-norms
    :toctree: generated/
    :nosignatures:
 
-   lukasiewicz
+   goguen_t_norm
+   heyting_t_norm
+   lukasiewicz_t_norm
 
 Transformations
 ---------------

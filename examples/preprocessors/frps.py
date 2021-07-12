@@ -23,7 +23,7 @@ from sklearn import datasets
 from frlearn.base import select_class
 from frlearn.classifiers import FRNN
 from frlearn.instance_preprocessors import FRPS
-from frlearn.utilities.t_norms import lukasiewicz
+from frlearn.utilities.t_norms import heyting_t_norm, lukasiewicz_t_norm
 
 # Import example data and reduce to 2 dimensions.
 iris = datasets.load_iris()
@@ -43,7 +43,7 @@ cmap_bold = ListedColormap(['#FF0000', '#00FF00', '#0000FF'])
 # Initialise figure.
 plt.figure()
 
-for i, (aggr_name, aggr_R) in enumerate([('mean', np.mean), ('Łukasiewicz', lukasiewicz), ('min', np.amin)]):
+for i, (aggr_name, aggr_R) in enumerate([('mean', np.mean), ('Łukasiewicz', lukasiewicz_t_norm), ('Heyting', heyting_t_norm)]):
     for j, quality_measure in enumerate(['upper', 'lower', 'both']):
         axes = plt.subplot(3, 3, i*3 + j + 1)
 
