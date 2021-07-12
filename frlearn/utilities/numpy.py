@@ -174,7 +174,21 @@ def least(a, k: int or Callable[[int], int] or None, axis: int = -1):
 
 
 def remove_diagonal(a):
-    #TODO: parametrise dimensions
+    # TODO: parametrise dimensions
+    """
+    Remove the diagonal from a square array.
+
+    Parameters
+    ----------
+    a: np.array
+        Input array of values. Should have shape `(n, n)`.
+
+    Returns
+    -------
+    b: np.array
+        An array of shape `(n, n-1)`, containing the same values as the input array,
+        except for the values in the diagonal.
+    """
     return a[~np.eye(a.shape[0], dtype=bool)].reshape(a.shape[0], -1)
 
 

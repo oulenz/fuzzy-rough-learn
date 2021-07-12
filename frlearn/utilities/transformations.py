@@ -1,3 +1,5 @@
+"""Functions for transforming ranges of values."""
+
 import numpy as np
 
 __all__ = [

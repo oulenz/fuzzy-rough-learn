@@ -1,3 +1,5 @@
+"""Functions for expressing one value in terms of another."""
+
 import numpy as np
 
 __all__ = [

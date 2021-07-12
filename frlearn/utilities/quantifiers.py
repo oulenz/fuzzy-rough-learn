@@ -1,3 +1,5 @@
+"""Functions from [0, 1] to [0, 1]."""
+
 from dataclasses import dataclass
 
 import numpy as np
