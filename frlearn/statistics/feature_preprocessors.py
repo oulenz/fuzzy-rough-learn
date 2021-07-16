@@ -37,7 +37,7 @@ class LinearNormaliser(Unsupervised, FeaturePreprocessor):
         self.location = location
         self.normalise_dimensionality = normalise_dimensionality
 
-    def _construct(self, X, ) -> Standardiser.Model:
+    def _construct(self, X, ) -> Model:
         model = super()._construct(X)
         if self.dispersion is not None:
             divisor = self.dispersion(X)
