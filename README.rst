@@ -64,7 +64,7 @@ Contents
 At present, fuzzy-rough-learn contains the following algorithms:
 
 Multiclass classifiers
-...........
+......................
 
 * Fuzzy Rough Nearest Neighbours (FRNN; multiclass)
 * Fuzzy Rough OVO COmbination (FROVOCO; muliclass, suitable for imbalanced data)
@@ -84,29 +84,30 @@ Data descriptors
 * Support Vector Machine (SVM)
 
 Feature preprocessors
-.............
+.....................
 
 * Fuzzy Rough Feature Selection (FRFS)
-* Linear normaliser, in particular:
+* Linear normaliser; in particular:
 
     * Interquartile range (IQR) normaliser
     * Maximum absolute value (MaxAbs) normaliser
     * Range normaliser
     * Standardiser
 
+* Norm normaliser
 * Shrink Autoencoder (SAE; unsupervised)
 
 Instance preprocessors
-.............
+......................
 
 * Fuzzy Rough Prototype Selection (FRPS)
 
-Utilities
-.........
+Other
+.....
 
 * dispersion measures
 * location measures
-* nearest neighbour search algorithms
+* nearest neighbour search methods
 * parametrisations
 * t_norms
 * transformations

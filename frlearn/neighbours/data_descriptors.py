@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Callable, Union
+from typing import Callable
 
 import numpy as np
 
-from .neighbour_search import KDTree, NNSearch
+from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
 from frlearn.base import DataDescriptor
 from frlearn.feature_preprocessors import IQRNormaliser
 from frlearn.numpy import div_or, soft_head, soft_max
@@ -15,28 +15,35 @@ from frlearn.transformations import shifted_reciprocal
 from frlearn.weights import LinearWeights
 
 
-# TODO: consider implementing NNDescriptor as addition of NNSearch to preprocessors,
+# TODO: consider implementing NNDescriptor as addition of NeighbourSearchMethod to preprocessors,
 # but have to handle k somehow (especially for ALP which also has l)
 
 class NNDataDescriptor(DataDescriptor):
 
     @abstractmethod
-    def __init__(self, nn_search: NNSearch, k: Union[int, Callable[[int], int]], *args, preprocessors=()):
+    def __init__(
+            self,
+            metric: str,
+            k: int or Callable[[int], int],
+            nn_search: NeighbourSearchMethod,
+            preprocessors=()
+    ):
         super().__init__(preprocessors=preprocessors)
+        self.metric = metric
         self.nn_search = nn_search
         self.k = k
 
     @abstractmethod
     def _construct(self, X) -> Model:
         model = super()._construct(X)
-        nn_model = self.nn_search(X)
+        nn_model = self.nn_search(X, self.metric)
         model.nn_model = nn_model
         model.k = self.k(len(nn_model)) if callable(self.k) else self.k
         return model
 
     class Model(DataDescriptor.Model):
 
-        nn_model: NNSearch.Model
+        nn_model: NeighbourSearchMethod.Model
         k: int
 
         def __call__(self, X):
@@ -59,6 +66,9 @@ class ALP(NNDataDescriptor):
 
     Parameters
     ----------
+    metric: str = 'manhattan'
+        The metric to use.
+
     k : int or (int -> int) = 5.5 * log n
         How many nearest neighbour distances / localised proximities to consider.
         Corresponds to the scale at which proximity is evaluated.
@@ -106,15 +116,16 @@ class ALP(NNDataDescriptor):
 
     def __init__(
             self,
+            metric: str = 'manhattan',
             k: int | Callable[[int], int] = log_units(5.5),
             l: int | Callable[[int], int] = log_units(6),
             scale_weights: Callable[[int], np.array] | None = LinearWeights(),
             localisation_weights: Callable[[int], np.array] | None = LinearWeights(),
-            nn_search: NNSearch = KDTree(),
+            nn_search: NeighbourSearchMethod = KDTree(),
             max_array_size: int = 2**26,
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(nn_search=nn_search, k=k, preprocessors=preprocessors)
+        super().__init__(metric=metric, k=k, nn_search=nn_search, preprocessors=preprocessors)
         self.l = l
         self.scale_weights = scale_weights
         self.localisation_weights = localisation_weights
@@ -167,6 +178,9 @@ class LNND(NNDataDescriptor):
 
     Parameters
     ----------
+    metric: str = 'manhattan'
+        The metric to use.
+
     k : int or (int -> int) = 3.4 * log n
         Which nearest neighbour to consider.
         Should be either a positive integer not larger than the target class size,
@@ -204,11 +218,12 @@ class LNND(NNDataDescriptor):
 
     def __init__(
             self,
-            nn_search: NNSearch = KDTree(),
-            k: Union[int, Callable[[int], int]] = log_units(3.4),
+            metric: str = 'manhattan',
+            k: int or Callable[[int], int] = log_units(3.4),
+            nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(nn_search=nn_search, k=k, preprocessors=preprocessors)
+        super().__init__(metric=metric, k=k, nn_search=nn_search, preprocessors=preprocessors)
 
     def _construct(self, X) -> Model:
         model: LNND.Model = super()._construct(X)
@@ -234,6 +249,9 @@ class LOF(NNDataDescriptor):
 
     Parameters
     ----------
+    metric: str = 'manhattan'
+        The metric to use.
+
     k : int or (int -> int) = 2.5 * log n
         How many nearest neighbours to consider.
         Should be either a positive integer not larger than the target class size,
@@ -266,11 +284,12 @@ class LOF(NNDataDescriptor):
 
     def __init__(
             self,
-            nn_search: NNSearch = KDTree(),
-            k: Union[int, Callable[[int], int]] = log_units(2.5),
+            metric: str = 'manhattan',
+            k: int or Callable[[int], int] = log_units(2.5),
+            nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(nn_search=nn_search, k=k, preprocessors=preprocessors)
+        super().__init__(metric=metric, k=k, nn_search=nn_search, preprocessors=preprocessors)
 
     def _construct(self, X) -> Model:
         model: LOF.Model = super()._construct(X)
@@ -304,6 +323,9 @@ class NND(NNDataDescriptor):
 
     Parameters
     ----------
+    metric: str = 'manhattan'
+        The metric to use.
+
     k : int or (int -> int) = 1
         Which nearest neighbour(s) to consider.
         Should be either a positive integer not larger than the target class size,
@@ -351,20 +373,21 @@ class NND(NNDataDescriptor):
 
     def __init__(
             self,
-            nn_search: NNSearch = KDTree(),
-            k: Union[int, Callable[[int], int]] = 1,
-            proximity: Callable[[float], float] = shifted_reciprocal,
+            metric: str = 'manhattan',
+            k: int or Callable[[int], int] = 1,
             weights: Callable[[int], np.array] | None = None,
+            proximity: Callable[[float], float] = shifted_reciprocal,
+            nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(nn_search=nn_search, k=k, preprocessors=preprocessors)
+        super().__init__(metric=metric, k=k, nn_search=nn_search, preprocessors=preprocessors)
+        self.weights = weights
         self.proximity = proximity
-        self.owa = weights
 
     def _construct(self, X) -> Model:
         model: NND.Model = super()._construct(X)
         model.proximity = self.proximity
-        model.weights = self.owa
+        model.weights = self.weights
         return model
 
     class Model(NNDataDescriptor.Model):

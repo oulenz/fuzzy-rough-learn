@@ -10,15 +10,17 @@ try:
 except ImportError:
     pass
 from .statistics.feature_preprocessors import LinearNormaliser, IQRNormaliser, MaxAbsNormaliser, RangeNormaliser, Standardiser
+from .utilities.feature_preprocessors import NormNormaliser
 
 __all__ = [
-    'LinearNormaliser',
-    'IQRNormaliser',
-    'MaxAbsNormaliser',
-    'RangeNormaliser',
-    'Standardiser',
     'FRFS',
+    'IQRNormaliser',
+    'LinearNormaliser',
+    'MaxAbsNormaliser',
+    'NormNormaliser',
+    'RangeNormaliser',
     'SAE',
+    'Standardiser',
 ]
 
 dependencies = {

@@ -15,29 +15,33 @@ def argmax_and_max(a, axis):
     return ai, av
 
 
-def div_or(x, y, fallback=np.nan):
+def div_or(x: np.array or float, y: np.array or float, fallback: np.array or float = np.nan):
     """
     Divides `x` by `y`, replacing `np.nan` values with `fallback`.
 
     Parameters
     ----------
-    x : ndarray
+    x: np.array or float
         Dividend.
 
-    y : ndarray
+    y: np.array or float
         Divisor.
 
-    fallback : numerical, default=np.nan
-        Fallback value to substitute for `np.nan` after division.
+    fallback: np.array or float, default=np.nan
+        Fallback value(s) to substitute for `np.nan` after division.
 
     Returns
     -------
-    z : ndarray
+    z: np.array
         Quotient.
+
+    Notes
+    -----
+    `x`, `y` and `fallback` should be broadcastable to a single shape.
     """
     with np.errstate(divide='ignore', invalid='ignore'):
         z = x / y
-        z[np.isnan(z)] = fallback
+        z = np.where(np.isnan(z), fallback, z)
     return z
 
 

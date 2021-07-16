@@ -6,8 +6,8 @@ from typing import Callable, List
 import numpy as np
 
 from frlearn.base import DataDescriptor, MultiClassClassifier, MultiLabelClassifier
-from frlearn.neighbours.data_descriptors import NND
-from frlearn.neighbours.neighbour_search import KDTree, NNSearch
+from frlearn.data_descriptors import NND
+from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
 from frlearn.statistics.feature_preprocessors import RangeNormaliser
 from frlearn.utilities.numpy import div_or, soft_max, soft_min
 from frlearn.utilities.parametrisations import fraction
@@ -74,7 +74,10 @@ class FRNN(FuzzyRoughEnsemble):
         Effective length of lower weights vector (number of nearest neighbours to consider).
         If None, only the upper approximation is used.
 
-    nn_search : NNSearch = KDTree()
+    metric: str = 'manhattan'
+        The metric to use.
+
+    nn_search : NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
 
     preprocessors : iterable = (RangeNormaliser(normalise_dimensionality=True), )
@@ -90,7 +93,6 @@ class FRNN(FuzzyRoughEnsemble):
 
     References
     ----------
-
     .. [1] `Jensen R, Cornelis C (2008).
        A New Approach to Fuzzy-Rough Nearest Neighbour Classification.
        In: Chan CC, Grzymala-Busse JW, Ziarko WP (eds). Rough Sets and Current Trends in Computing. RSCTC 2008.
@@ -115,14 +117,15 @@ class FRNN(FuzzyRoughEnsemble):
             upper_k: int | None = 20,
             lower_weights: Callable[[int], np.array] | None = LinearWeights(),
             lower_k: int | None = 20,
-            nn_search: NNSearch = KDTree(metric='manhattan'),
+            metric: str = 'manhattan',
+            nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
     ):
         upper_approximator = upper_k and NND(
-            weights=upper_weights, k=upper_k, proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+            weights=upper_weights, k=upper_k, proximity=truncated_complement, metric=metric, nn_search=nn_search, preprocessors=()
         )
         lower_approximator = lower_k and NND(
-            weights=lower_weights, k=lower_k, proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+            weights=lower_weights, k=lower_k, proximity=truncated_complement, metric=metric, nn_search=nn_search, preprocessors=()
         )
         super().__init__(upper_approximator, lower_approximator, preprocessors=preprocessors, )
 
@@ -140,7 +143,10 @@ class FROVOCO(MultiClassClassifier):
 
     Parameters
     ----------
-    nn_search : NNSearch, default=KDTree()
+    metric: str = 'manhattan'
+        The metric to use.
+
+    nn_search: NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
 
     preprocessors : iterable = (RangeNormaliser(normalise_dimensionality=True), )
@@ -159,15 +165,18 @@ class FROVOCO(MultiClassClassifier):
     """
     def __init__(
             self,
-            nn_search: NNSearch = KDTree(),
+            metric: str = 'manhattan',
+            nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
     ):
         super().__init__(preprocessors=preprocessors)
         self.exponential_approximator = NND(
-            weights=ExponentialWeights(2), k=fraction(1), proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+            metric=metric, k=None, weights=ExponentialWeights(2), proximity=truncated_complement,
+            nn_search=nn_search, preprocessors=()
         )
         self.linear_approximator = NND(
-            weights=LinearWeights(), k=fraction(.1), proximity=truncated_complement, nn_search=nn_search, preprocessors=()
+            metric=metric, k=fraction(.1), weights=LinearWeights(), proximity=truncated_complement,
+            nn_search=nn_search, preprocessors=()
         )
 
     def _construct(self, X, y) -> Model:
@@ -258,7 +267,10 @@ class FRONEC(MultiLabelClassifier):
     owa_weights: (int -> np.array) = LinearWeights()
         OWA weights to use for calculation of soft maximum and/or minimum.
 
-    nn_search : NNSearch, default=KDTree()
+    metric: str = 'manhattan'
+        The metric to use.
+
+    nn_search: NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
 
     preprocessors : iterable = (RangeNormaliser(normalise_dimensionality=True), )
@@ -277,7 +289,8 @@ class FRONEC(MultiLabelClassifier):
 
     def __init__(
             self, Q_type: int = 2, R_d_type: int = 1,
-            k: int = 20, owa_weights: Callable[[int], np.array] | None = LinearWeights(), nn_search: NNSearch = KDTree(),
+            k: int = 20, owa_weights: Callable[[int], np.array] | None = LinearWeights(),
+            metric: str = 'manhattan', nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
     ):
         super().__init__(preprocessors=preprocessors)
@@ -285,6 +298,7 @@ class FRONEC(MultiLabelClassifier):
         self.R_d_type = R_d_type
         self.k = k
         self.owa_weights = owa_weights
+        self.metric = metric
         self.nn_search = nn_search
 
     def _construct(self, X, Y) -> Model:
@@ -293,7 +307,7 @@ class FRONEC(MultiLabelClassifier):
         model.R_d = model._R_d_2(Y) if self.R_d_type == 2 else model._R_d_1(Y)
         model.k = self.k
         model.owa_weights = self.owa_weights
-        model.nn_model = self.nn_search(X)
+        model.nn_model = self.nn_search(X, metric=self.metric)
         model.Y = Y
         return model
 
@@ -303,7 +317,7 @@ class FRONEC(MultiLabelClassifier):
         R_d: np.array
         k: int
         owa_weights: Callable[[int], np.array] | None
-        nn_model: NNSearch.Model
+        nn_model: NeighbourSearchMethod.Model
         Y: np.array
 
         @staticmethod

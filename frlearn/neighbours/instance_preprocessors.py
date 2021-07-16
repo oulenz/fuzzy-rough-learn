@@ -6,7 +6,7 @@ from typing import Callable
 import numpy as np
 
 from frlearn.base import SupervisedInstancePreprocessor
-from frlearn.neighbours.neighbour_search import KDTree, NNSearch
+from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
 from frlearn.utilities.numpy import remove_diagonal, soft_max, soft_min
 from frlearn.utilities.weights import ReciprocallyLinearWeights
 
@@ -42,7 +42,10 @@ class FRPS(SupervisedInstancePreprocessor):
         OWA weights to use for calculation of soft maximum and/or minimum in quality measure.
         [1] uses linear weights, while [2] uses reciprocally linear weights.
 
-    nn_search : NNSearch, default=KDTree()
+    metric: str = 'manhattan'
+        The metric to use.
+
+    nn_search : NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
 
     Notes
@@ -91,12 +94,14 @@ class FRPS(SupervisedInstancePreprocessor):
             owa_weights: Callable[[int], np.array] = ReciprocallyLinearWeights(),
             quality_measure: str = 'lower',
             aggr_R = np.mean,
-            nn_search: NNSearch = KDTree(),
+            metric: str = 'manhattan',
+            nn_search: NeighbourSearchMethod = KDTree(),
     ):
-        self.nn_search = nn_search
         self.owa_weights = owa_weights
         self.aggr_R = aggr_R
         self.quality_measure = quality_measure
+        self.metric = metric
+        self.nn_search = nn_search
 
     def __call__(self, X, y):
         classes = np.unique(y)
@@ -123,7 +128,7 @@ class FRPS(SupervisedInstancePreprocessor):
         for tau in np.unique(Q):
             if np.sum(Q >= tau) <= 1:
                 continue
-            nn_model = self.nn_search(X[Q >= tau])
+            nn_model = self.nn_search(X[Q >= tau], metric=self.metric)
             neighbours = nn_model(X[Q >= tau], k=2)[0][:, 1]
             deselected = X[Q < tau]
             if len(deselected) >= 1:

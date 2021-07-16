@@ -68,6 +68,7 @@ Other
    :template: class.rst
 
    FRFS
+   NormNormaliser
 
 Instance preprocessors
 ======================
@@ -118,14 +119,13 @@ Location measures
 Nearest neighbour search algorithms
 -----------------------------------
 
-.. currentmodule:: frlearn.neighbours.neighbour_search
+.. currentmodule:: frlearn.neighbour_search_methods
 
 .. autosummary::
    :toctree: generated/
    :nosignatures:
    :template: class.rst
 
-   NNSearch
    BallTree
    KDTree
 
