@@ -20,11 +20,11 @@ class CD(DataDescriptor):
     a suitable central value of the data is located at the origin,
     and that all features have the same scale.
 
-    By default (standardisation) this is centroid distance.
+    By default (standardisation) this is euclidean centroid distance.
 
     Parameters
     ----------
-    ord: float = 2
+    p: float = 2
         Order of the norm to use. Can also be `-np.inf` or `np.inf`.
 
     threshold_perc : int or None, default=80
@@ -39,17 +39,17 @@ class CD(DataDescriptor):
 
     def __init__(
             self,
-            ord: float = 2,
+            p: float = 2,
             threshold_perc: int | None = 80,
             preprocessors=(Standardiser(), )
     ):
         super().__init__(preprocessors=preprocessors)
-        self.ord = ord
+        self.p = p
         self.threshold_perc = threshold_perc
 
     def _construct(self, X) -> Model:
         model: CD.Model = super()._construct(X)
-        model.ord = self.ord
+        model.p = self.p
         if self.threshold_perc:
             distances = model._distances(X)
             model.threshold = np.percentile(distances, self.threshold_perc)
@@ -59,7 +59,7 @@ class CD(DataDescriptor):
 
     class Model(DataDescriptor.Model):
 
-        ord: float
+        p: float
         threshold: float
 
         def _query(self, X):
@@ -67,7 +67,9 @@ class CD(DataDescriptor):
             return shifted_reciprocal(distances, self.threshold)
 
         def _distances(self, X):
-            return np.linalg.norm(X, ord=self.ord, axis=1)
+            if self.p == 0:
+                return np.where(np.count_nonzero(X, axis=-1) <= 1, np.sum(np.abs(X), axis=-1), np.inf)
+            return np.linalg.norm(X, ord=self.p, axis=1)
 
 
 class MD(DataDescriptor):
