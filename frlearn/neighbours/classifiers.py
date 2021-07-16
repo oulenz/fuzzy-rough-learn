@@ -64,7 +64,10 @@ class FRNN(FuzzyRoughEnsemble):
 
     upper_k : int or None = 20
         Effective length of upper weights vector (number of nearest neighbours to consider).
-        If None, only the lower approximation is used.
+        Should be either a positive integer not larger than the smallest class size,
+        or a function that takes the size of a class and returns such an integer,
+        or None, in which case all instances of a class are used,
+        or 0, in which case only the lower approximation is used.
 
     lower_weights : (int -> np.array) or None = LinearWeights()
         OWA weights to use in calculation of lower approximation of decision classes.
@@ -72,7 +75,10 @@ class FRNN(FuzzyRoughEnsemble):
 
     lower_k : int or None = 20
         Effective length of lower weights vector (number of nearest neighbours to consider).
-        If None, only the upper approximation is used.
+        Should be either a positive integer not larger than the complement of the largest class,
+        or a function that takes the size of a class complement and returns such an integer,
+        or None, in which case all instances of the other classes are used,
+        or 0, in which case only the upper approximation is used.
 
     metric: str = 'manhattan'
         The metric to use.
@@ -86,10 +92,10 @@ class FRNN(FuzzyRoughEnsemble):
 
     Notes
     -----
-    With strict upper_weights and lower_weights, this is FRNN classification
-    as presented in [1]_. The use of OWA operators for the calculation of
-    fuzzy rough sets was proposed in [2]_, and OWA operators were first
-    explicitly combined with FRNN in [3]_.
+    If `upper_weights = lower_weights = None` and `upper_k = lower_k = 1`,
+    this is the original strict FRNN classification as presented in [1]_.
+    The use of OWA operators for the calculation of fuzzy rough sets was proposed in [2]_,
+    and OWA operators were first explicitly combined with FRNN in [3]_.
 
     References
     ----------
@@ -114,17 +120,17 @@ class FRNN(FuzzyRoughEnsemble):
     def __init__(
             self, *,
             upper_weights: Callable[[int], np.array] | None = LinearWeights(),
-            upper_k: int | None = 20,
+            upper_k: int or Callable[[int], int] or None = 20,
             lower_weights: Callable[[int], np.array] | None = LinearWeights(),
-            lower_k: int | None = 20,
+            lower_k: int or Callable[[int], int] or None = 20,
             metric: str = 'manhattan',
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
     ):
-        upper_approximator = upper_k and NND(
+        upper_approximator = upper_k != 0 and NND(
             weights=upper_weights, k=upper_k, proximity=truncated_complement, metric=metric, nn_search=nn_search, preprocessors=()
         )
-        lower_approximator = lower_k and NND(
+        lower_approximator = lower_k != 0 and NND(
             weights=lower_weights, k=lower_k, proximity=truncated_complement, metric=metric, nn_search=nn_search, preprocessors=()
         )
         super().__init__(upper_approximator, lower_approximator, preprocessors=preprocessors, )

@@ -24,7 +24,7 @@ class NNDataDescriptor(DataDescriptor):
     def __init__(
             self,
             metric: str,
-            k: int or Callable[[int], int],
+            k: int or Callable[[int], int] or None,
             nn_search: NeighbourSearchMethod,
             preprocessors=()
     ):
@@ -38,7 +38,7 @@ class NNDataDescriptor(DataDescriptor):
         model = super()._construct(X)
         nn_model = self.nn_search(X, self.metric)
         model.nn_model = nn_model
-        model.k = self.k(len(nn_model)) if callable(self.k) else self.k
+        model.k = self.k(len(nn_model)) if callable(self.k) else len(nn_model) if self.k is None else self.k
         return model
 
     class Model(DataDescriptor.Model):
@@ -73,13 +73,15 @@ class ALP(NNDataDescriptor):
         How many nearest neighbour distances / localised proximities to consider.
         Corresponds to the scale at which proximity is evaluated.
         Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer.
+        or a function that takes the size of the target class and returns such an integer,
+        or None, in which case all instances of the target class are used.
 
     l : int or (int -> int) = 6 * log n
         How many nearest neighbours to use for determining the local ith nearest neighbour distance, for each `i <= k`.
         Lower values correspond to more localisation.
         Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer.
+        or a function that takes the size of the target class and returns such an integer,
+        or None, in which case all instances of the target class are used.
 
     scale_weights : (int -> np.array) or None = LinearWeights()
         Weights to use for calculating the soft maximum of localised proximities.
@@ -117,8 +119,8 @@ class ALP(NNDataDescriptor):
     def __init__(
             self,
             metric: str = 'manhattan',
-            k: int | Callable[[int], int] = log_units(5.5),
-            l: int | Callable[[int], int] = log_units(6),
+            k: int or Callable[[int], int] or None = log_units(5.5),
+            l: int or Callable[[int], int] or None = log_units(6),
             scale_weights: Callable[[int], np.array] | None = LinearWeights(),
             localisation_weights: Callable[[int], np.array] | None = LinearWeights(),
             nn_search: NeighbourSearchMethod = KDTree(),
@@ -133,7 +135,7 @@ class ALP(NNDataDescriptor):
 
     def _construct(self, X):
         model: ALP.Model = super()._construct(X)
-        model.l = self.l(len(model.nn_model)) if callable(self.l) else self.l
+        model.l = self.l(len(model.nn_model)) if callable(self.l) else len(model.nn_model) if self.l is None else self.l
         model._kl = max(model.k, model.l)
         _, model.distances = model.nn_model.query_self(model._kl)
         model.scale_weights = self.scale_weights
@@ -329,8 +331,9 @@ class NND(NNDataDescriptor):
     k : int or (int -> int) = 1
         Which nearest neighbour(s) to consider.
         Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer.
-        If `owa = trimmed()`, only the kth neighbour is used,
+        or a function that takes the size of the target class and returns such an integer,
+        or None, in which case all instances of the target class are used.
+        If `weights = None`, only the kth neighbour is used,
         otherwise closer neighbours are also taken into account.
 
     proximity : float -> float = np_utils.shifted_reciprocal
@@ -374,7 +377,7 @@ class NND(NNDataDescriptor):
     def __init__(
             self,
             metric: str = 'manhattan',
-            k: int or Callable[[int], int] = 1,
+            k: int or Callable[[int], int] or None = 1,
             weights: Callable[[int], np.array] | None = None,
             proximity: Callable[[float], float] = shifted_reciprocal,
             nn_search: NeighbourSearchMethod = KDTree(),
