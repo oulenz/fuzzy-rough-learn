@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Callable
 
 import numpy as np
 from sklearn.neighbors._unsupervised import NearestNeighbors
@@ -47,12 +46,10 @@ class NeighbourSearchMethod(ModelFactory):
         _X: np.array
         metric: str
 
-        def query_self(self, k: int or Callable[[int], int]):
-            if callable(k):
-                k = k(self.n - 1)
+        def query_self(self, k: int):
             return [a[:, 1:] for a in self(self._X, k + 1)]
 
-        def __call__(self, X, k: int or Callable[[int], int] or None):
+        def __call__(self, X, k: int):
             """
             Identify the k nearest neighbours for each of the instances in X.
 
@@ -61,10 +58,8 @@ class NeighbourSearchMethod(ModelFactory):
             X: array shape=(n, m, )
                 Query instances.
 
-            k: int or (int -> int) or None
-                Number of neighbours to return. Should be either a positive integer not larger than the model size,
-                or a function that takes the size of the model and returns such an integer,
-                or None, in which case all instances of the target dataset are returned.
+            k: int
+                Number of neighbours to return. Should be a positive integer not larger than the model size.
 
             Returns
             -------
@@ -76,10 +71,6 @@ class NeighbourSearchMethod(ModelFactory):
                 Distances to the k nearest neighbours among the construction
                 instances for each query instance.
             """
-            if callable(k):
-                k = k(self.n)
-            if k is None:
-                k = self.n
             return super().__call__(X, k)
 
         @property
@@ -140,10 +131,7 @@ class _SKLearnTree(NeighbourSearchMethod):
         def _query(self, X, k: int):
             indices, distances = self.tree.kneighbors(X, n_neighbors=k)[::-1]
             if self.metric == 'cosine':
-                print(True)
-                #distances = 0.25 * distances**2
-                cosine = 1 - .5 * distances**2
-                distances = .5 - .5*cosine
+                distances = 0.25 * distances**2
             return indices, distances
 
 

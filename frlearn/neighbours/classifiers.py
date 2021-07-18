@@ -10,7 +10,7 @@ from frlearn.data_descriptors import NND
 from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
 from frlearn.statistics.feature_preprocessors import RangeNormaliser
 from frlearn.utilities.numpy import div_or, soft_max, soft_min
-from frlearn.utilities.parametrisations import fraction
+from frlearn.utilities.parametrisations import multiple
 from frlearn.utilities.transformations import truncated_complement
 from frlearn.utilities.weights import ExponentialWeights, LinearWeights
 
@@ -62,23 +62,25 @@ class FRNN(FuzzyRoughEnsemble):
         OWA weights to use in calculation of upper approximation of decision classes.
         `upper_weights` and `lower_weights` cannot both be None.
 
-    upper_k : int or None = 20
+    upper_k: int or (int -> float) or None = 20
         Effective length of upper weights vector (number of nearest neighbours to consider).
-        Should be either a positive integer not larger than the smallest class size,
-        or a function that takes the size of a class and returns such an integer,
-        or None, in which case all instances of a class are used,
-        or 0, in which case only the lower approximation is used.
+        Should be either a positive integer,
+        or a function that takes the class size `n` and returns a float,
+        or None, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
+        Alternatively, if this is 0, only the lower approximation is used.
 
     lower_weights : (int -> np.array) or None = LinearWeights()
         OWA weights to use in calculation of lower approximation of decision classes.
         `upper_weights` and `lower_weights` cannot both be None.
 
-    lower_k : int or None = 20
+    lower_k: int or (int -> float) or None = 20
         Effective length of lower weights vector (number of nearest neighbours to consider).
-        Should be either a positive integer not larger than the complement of the largest class,
-        or a function that takes the size of a class complement and returns such an integer,
-        or None, in which case all instances of the other classes are used,
-        or 0, in which case only the upper approximation is used.
+        Should be either a positive integer,
+        or a function that takes the size `n` of the complement of the class and returns a float,
+        or None, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
+        Alternatively, if this is 0, only the upper approximation is used.
 
     metric: str = 'manhattan'
         The metric to use.
@@ -120,9 +122,9 @@ class FRNN(FuzzyRoughEnsemble):
     def __init__(
             self, *,
             upper_weights: Callable[[int], np.array] | None = LinearWeights(),
-            upper_k: int or Callable[[int], int] or None = 20,
+            upper_k: int or Callable[[int], float] or None = 20,
             lower_weights: Callable[[int], np.array] | None = LinearWeights(),
-            lower_k: int or Callable[[int], int] or None = 20,
+            lower_k: int or Callable[[int], float] or None = 20,
             metric: str = 'manhattan',
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
@@ -159,9 +161,17 @@ class FROVOCO(MultiClassClassifier):
         Preprocessors to apply. The default range normaliser ensures that all features have the same range,
         and that the sum of the ranges is 1, so that we can use the Manhattan distance to obtain the mean similarity.
 
+    Notes
+    -----
+    The original proposal uses full length exponential weight vectors,
+    but since exponential weights decrease exponentially,
+    the contribution of these additional weights to the classification result
+    also decreases exponentially, and they are liable to corrupt the calculation
+    due to their small size.
+    Therefore, the length of the exponential weight vector has been limited to 16.
+
     References
     ----------
-
     .. [1] `Vluymans S, Fernández A, Saeys Y, Cornelis C, Herrera F (2018).
        Dynamic affinity-based classification of multi-class imbalanced data with one-versus-one decomposition:
        a fuzzy rough set approach.
@@ -177,11 +187,11 @@ class FROVOCO(MultiClassClassifier):
     ):
         super().__init__(preprocessors=preprocessors)
         self.exponential_approximator = NND(
-            metric=metric, k=None, weights=ExponentialWeights(2), proximity=truncated_complement,
+            metric=metric, k=16, weights=ExponentialWeights(2), proximity=truncated_complement,
             nn_search=nn_search, preprocessors=()
         )
         self.linear_approximator = NND(
-            metric=metric, k=fraction(.1), weights=LinearWeights(), proximity=truncated_complement,
+            metric=metric, k=multiple(.1), weights=LinearWeights(), proximity=truncated_complement,
             nn_search=nn_search, preprocessors=()
         )
 

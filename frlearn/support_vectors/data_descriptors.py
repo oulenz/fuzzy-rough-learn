@@ -7,7 +7,7 @@ from sklearn.svm import OneClassSVM
 
 from frlearn.base import DataDescriptor
 from frlearn.statistics.feature_preprocessors import IQRNormaliser
-from frlearn.utilities.parametrisations import fraction
+from frlearn.utilities.parametrisations import multiple
 from frlearn.utilities.transformations import contract
 
 
@@ -57,7 +57,7 @@ class SVM(DataDescriptor):
     def __init__(
             self,
             nu: float = 0.20,
-            c: float | Callable[[int], float] = fraction(0.25),
+            c: float | Callable[[int], float] = multiple(0.25),
             preprocessors=(IQRNormaliser(), ),
             **sklearn_params,
     ):

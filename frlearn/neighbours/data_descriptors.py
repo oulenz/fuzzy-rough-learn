@@ -9,8 +9,9 @@ import numpy as np
 from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
 from frlearn.base import DataDescriptor
 from frlearn.feature_preprocessors import IQRNormaliser
+from frlearn.neighbours.utilities import resolve_k
 from frlearn.numpy import div_or, soft_head, soft_max
-from frlearn.parametrisations import log_units
+from frlearn.parametrisations import log_multiple
 from frlearn.transformations import shifted_reciprocal
 from frlearn.weights import LinearWeights
 
@@ -38,7 +39,7 @@ class NNDataDescriptor(DataDescriptor):
         model = super()._construct(X)
         nn_model = self.nn_search(X, self.metric)
         model.nn_model = nn_model
-        model.k = self.k(len(nn_model)) if callable(self.k) else len(nn_model) if self.k is None else self.k
+        model.k = resolve_k(self.k, len(nn_model))
         return model
 
     class Model(DataDescriptor.Model):
@@ -69,19 +70,21 @@ class ALP(NNDataDescriptor):
     metric: str = 'manhattan'
         The metric to use.
 
-    k : int or (int -> int) = 5.5 * log n
+    k : int or (int -> float) or None = 5.5 * log n
         How many nearest neighbour distances / localised proximities to consider.
         Corresponds to the scale at which proximity is evaluated.
-        Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer,
-        or None, in which case all instances of the target class are used.
+        Should be either a positive integer,
+        or a function that takes the target class size `n` and returns a float,
+        or None, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
 
-    l : int or (int -> int) = 6 * log n
+    l : int or (int -> float) or None = 6 * log n
         How many nearest neighbours to use for determining the local ith nearest neighbour distance, for each `i <= k`.
         Lower values correspond to more localisation.
-        Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer,
-        or None, in which case all instances of the target class are used.
+        Should be either a positive integer,
+        or a function that takes the target class size `n` and returns a float,
+        or None, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
 
     scale_weights : (int -> np.array) or None = LinearWeights()
         Weights to use for calculating the soft maximum of localised proximities.
@@ -119,8 +122,8 @@ class ALP(NNDataDescriptor):
     def __init__(
             self,
             metric: str = 'manhattan',
-            k: int or Callable[[int], int] or None = log_units(5.5),
-            l: int or Callable[[int], int] or None = log_units(6),
+            k: int or Callable[[int], float] or None = log_multiple(5.5),
+            l: int or Callable[[int], float] or None = log_multiple(6),
             scale_weights: Callable[[int], np.array] | None = LinearWeights(),
             localisation_weights: Callable[[int], np.array] | None = LinearWeights(),
             nn_search: NeighbourSearchMethod = KDTree(),
@@ -135,7 +138,7 @@ class ALP(NNDataDescriptor):
 
     def _construct(self, X):
         model: ALP.Model = super()._construct(X)
-        model.l = self.l(len(model.nn_model)) if callable(self.l) else len(model.nn_model) if self.l is None else self.l
+        model.l = resolve_k(self.l, len(model.nn_model))
         model._kl = max(model.k, model.l)
         _, model.distances = model.nn_model.query_self(model._kl)
         model.scale_weights = self.scale_weights
@@ -183,10 +186,12 @@ class LNND(NNDataDescriptor):
     metric: str = 'manhattan'
         The metric to use.
 
-    k : int or (int -> int) = 3.4 * log n
+    k : int or (int -> float) or None = 3.4 * log n
         Which nearest neighbour to consider.
-        Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer.
+        Should be either a positive integer,
+        or a function that takes the target class size `n` and returns a float,
+        or None, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
 
     preprocessors : iterable = (IQRNormaliser(), )
         Preprocessors to apply. The default interquartile range normaliser rescales all features
@@ -221,7 +226,7 @@ class LNND(NNDataDescriptor):
     def __init__(
             self,
             metric: str = 'manhattan',
-            k: int or Callable[[int], int] = log_units(3.4),
+            k: int or Callable[[int], float] or None = log_multiple(3.4),
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
@@ -254,10 +259,12 @@ class LOF(NNDataDescriptor):
     metric: str = 'manhattan'
         The metric to use.
 
-    k : int or (int -> int) = 2.5 * log n
+    k : int or (int -> float) or None = 2.5 * log n
         How many nearest neighbours to consider.
-        Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer.
+        Should be either a positive integer,
+        or a function that takes the target class size `n` and returns a float,
+        or None, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
 
     preprocessors : iterable = (IQRNormaliser(), )
         Preprocessors to apply. The default interquartile range normaliser rescales all features
@@ -287,7 +294,7 @@ class LOF(NNDataDescriptor):
     def __init__(
             self,
             metric: str = 'manhattan',
-            k: int or Callable[[int], int] = log_units(2.5),
+            k: int or Callable[[int], float] or None = log_multiple(2.5),
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
@@ -328,11 +335,12 @@ class NND(NNDataDescriptor):
     metric: str = 'manhattan'
         The metric to use.
 
-    k : int or (int -> int) = 1
+    k : int or (int -> float) or None = 1
         Which nearest neighbour(s) to consider.
-        Should be either a positive integer not larger than the target class size,
-        or a function that takes the size of the target class and returns such an integer,
-        or None, in which case all instances of the target class are used.
+        Should be either a positive integer,
+        or a function that takes the target class size `n` and returns a float,
+        or None, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
         If `weights = None`, only the kth neighbour is used,
         otherwise closer neighbours are also taken into account.
 
@@ -377,7 +385,7 @@ class NND(NNDataDescriptor):
     def __init__(
             self,
             metric: str = 'manhattan',
-            k: int or Callable[[int], int] or None = 1,
+            k: int or Callable[[int], float] or None = 1,
             weights: Callable[[int], np.array] | None = None,
             proximity: Callable[[float], float] = shifted_reciprocal,
             nn_search: NeighbourSearchMethod = KDTree(),
