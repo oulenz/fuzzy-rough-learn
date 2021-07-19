@@ -74,7 +74,7 @@ class ExponentialWeights(Weights):
 
     Parameters
     ----------
-    b: float
+    base: float
         Exponential base. Should be larger than 1.
 
     Returns
@@ -94,10 +94,10 @@ class ExponentialWeights(Weights):
     These issues are exacerbated for larger bases, so bases only slightly larger than 1 may be most useful.
     """
 
-    b: float = 2
+    base: float = 2
 
     def __call__(self, k: int):
-        w = np.flip(self.b ** np.arange(k))
+        w = np.flip(self.base ** np.arange(k))
         return w / np.sum(w)
 
 

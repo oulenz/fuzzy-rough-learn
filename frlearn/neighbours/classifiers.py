@@ -60,7 +60,7 @@ class FRNN(FuzzyRoughEnsemble):
     ----------
     upper_weights : (int -> np.array) or None = LinearWeights()
         OWA weights to use in calculation of upper approximation of decision classes.
-        `upper_weights` and `lower_weights` cannot both be None.
+        If `None`, only the `upper_k`th neighbour is used.
 
     upper_k: int or (int -> float) or None = 20
         Effective length of upper weights vector (number of nearest neighbours to consider).
@@ -72,7 +72,7 @@ class FRNN(FuzzyRoughEnsemble):
 
     lower_weights : (int -> np.array) or None = LinearWeights()
         OWA weights to use in calculation of lower approximation of decision classes.
-        `upper_weights` and `lower_weights` cannot both be None.
+        If `None`, only the `lower_k`th neighbour is used.
 
     lower_k: int or (int -> float) or None = 20
         Effective length of lower weights vector (number of nearest neighbours to consider).
@@ -113,17 +113,17 @@ class FRNN(FuzzyRoughEnsemble):
        Lecture Notes in Computer Science, vol 6401. Springer, Berlin, Heidelberg.
        doi: 10.1007/978-3-642-16248-0_16
        <https://link.springer.com/chapter/10.1007/978-3-642-16248-0_16>`_
-    .. [3] `E. Ramentol et al.,
+    .. [3] `Ramentol E, Vluymans S, Verbiest N, Caballero Y, Bello R, Cornelis C, Herrera F (2015).
        IFROWANN: Imbalanced Fuzzy-Rough Ordered Weighted Average Nearest Neighbor Classification.
-       IEEE Transactions on Fuzzy Systems, vol 23, no 5, pp 1622-1637, Oct 2015.
+       IEEE Transactions on Fuzzy Systems, vol 23, no 5, pp 1622–1637.
        doi: 10.1109/TFUZZ.2014.2371472
        <https://ieeexplore.ieee.org/document/6960859>`_
     """
     def __init__(
             self, *,
-            upper_weights: Callable[[int], np.array] | None = LinearWeights(),
+            upper_weights: Callable[[int], np.array] or None = LinearWeights(),
             upper_k: int or Callable[[int], float] or None = 20,
-            lower_weights: Callable[[int], np.array] | None = LinearWeights(),
+            lower_weights: Callable[[int], np.array] or None = LinearWeights(),
             lower_k: int or Callable[[int], float] or None = 20,
             metric: str = 'manhattan',
             nn_search: NeighbourSearchMethod = KDTree(),
@@ -147,10 +147,44 @@ class FRNN(FuzzyRoughEnsemble):
 
 class FROVOCO(MultiClassClassifier):
     """
-    Implementation of the Fuzzy Rough OVO COmbination (FROVOCO) ensemble classifier.
+    Implementation of the Fuzzy Rough OVO COmbination (FROVOCO) ensemble classifier [1]_.
+
+    FROVOCO decomposes muliclass classification into a number of one-vs-one and one-vs-rest comparisons.
+    Depending on the imbalance ratio (ir) of each comparison,
+    it uses different weights, following the IFROWANN scheme [2]_.
 
     Parameters
     ----------
+    balanced_weights : (int -> np.array) or None = ExponentialWeights(base=2)
+        OWA weights to use when the imbalance ratio is not larger than `ir_threshold`.
+        If `None`, only the `balanced_k`th neighbour is used.
+
+    balanced_k: int or (int -> float) or None = 16
+        Length of the weights vector when the imbalance ratio is not larger than `ir_threshold`.
+        Should be either a positive integer,
+        or a function that takes the class size `n` and returns a float,
+        or None, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
+        Alternatively, if this is 0, only the lower approximation is used.
+
+    imbalanced_weights : (int -> np.array) or None = LinearWeights()
+        OWA weights to use when the imbalance ratio is larger than `ir_threshold`.
+        If `None`, only the `imbalanced_k`th neighbour is used.
+
+    imbalanced_k: int or (int -> float) or None = 0.1 * n
+        Length of the weights vector when the imbalance ratio is larger than `ir_threshold`.
+        Effective length of lower weights vector (number of nearest neighbours to consider).
+        Should be either a positive integer,
+        or a function that takes the size `n` of the complement of the class and returns a float,
+        or None, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
+        Alternatively, if this is 0, only the upper approximation is used.
+
+    ir_threshold: float or None = 9
+        Imbalance ratio threshold.  Above this value, `imbalanced_weights` and `imbalanced_k` are used,
+        otherwise `balanced_weights` and `balanced_k`.
+        Set to `None` to only use `balanced_weights` and `balanced_k`.
+
     metric: str = 'manhattan'
         The metric to use.
 
@@ -168,7 +202,8 @@ class FROVOCO(MultiClassClassifier):
     the contribution of these additional weights to the classification result
     also decreases exponentially, and they are liable to corrupt the calculation
     due to their small size.
-    Therefore, the length of the exponential weight vector has been limited to 16.
+    Therefore, the default length of the exponential weight vector is 16.
+    The original behaviour can be obtained by setting `balanced_k` to `None`.
 
     References
     ----------
@@ -178,39 +213,56 @@ class FROVOCO(MultiClassClassifier):
        Knowledge and Information Systems, vol 56, pp 55–84.
        doi: 10.1007/s10115-017-1126-1
        <https://link.springer.com/article/10.1007/s10115-017-1126-1>`_
+    .. [2] `Ramentol E, Vluymans S, Verbiest N, Caballero Y, Bello R, Cornelis C, Herrera F (2015).
+       IFROWANN: Imbalanced Fuzzy-Rough Ordered Weighted Average Nearest Neighbor Classification.
+       IEEE Transactions on Fuzzy Systems, vol 23, no 5, pp 1622–1637.
+       doi: 10.1109/TFUZZ.2014.2371472
+       <https://ieeexplore.ieee.org/document/6960859>`_
     """
     def __init__(
             self,
+            balanced_weights: Callable[[int], np.array] or None = ExponentialWeights(base=2),
+            balanced_k: int or Callable[[int], float] or None = 16,
+            imbalanced_weights: Callable[[int], np.array] or None = LinearWeights(),
+            imbalanced_k: int or Callable[[int], float] or None = multiple(0.1),
+            ir_threshold: float or None = 9,
             metric: str = 'manhattan',
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
     ):
         super().__init__(preprocessors=preprocessors)
-        self.exponential_approximator = NND(
-            metric=metric, k=16, weights=ExponentialWeights(2), proximity=truncated_complement,
+        self.ir_threshold = ir_threshold if ir_threshold is not None else np.inf
+        self.balanced_approximator = NND(
+            metric=metric, k=balanced_k, weights=balanced_weights, proximity=truncated_complement,
             nn_search=nn_search, preprocessors=()
         )
-        self.linear_approximator = NND(
-            metric=metric, k=multiple(.1), weights=LinearWeights(), proximity=truncated_complement,
+        self.imbalanced_approximator = NND(
+            metric=metric, k=imbalanced_k, weights=imbalanced_weights, proximity=truncated_complement,
             nn_search=nn_search, preprocessors=()
         )
 
     def _construct(self, X, y) -> Model:
         model: FROVOCO.Model = super()._construct(X, y)
+        model.ir_threshold = self.ir_threshold
 
         Cs = [X[np.where(y == c)] for c in model.classes]
         co_Cs = [X[np.where(y != c)] for c in model.classes]
 
         class_sizes = np.array([len(C) for C in Cs])
         model.ovo_ir = (class_sizes[:, None] / class_sizes)
-        model.ova_ir = np.array([c_n / (len(X) - c_n) for c_n in class_sizes])
+        model.ovr_ir = np.array([c_n / (len(X) - c_n) for c_n in class_sizes])
         max_ir = np.max(model.ovo_ir, axis=1)
 
-        lin_costr = self.linear_approximator
-        exp_costr = self.exponential_approximator
-        model.lin_approx = [lin_costr(C) if ir > 9 else None for ir, C in zip(max_ir, Cs)]
-        model.exp_approx = [exp_costr(C) if ir <= 9 else None for ir, C in zip(model.ova_ir, Cs)]
-        model.co_approx = [(lin_costr if 1/ir > 9 else exp_costr)(co_C) for ir, co_C in zip(model.ova_ir, co_Cs)]
+        model.imb_approxs = [
+            self.imbalanced_approximator(C) if ir > self.ir_threshold else None for ir, C in zip(max_ir, Cs)
+        ]
+        model.bal_approxs = [
+            self.balanced_approximator(C) if ir <= self.ir_threshold else None for ir, C in zip(model.ovr_ir, Cs)
+        ]
+        model.co_approxs = [
+            (self.imbalanced_approximator if 1 / ir > self.ir_threshold else self.balanced_approximator)(co_C)
+            for ir, co_C in zip(model.ovr_ir, co_Cs)
+        ]
 
         model.sig = np.array([model._sig(C) for C in Cs])
         return model
@@ -218,43 +270,47 @@ class FROVOCO(MultiClassClassifier):
 
     class Model(MultiClassClassifier.Model):
 
+        ir_threshold: float
         ovo_ir: np.array
-        ova_ir: np.array
-        lin_approx: List[DataDescriptor.Model | None]
-        exp_approx: List[DataDescriptor.Model | None]
-        co_approx: List[DataDescriptor.Model]
+        ovr_ir: np.array
+        imb_approxs: List[DataDescriptor.Model or None]
+        bal_approxs: List[DataDescriptor.Model or None]
+        co_approxs: List[DataDescriptor.Model]
         sig: np.array
 
         def _sig(self, C):
-            approx = [a if ir > 9 else e for ir, a, e in zip(self.ova_ir, self.lin_approx, self.exp_approx)]
-            vals_C = np.array([np.mean(a(C)) for a in approx])
-            co_vals_C = np.array([np.mean(co_a(C)) for co_a in self.co_approx])
+            approxs = [
+                imb if ir > self.ir_threshold else bal
+                for ir, imb, bal in zip(self.ovr_ir, self.imb_approxs, self.bal_approxs)
+            ]
+            vals_C = np.array([np.mean(a(C)) for a in approxs])
+            co_vals_C = np.array([np.mean(co_a(C)) for co_a in self.co_approxs])
             return (vals_C + 1 - co_vals_C)/2
 
         def _query(self, X):
             # The values in the else clause are just placeholders. But we can't use `None`, because that will force
             # the dtype of the resulting array to become `object`, which will in turn lead to 0/0 producing
             # ZeroDivisionError rather than np.nan
-            linear_vals_X = np.stack(np.broadcast_arrays(*[a(X) if a else -np.inf for a in self.lin_approx])).transpose()
-            exponential_vals_X = np.stack(np.broadcast_arrays(*[a(X) if a else -np.inf for a in self.exp_approx])).transpose()
-            co_vals_X = np.array([a(X) for a in self.co_approx]).transpose()
+            imb_vals_X = np.stack(np.broadcast_arrays(*[a(X) if a else -np.inf for a in self.imb_approxs])).transpose()
+            bal_vals_X = np.stack(np.broadcast_arrays(*[a(X) if a else -np.inf for a in self.bal_approxs])).transpose()
+            co_vals_X = np.array([a(X) for a in self.co_approxs]).transpose()
 
-            mem = self._mem(linear_vals_X, exponential_vals_X, co_vals_X)
+            mem = self._mem(imb_vals_X, bal_vals_X, co_vals_X)
 
             mse = np.mean((mem[:, None, :] - self.sig) ** 2, axis=-1)
             mse_n = mse/np.sum(mse, axis=-1, keepdims=True)
 
-            wv = self._wv(linear_vals_X, exponential_vals_X)
+            wv = self._wv(imb_vals_X, bal_vals_X)
 
             return (wv + mem)/2 - mse_n/self.n_classes
 
-        def _mem(self, linear_vals, exponential_vals, co_approximation_vals):
-            approximation_vals = np.where(self.ova_ir > 9, linear_vals, exponential_vals)
-            return (approximation_vals + 1 - co_approximation_vals) / 2
+        def _mem(self, imb_vals, bal_vals, co_vals):
+            vals = np.where(self.ovr_ir > self.ir_threshold, imb_vals, bal_vals)
+            return (vals + 1 - co_vals) / 2
 
-        def _wv(self, linear_vals, exponential_vals):
+        def _wv(self, imb_vals, bal_vals):
             # Subtract from 1 because we're using lower approximations.
-            vals = 1 - np.where(self.ovo_ir > 9, linear_vals[..., None], exponential_vals[..., None])
+            vals = 1 - np.where(self.ovo_ir > self.ir_threshold, imb_vals[..., None], bal_vals[..., None])
             tot_vals = vals + vals.transpose(0, 2, 1)
             vals = div_or(vals, tot_vals, 0.5)
             # Exclude comparisons of a class with itself.
