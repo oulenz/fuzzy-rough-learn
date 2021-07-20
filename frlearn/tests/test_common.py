@@ -1,13 +1,23 @@
+import importlib
 import pytest
 
 import numpy as np
 from sklearn.datasets import load_diabetes, load_iris
 
-from frlearn.classifiers import FRNN as FRNNClassification, FRONEC, FROVOCO
-from frlearn.data_descriptors import ALP, CD, IF, LNND, LOF, MD, NND, SVM
-from frlearn.feature_preprocessors import FRFS, IQRNormaliser, MaxAbsNormaliser, RangeNormaliser, Standardiser
-from frlearn.instance_preprocessors import FRPS
-from frlearn.regressors import FRNN as FRNNRegression
+from frlearn.base import ClassSupervised, FeatureSelector, FeaturePreprocessor, MultiClassClassifier, MultiLabelClassifier, Unsupervised
+
+
+algorithm_types = [
+    'classifiers',
+    'data_descriptors',
+    'feature_preprocessors',
+    'instance_preprocessors',
+    'regressors'
+]
+algorithms = {}
+for algorithm_type in algorithm_types:
+    module = importlib.import_module('frlearn.' + algorithm_type)
+    algorithms[algorithm_type] = [getattr(module, a) for a in module.__all__]
 
 
 @pytest.fixture
@@ -22,7 +32,7 @@ def regression_data():
 
 @pytest.mark.parametrize(
     'cls',
-    [FRNNClassification, FROVOCO],
+    [a for a in algorithms['classifiers'] if issubclass(a, MultiClassClassifier)],
 )
 def test_multiclass_classifier(multiclass_data, cls):
     X, y = multiclass_data
@@ -35,7 +45,7 @@ def test_multiclass_classifier(multiclass_data, cls):
 
 @pytest.mark.parametrize(
     'cls',
-    [FRONEC],
+    [a for a in algorithms['classifiers'] if issubclass(a, MultiLabelClassifier)],
 )
 def test_multilabel_classifier(multiclass_data, cls):
     X, y = multiclass_data
@@ -53,7 +63,7 @@ def test_multilabel_classifier(multiclass_data, cls):
 
 @pytest.mark.parametrize(
     'cls',
-    [ALP, CD, IF, LNND, LOF, MD, NND, SVM],
+    algorithms['data_descriptors'],
 )
 def test_data_descriptor(multiclass_data, cls):
     X, y = multiclass_data
@@ -66,7 +76,7 @@ def test_data_descriptor(multiclass_data, cls):
 
 @pytest.mark.parametrize(
     'cls',
-    [FRNNRegression],
+    algorithms['regressors'],
 )
 def test_regressor(regression_data, cls):
     X, y = regression_data
@@ -79,7 +89,7 @@ def test_regressor(regression_data, cls):
 
 @pytest.mark.parametrize(
     'cls',
-    [FRFS],
+    [a for a in algorithms['feature_preprocessors'] if issubclass(a, ClassSupervised) and issubclass(a, FeatureSelector)],
 )
 def test_supervised_feature_selector(multiclass_data, cls):
     X_orig, y_orig = multiclass_data
@@ -93,7 +103,7 @@ def test_supervised_feature_selector(multiclass_data, cls):
 
 @pytest.mark.parametrize(
     'cls',
-    [IQRNormaliser, MaxAbsNormaliser, RangeNormaliser, Standardiser],
+    [a for a in algorithms['feature_preprocessors'] if issubclass(a, Unsupervised) and issubclass(a, FeaturePreprocessor)],
 )
 def test_unsupervised_feature_preprocessor(multiclass_data, cls):
     X_orig, y_orig = multiclass_data
@@ -109,7 +119,7 @@ def test_unsupervised_feature_preprocessor(multiclass_data, cls):
 
 @pytest.mark.parametrize(
     'cls',
-    [FRPS],
+    algorithms['instance_preprocessors'],
 )
 def test_supervised_instance_selector(multiclass_data, cls):
     X_orig, y_orig = multiclass_data
