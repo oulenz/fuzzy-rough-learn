@@ -83,6 +83,11 @@ Data descriptors
 * Nearest Neighbour Distance (NND)
 * Support Vector Machine (SVM)
 
+Regressors
+..........
+
+* Fuzzy Rough Nearest Neighbours (FRNN)
+
 Feature preprocessors
 .....................
 

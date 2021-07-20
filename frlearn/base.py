@@ -135,6 +135,29 @@ class MultiLabelClassifier(LabelSupervised, Classifier):
         pass
 
 
+class Regressor(ModelFactory):
+
+    def __call__(self, X, y) -> Regressor.Model:
+        return super().__call__(X, y=y)
+
+    def _construct(self, X, y) -> Regressor.Model:
+        model = super()._construct(X, y=y)
+        return model
+
+    class Model(ModelFactory.Model):
+
+        def __call__(self, X):
+            return super().__call__(X)
+
+        @property
+        def query(self):
+            return self.__call__
+
+        @abstractmethod
+        def _query(self, X):
+            pass
+
+
 class FeaturePreprocessor(ModelFactory):
 
     class Model(ModelFactory.Model):

@@ -38,6 +38,19 @@ Data descriptors
    NND
    SVM
 
+Regressors
+==========
+
+.. currentmodule:: frlearn.regressors
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+   :template: class.rst
+
+   FRNN
+
+
 Feature preprocessors
 =====================
 

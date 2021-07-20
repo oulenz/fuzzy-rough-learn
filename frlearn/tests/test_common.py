@@ -1,25 +1,31 @@
 import pytest
 
 import numpy as np
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_diabetes, load_iris
 
-from frlearn.classifiers import FRNN, FRONEC, FROVOCO
+from frlearn.classifiers import FRNN as FRNNClassification, FRONEC, FROVOCO
 from frlearn.data_descriptors import ALP, CD, IF, LNND, LOF, MD, NND, SVM
 from frlearn.feature_preprocessors import FRFS, IQRNormaliser, MaxAbsNormaliser, RangeNormaliser, Standardiser
 from frlearn.instance_preprocessors import FRPS
+from frlearn.regressors import FRNN as FRNNRegression
 
 
 @pytest.fixture
-def data():
+def multiclass_data():
     return load_iris(return_X_y=True)
+
+
+@pytest.fixture
+def regression_data():
+    return load_diabetes(return_X_y=True)
 
 
 @pytest.mark.parametrize(
     'cls',
-    [FRNN, FROVOCO],
+    [FRNNClassification, FROVOCO],
 )
-def test_multiclass_classifier(data, cls):
-    X, y = data
+def test_multiclass_classifier(multiclass_data, cls):
+    X, y = multiclass_data
     clf = cls()
     model = clf(X, y)
 
@@ -31,8 +37,8 @@ def test_multiclass_classifier(data, cls):
     'cls',
     [FRONEC],
 )
-def test_multilabel_classifier(data, cls):
-    X, y = data
+def test_multilabel_classifier(multiclass_data, cls):
+    X, y = multiclass_data
     Y = (y[:, None] == np.arange(3)).astype(int)
     Y[[109, 117, 131], 2] = 0
     Y[((X[:, 0] >= 6) & (y == 1)), 2] = 1
@@ -49,8 +55,8 @@ def test_multilabel_classifier(data, cls):
     'cls',
     [ALP, CD, IF, LNND, LOF, MD, NND, SVM],
 )
-def test_data_descriptor(data, cls):
-    X, y = data
+def test_data_descriptor(multiclass_data, cls):
+    X, y = multiclass_data
     descriptor = cls()
     model = descriptor(X[y == 0])
 
@@ -60,10 +66,23 @@ def test_data_descriptor(data, cls):
 
 @pytest.mark.parametrize(
     'cls',
+    [FRNNRegression],
+)
+def test_regressor(regression_data, cls):
+    X, y = regression_data
+    regressor = cls()
+    model = regressor(X, y)
+
+    predictions = model(X)
+    assert predictions.shape == (X.shape[0], )
+
+
+@pytest.mark.parametrize(
+    'cls',
     [FRFS],
 )
-def test_supervised_feature_selector(data, cls):
-    X_orig, y_orig = data
+def test_supervised_feature_selector(multiclass_data, cls):
+    X_orig, y_orig = multiclass_data
 
     preprocessor = cls()
     model = preprocessor(X_orig, y_orig)
@@ -76,8 +95,8 @@ def test_supervised_feature_selector(data, cls):
     'cls',
     [IQRNormaliser, MaxAbsNormaliser, RangeNormaliser, Standardiser],
 )
-def test_unsupervised_feature_preprocessor(data, cls):
-    X_orig, y_orig = data
+def test_unsupervised_feature_preprocessor(multiclass_data, cls):
+    X_orig, y_orig = multiclass_data
 
     preprocessor = cls()
     model = preprocessor(X_orig)
@@ -92,8 +111,8 @@ def test_unsupervised_feature_preprocessor(data, cls):
     'cls',
     [FRPS],
 )
-def test_supervised_instance_selector(data, cls):
-    X_orig, y_orig = data
+def test_supervised_instance_selector(multiclass_data, cls):
+    X_orig, y_orig = multiclass_data
     preprocessor = cls()
 
     X, y = preprocessor(X_orig, y_orig)
