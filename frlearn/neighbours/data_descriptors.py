@@ -24,20 +24,20 @@ class NNDataDescriptor(DataDescriptor):
     @abstractmethod
     def __init__(
             self,
-            metric: str,
+            dissimilarity: str,
             k: int or Callable[[int], int] or None,
             nn_search: NeighbourSearchMethod,
             preprocessors=()
     ):
         super().__init__(preprocessors=preprocessors)
-        self.metric = metric
+        self.dissimilarity = dissimilarity
         self.nn_search = nn_search
         self.k = k
 
     @abstractmethod
     def _construct(self, X) -> Model:
         model = super()._construct(X)
-        nn_model = self.nn_search(X, self.metric)
+        nn_model = self.nn_search(X, self.dissimilarity)
         model.nn_model = nn_model
         model.k = resolve_k(self.k, len(nn_model))
         return model
@@ -67,8 +67,8 @@ class ALP(NNDataDescriptor):
 
     Parameters
     ----------
-    metric: str = 'manhattan'
-        The metric to use.
+    dissimilarity: str = 'manhattan'
+        The dissimilarity measure to use.
 
     k : int or (int -> float) or None = 5.5 * log n
         How many nearest neighbour distances / localised proximities to consider.
@@ -121,7 +121,7 @@ class ALP(NNDataDescriptor):
 
     def __init__(
             self,
-            metric: str = 'manhattan',
+            dissimilarity: str = 'manhattan',
             k: int or Callable[[int], float] or None = log_multiple(5.5),
             l: int or Callable[[int], float] or None = log_multiple(6),
             scale_weights: Callable[[int], np.array] | None = LinearWeights(),
@@ -130,7 +130,7 @@ class ALP(NNDataDescriptor):
             max_array_size: int = 2**26,
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(metric=metric, k=k, nn_search=nn_search, preprocessors=preprocessors)
+        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, preprocessors=preprocessors)
         self.l = l
         self.scale_weights = scale_weights
         self.localisation_weights = localisation_weights
@@ -183,8 +183,8 @@ class LNND(NNDataDescriptor):
 
     Parameters
     ----------
-    metric: str = 'manhattan'
-        The metric to use.
+    dissimilarity: str = 'manhattan'
+        The dissimilarity measure to use.
 
     k : int or (int -> float) or None = 3.4 * log n
         Which nearest neighbour to consider.
@@ -225,12 +225,12 @@ class LNND(NNDataDescriptor):
 
     def __init__(
             self,
-            metric: str = 'manhattan',
+            dissimilarity: str = 'manhattan',
             k: int or Callable[[int], float] or None = log_multiple(3.4),
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(metric=metric, k=k, nn_search=nn_search, preprocessors=preprocessors)
+        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, preprocessors=preprocessors)
 
     def _construct(self, X) -> Model:
         model: LNND.Model = super()._construct(X)
@@ -256,8 +256,8 @@ class LOF(NNDataDescriptor):
 
     Parameters
     ----------
-    metric: str = 'manhattan'
-        The metric to use.
+    dissimilarity: str = 'manhattan'
+        The dissimilarity measure to use.
 
     k : int or (int -> float) or None = 2.5 * log n
         How many nearest neighbours to consider.
@@ -293,12 +293,12 @@ class LOF(NNDataDescriptor):
 
     def __init__(
             self,
-            metric: str = 'manhattan',
+            dissimilarity: str = 'manhattan',
             k: int or Callable[[int], float] or None = log_multiple(2.5),
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(metric=metric, k=k, nn_search=nn_search, preprocessors=preprocessors)
+        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, preprocessors=preprocessors)
 
     def _construct(self, X) -> Model:
         model: LOF.Model = super()._construct(X)
@@ -332,8 +332,8 @@ class NND(NNDataDescriptor):
 
     Parameters
     ----------
-    metric: str = 'manhattan'
-        The metric to use.
+    dissimilarity: str = 'manhattan'
+        The dissimilarity measure to use.
 
     k : int or (int -> float) or None = 1
         Which nearest neighbour(s) to consider.
@@ -384,14 +384,14 @@ class NND(NNDataDescriptor):
 
     def __init__(
             self,
-            metric: str = 'manhattan',
+            dissimilarity: str = 'manhattan',
             k: int or Callable[[int], float] or None = 1,
             weights: Callable[[int], np.array] | None = None,
             proximity: Callable[[float], float] = shifted_reciprocal,
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(metric=metric, k=k, nn_search=nn_search, preprocessors=preprocessors)
+        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, preprocessors=preprocessors)
         self.weights = weights
         self.proximity = proximity
 

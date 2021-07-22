@@ -28,13 +28,13 @@ class FRNN(Regressor):
         Due to the computational complexity of this algorithm,
         `k` should not be chosen too large.
 
-    metric: str = 'chebyshev'
-        Dissimilarity to use.
+    dissimilarity: str = 'chebyshev'
+        The dissimilarity measure to use.
 
     preprocessors : iterable = (RangeNormaliser(), )
         Preprocessors to apply. The default range normaliser ensures that all features have range 1.,
         To simulate a tolerance relation R that is the mean of the per-atribute tolerance relations,
-        `metric` should be set to `'manhattan'` and `RangeNormaliser(normalise_dimensionality=True)`
+        `dissimilarity` should be set to `'manhattan'` and `RangeNormaliser(normalise_dimensionality=True)`
         should be used as preprocessor, to ensure that the ranges sum to 1.
 
     Notes
@@ -54,17 +54,17 @@ class FRNN(Regressor):
     def __init__(
             self,
             k: int = 10,
-            metric: str = 'chebyshev',
+            dissimilarity: str = 'chebyshev',
             preprocessors=(RangeNormaliser(), )
     ):
         super().__init__(preprocessors=preprocessors)
         self.k = k
-        self.metric = metric
+        self.dissimilarity = dissimilarity
 
     def _construct(self, X, y) -> Model:
         model: FRNN.Model = super()._construct(X, y)
         model.k = resolve_k(self.k, model.n)
-        model.metric = self.metric
+        model.dissimilarity = self.dissimilarity
         model.X = X
         model.y_range = np.max(y) - np.min(y)
         model.y = y
@@ -73,13 +73,13 @@ class FRNN(Regressor):
     class Model(Regressor.Model):
 
         k: int
-        metric: str
+        dissimilarity: str
         X: np.array
         y: np.array
         y_range: float
 
         def _query(self, X):
-            distances = cdist(X, self.X, self.metric)
+            distances = cdist(X, self.X, self.dissimilarity)
             neighbour_indices = np.argpartition(distances, kth=self.k - 1, axis=-1)[:, :self.k]
             neighbour_vals = self.y[neighbour_indices]
             neighbour_vals_sims = 1 - np.abs((neighbour_vals/self.y_range)[..., None] - self.y / self.y_range)

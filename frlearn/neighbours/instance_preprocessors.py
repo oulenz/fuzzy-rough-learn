@@ -42,8 +42,8 @@ class FRPS(SupervisedInstancePreprocessor):
         OWA weights to use for calculation of soft maximum and/or minimum in quality measure.
         [1] uses linear weights, while [2] uses reciprocally linear weights.
 
-    metric: str = 'manhattan'
-        The metric to use.
+    dissimilarity: str = 'manhattan'
+        The dissimilarity measure to use.
 
     nn_search : NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
@@ -64,10 +64,10 @@ class FRPS(SupervisedInstancePreprocessor):
 
     In addition, there are implementation issues not addressed in [1] or [2]:
 
-    * It is unclear what metric the nearest neighbour search should use.
+    * It is unclear what dissimilarity the nearest neighbour search should use.
       It seems reasonable that it should either correspond with the similarity relation `R`
       (and therefore incorporate the same aggregation strategy from per-attribute similarities),
-      or that it should match whatever metric is used by nearest neighbour classifition subsequent to FRPS.
+      or that it should match whatever dissimilarity is used by nearest neighbour classifition subsequent to FRPS.
       By default, the present implementation uses manhattan distance on the scaled attribute values.
     * When the largest quality measure value corresponds to a singleton candidate instance set,
       it cannot be evaluated (because the single instance in that set has no nearest neighbour).
@@ -94,13 +94,13 @@ class FRPS(SupervisedInstancePreprocessor):
             owa_weights: Callable[[int], np.array] = ReciprocallyLinearWeights(),
             quality_measure: str = 'lower',
             aggr_R = np.mean,
-            metric: str = 'manhattan',
+            dissimilarity: str = 'manhattan',
             nn_search: NeighbourSearchMethod = KDTree(),
     ):
         self.owa_weights = owa_weights
         self.aggr_R = aggr_R
         self.quality_measure = quality_measure
-        self.metric = metric
+        self.dissimilarity = dissimilarity
         self.nn_search = nn_search
 
     def __call__(self, X, y):
@@ -128,7 +128,7 @@ class FRPS(SupervisedInstancePreprocessor):
         for tau in np.unique(Q):
             if np.sum(Q >= tau) <= 1:
                 continue
-            nn_model = self.nn_search(X[Q >= tau], metric=self.metric)
+            nn_model = self.nn_search(X[Q >= tau], dissimilarity=self.dissimilarity)
             neighbours = nn_model(X[Q >= tau], k=2)[0][:, 1]
             deselected = X[Q < tau]
             if len(deselected) >= 1:

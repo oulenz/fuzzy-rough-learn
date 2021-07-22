@@ -16,7 +16,7 @@ class NeighbourSearchMethod(ModelFactory):
     implement Model._query (and typically __init__ and _construct).
     """
 
-    def __call__(self, X, metric='manhattan', *, preprocessors=()) -> Model:
+    def __call__(self, X, dissimilarity='manhattan', *, preprocessors=()) -> Model:
         """
         Construct the model based on the data X.
 
@@ -25,26 +25,26 @@ class NeighbourSearchMethod(ModelFactory):
         X: array shape=(n, m, )
             Construction instances.
 
-        metric: str = 'manhattan'
-            The metric through which distances are defined.
+        dissimilarity: str = 'manhattan'
+            The dissimilarity measure used to calculate distances.
 
         Returns
         -------
         M: Model
             Constructed model
         """
-        return super().__call__(X, metric=metric, preprocessors=preprocessors)
+        return super().__call__(X, dissimilarity=dissimilarity, preprocessors=preprocessors)
 
-    def _construct(self, X, metric) -> Model:
+    def _construct(self, X, dissimilarity) -> Model:
         model = super()._construct(X)
         model._X = X
-        model.metric = metric
+        model.dissimilarity = dissimilarity
         return model
 
     class Model(ModelFactory.Model):
 
         _X: np.array
-        metric: str
+        dissimilarity: str
 
         def query_self(self, k: int):
             return [a[:, 1:] for a in self(self._X, k + 1)]
@@ -112,16 +112,16 @@ class _SKLearnTree(NeighbourSearchMethod):
             'n_jobs': n_jobs,
         }
 
-    def __call__(self, X, metric='manhattan'):
-        if metric == 'cosine':
-            return super().__call__(X, metric=metric, preprocessors=(NormNormaliser(p=2), ))
-        return super().__call__(X, metric=metric, )
+    def __call__(self, X, dissimilarity='manhattan'):
+        if dissimilarity == 'cosine':
+            return super().__call__(X, dissimilarity=dissimilarity, preprocessors=(NormNormaliser(p=2),))
+        return super().__call__(X, dissimilarity=dissimilarity, )
 
-    def _construct(self, X, metric) -> Model:
-        model = super()._construct(X, metric)
-        if metric == 'cosine':
-            metric = 'euclidean'
-        model.tree = NearestNeighbors(metric=metric, **self.construction_params).fit(X)
+    def _construct(self, X, dissimilarity) -> Model:
+        model = super()._construct(X, dissimilarity)
+        if dissimilarity == 'cosine':
+            dissimilarity = 'euclidean'
+        model.tree = NearestNeighbors(metric=dissimilarity, **self.construction_params).fit(X)
         return model
 
     class Model(NeighbourSearchMethod.Model):
@@ -130,7 +130,7 @@ class _SKLearnTree(NeighbourSearchMethod):
 
         def _query(self, X, k: int):
             indices, distances = self.tree.kneighbors(X, n_neighbors=k)[::-1]
-            if self.metric == 'cosine':
+            if self.dissimilarity == 'cosine':
                 distances = 0.25 * distances**2
             return indices, distances
 
