@@ -7,10 +7,10 @@ import numpy as np
 
 from frlearn.base import FeatureSelector, ClassSupervised
 from frlearn.statistics.feature_preprocessors import Standardiser
-from frlearn.utilities.numpy import soft_min
-from frlearn.utilities.t_norms import lukasiewicz_t_norm
-from frlearn.utilities.weights import QuantifierWeights
+from frlearn.array_functions import soft_min
+from frlearn.t_norms import lukasiewicz_t_norm
 from frlearn.utilities.quantifiers import QuadraticSigmoid
+from frlearn.weights import QuantifierWeights
 
 
 class FRFS(ClassSupervised, FeatureSelector):

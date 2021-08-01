@@ -5,9 +5,9 @@ import numpy as np
 from scipy import linalg
 from scipy.stats import chi2
 
-from frlearn.statistics.feature_preprocessors import Standardiser
 from frlearn.base import DataDescriptor
-from frlearn.utilities.transformations import shifted_reciprocal
+from frlearn.feature_preprocessors import Standardiser
+from frlearn.transformations import shifted_reciprocal
 
 
 class CD(DataDescriptor):

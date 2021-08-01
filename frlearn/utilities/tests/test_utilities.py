@@ -2,7 +2,7 @@ import pytest
 
 import numpy as np
 
-from frlearn.numpy import first, greatest, last, least
+from frlearn.array_functions import first, greatest, last, least
 
 
 @pytest.fixture

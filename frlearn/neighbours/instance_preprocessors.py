@@ -7,9 +7,9 @@ import numpy as np
 
 from frlearn.base import SupervisedInstancePreprocessor
 from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
-from frlearn.utilities.numpy import remove_diagonal, soft_max, soft_min
+from frlearn.array_functions import remove_diagonal, soft_max, soft_min
 from frlearn.utilities.utilities import resolve_dissimilarity
-from frlearn.utilities.weights import ReciprocallyLinearWeights
+from frlearn.weights import ReciprocallyLinearWeights
 
 
 class FRPS(SupervisedInstancePreprocessor):

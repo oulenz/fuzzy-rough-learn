@@ -6,9 +6,9 @@ from typing import Callable
 from sklearn.svm import OneClassSVM
 
 from frlearn.base import DataDescriptor
-from frlearn.statistics.feature_preprocessors import IQRNormaliser
-from frlearn.utilities.parametrisations import multiple
-from frlearn.utilities.transformations import contract
+from frlearn.feature_preprocessors import IQRNormaliser
+from frlearn.parametrisations import multiple
+from frlearn.transformations import contract
 
 
 class SVM(DataDescriptor):

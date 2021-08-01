@@ -6,11 +6,11 @@ from typing import Callable
 
 import numpy as np
 
-from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
+from frlearn.array_functions import div_or, soft_head, soft_max
 from frlearn.base import DataDescriptor
 from frlearn.feature_preprocessors import IQRNormaliser
+from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
 from frlearn.neighbours.utilities import resolve_k
-from frlearn.numpy import div_or, soft_head, soft_max
 from frlearn.parametrisations import log_multiple
 from frlearn.transformations import shifted_reciprocal
 from frlearn.weights import LinearWeights

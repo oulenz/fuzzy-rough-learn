@@ -9,11 +9,11 @@ from frlearn.base import DataDescriptor, MultiClassClassifier, MultiLabelClassif
 from frlearn.data_descriptors import NND
 from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
 from frlearn.statistics.feature_preprocessors import RangeNormaliser
-from frlearn.utilities.numpy import div_or, soft_max, soft_min
-from frlearn.utilities.parametrisations import multiple
-from frlearn.utilities.transformations import truncated_complement
+from frlearn.array_functions import div_or, soft_max, soft_min
+from frlearn.parametrisations import multiple
+from frlearn.transformations import truncated_complement
 from frlearn.utilities.utilities import resolve_dissimilarity
-from frlearn.utilities.weights import ExponentialWeights, LinearWeights
+from frlearn.weights import ExponentialWeights, LinearWeights
 
 
 class FuzzyRoughEnsemble(MultiClassClassifier):

@@ -1,7 +1,5 @@
 """Utility functions for numpy"""
 
-from typing import Callable
-
 import numpy as np
 
 __all__ = [

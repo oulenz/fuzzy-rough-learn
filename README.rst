@@ -110,14 +110,15 @@ Instance preprocessors
 Other
 .....
 
+* array functions
 * dispersion measures
+* dissimilarity measures
 * location measures
 * nearest neighbour search methods
 * parametrisations
 * t_norms
 * transformations
 * weights
-* other array functions
 
 
 Documentation

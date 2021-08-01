@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import numpy as np
 
+from frlearn.array_functions import div_or
 from frlearn.base import FeaturePreprocessor, Unsupervised
-from frlearn.numpy import div_or
 
 
 class NormNormaliser(Unsupervised, FeaturePreprocessor):

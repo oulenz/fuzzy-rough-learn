@@ -98,6 +98,26 @@ Instance preprocessors
 Other
 =====
 
+Array functions
+---------------
+
+.. currentmodule:: frlearn.array_functions
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   div_or
+   first
+   greatest
+   last
+   least
+   remove_diagonal
+   soft_head
+   soft_max
+   soft_min
+   soft_tail
+
 Dispersion measures
 -------------------
 
@@ -153,26 +173,6 @@ Nearest neighbour search algorithms
 
    BallTree
    KDTree
-
-Numpy
------
-
-.. currentmodule:: frlearn.numpy
-
-.. autosummary::
-   :toctree: generated/
-   :nosignatures:
-
-   div_or
-   first
-   greatest
-   last
-   least
-   remove_diagonal
-   soft_head
-   soft_max
-   soft_min
-   soft_tail
 
 Parametrisations
 ----------------

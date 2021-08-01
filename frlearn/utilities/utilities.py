@@ -3,7 +3,7 @@ from inspect import signature, Parameter
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from frlearn.utilities.dissimilarity_measures import MinkowskiDistance
+from frlearn.dissimilarity_measures import MinkowskiDistance
 
 
 def resolve_dissimilarity(dissimilarity, scale_by_dimensionality=False):

@@ -4,8 +4,8 @@ from __future__ import annotations
 import numpy as np
 
 from frlearn.base import FeaturePreprocessor, Unsupervised
-from frlearn.statistics.dispersion_measures import interquartile_range, maximum_absolute_value, standard_deviation, total_range
-from frlearn.statistics.location_measures import mean, midhinge, minimum
+from frlearn.dispersion_measures import interquartile_range, maximum_absolute_value, standard_deviation, total_range
+from frlearn.location_measures import mean, midhinge, minimum
 
 
 class LinearNormaliser(Unsupervised, FeaturePreprocessor):
