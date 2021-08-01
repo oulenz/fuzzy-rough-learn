@@ -6,7 +6,7 @@ Version 0.2
 Changelog
 ---------
 
-Adds number of data descriptors and basic feature preprocessors, revised api.
+Adds core set of data descriptors, basic feature preprocessors and first regressor, thoroughly revised api.
 
 New algorithms
 ~~~~~~~~~~~~~~
@@ -32,10 +32,16 @@ New algorithms
         * `RangeNormaliser`
         * `Standardiser`
 
-    * SAE (requires optional `tensorflow` dependency
+    * `NormNormaliser`
+    * `SAE` (requires optional `tensorflow` dependency
+
+* regressors:
+
+    * `FRNN`
 
 API changes
 ~~~~~~~~~~~
 * Uniform ModelFactory pattern: callable algorithms that create callable models.
 * Preprocessors can be included at initialisation and are applied automatically.
 * Algorithms are presented no longer by submodule (neighbours, trees, etc), but by type (classifiers, feature preprocessors, etc)
+* Many changes and additions to secondary functions that can be used to parametrise the main algorithms.
