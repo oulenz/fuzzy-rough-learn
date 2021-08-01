@@ -14,6 +14,7 @@ from frlearn.numpy import div_or, soft_head, soft_max
 from frlearn.parametrisations import log_multiple
 from frlearn.transformations import shifted_reciprocal
 from frlearn.weights import LinearWeights
+from frlearn.utilities.utilities import resolve_dissimilarity
 
 
 # TODO: consider implementing NNDescriptor as addition of NeighbourSearchMethod to preprocessors,
@@ -30,7 +31,7 @@ class NNDataDescriptor(DataDescriptor):
             preprocessors=()
     ):
         super().__init__(preprocessors=preprocessors)
-        self.dissimilarity = dissimilarity
+        self.dissimilarity = resolve_dissimilarity(dissimilarity)
         self.nn_search = nn_search
         self.k = k
 
@@ -67,8 +68,14 @@ class ALP(NNDataDescriptor):
 
     Parameters
     ----------
-    dissimilarity: str = 'manhattan'
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
         The dissimilarity measure to use.
+
+        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+        The default is Boscovich distance (also known as cityblock, Manhattan or taxicab distance).
 
     k : int or (int -> float) or None = 5.5 * log n
         How many nearest neighbour distances / localised proximities to consider.
@@ -121,7 +128,7 @@ class ALP(NNDataDescriptor):
 
     def __init__(
             self,
-            dissimilarity: str = 'manhattan',
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
             k: int or Callable[[int], float] or None = log_multiple(5.5),
             l: int or Callable[[int], float] or None = log_multiple(6),
             scale_weights: Callable[[int], np.array] | None = LinearWeights(),
@@ -183,8 +190,14 @@ class LNND(NNDataDescriptor):
 
     Parameters
     ----------
-    dissimilarity: str = 'manhattan'
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
         The dissimilarity measure to use.
+
+        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+        The default is Boscovich distance (also known as cityblock, Manhattan or taxicab distance).
 
     k : int or (int -> float) or None = 3.4 * log n
         Which nearest neighbour to consider.
@@ -225,7 +238,7 @@ class LNND(NNDataDescriptor):
 
     def __init__(
             self,
-            dissimilarity: str = 'manhattan',
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
             k: int or Callable[[int], float] or None = log_multiple(3.4),
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
@@ -256,8 +269,14 @@ class LOF(NNDataDescriptor):
 
     Parameters
     ----------
-    dissimilarity: str = 'manhattan'
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
         The dissimilarity measure to use.
+
+        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+        The default is Boscovich distance (also known as cityblock, Manhattan or taxicab distance).
 
     k : int or (int -> float) or None = 2.5 * log n
         How many nearest neighbours to consider.
@@ -293,7 +312,7 @@ class LOF(NNDataDescriptor):
 
     def __init__(
             self,
-            dissimilarity: str = 'manhattan',
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
             k: int or Callable[[int], float] or None = log_multiple(2.5),
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
@@ -332,8 +351,14 @@ class NND(NNDataDescriptor):
 
     Parameters
     ----------
-    dissimilarity: str = 'manhattan'
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
         The dissimilarity measure to use.
+
+        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+        The default is Boscovich distance (also known as cityblock, Manhattan or taxicab distance).
 
     k : int or (int -> float) or None = 1
         Which nearest neighbour(s) to consider.
@@ -384,7 +409,7 @@ class NND(NNDataDescriptor):
 
     def __init__(
             self,
-            dissimilarity: str = 'manhattan',
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
             k: int or Callable[[int], float] or None = 1,
             weights: Callable[[int], np.array] | None = None,
             proximity: Callable[[float], float] = shifted_reciprocal,

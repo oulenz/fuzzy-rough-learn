@@ -21,21 +21,16 @@ class LinearNormaliser(Unsupervised, FeaturePreprocessor):
     location: (np.array -> np.array) or None = None
         The measure of location to normalise.
 
-    normalise_dimensionality: bool = False
-        If False, normalises dispersion to 1. If True, to 1/m,
-        where m is the dimensionality of the data.
-
     Notes
     -----
     If the measure of dispersion is 0 for some feature, it will be left unnormalised.
 
     """
 
-    def __init__(self, dispersion=None, location=None, normalise_dimensionality=False, ):
+    def __init__(self, dispersion=None, location=None, ):
         super().__init__()
         self.dispersion = dispersion
         self.location = location
-        self.normalise_dimensionality = normalise_dimensionality
 
     def _construct(self, X, ) -> Model:
         model = super()._construct(X)
@@ -44,8 +39,6 @@ class LinearNormaliser(Unsupervised, FeaturePreprocessor):
             divisor = np.where(divisor == 0 | np.isnan(divisor), 1, divisor)
         else:
             divisor = 1
-        if self.normalise_dimensionality:
-            divisor = divisor * X.shape[1]
         if self.location is not None:
             subtrahend = self.location(X)
             subtrahend = np.where(np.isnan(subtrahend), 0, subtrahend)
@@ -102,20 +95,14 @@ class RangeNormaliser(LinearNormaliser):
     Rescales all features by dividing through their total range,
     ensuring that the values of each feature lie in [0, 1].
 
-    Parameters
-    ----------
-    normalise_dimensionality: bool = False
-        If False, scales to 1. If True, scales to 1/m,
-        where m is the dimensionality of the data, ensuring a sum of 1.
-
     Notes
     -----
     If the range of a feature is 0, that feature is left unscaled.
 
     """
 
-    def __init__(self, normalise_dimensionality=False, ):
-        super().__init__(dispersion=total_range, location=minimum, normalise_dimensionality=normalise_dimensionality)
+    def __init__(self):
+        super().__init__(dispersion=total_range, location=minimum, )
 
 
 class Standardiser(LinearNormaliser):

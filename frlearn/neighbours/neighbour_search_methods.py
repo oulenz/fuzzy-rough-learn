@@ -2,12 +2,13 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from typing import Callable
 
 import numpy as np
 from sklearn.neighbors._unsupervised import NearestNeighbors
 
 from frlearn.base import ModelFactory
-from frlearn.feature_preprocessors import NormNormaliser
+from frlearn.dissimilarity_measures import MinkowskiDistance
 
 
 class NeighbourSearchMethod(ModelFactory):
@@ -16,7 +17,10 @@ class NeighbourSearchMethod(ModelFactory):
     implement Model._query (and typically __init__ and _construct).
     """
 
-    def __call__(self, X, dissimilarity='manhattan', *, preprocessors=()) -> Model:
+    def __call__(
+            self, X,
+            dissimilarity: Callable[[np.array], float] or Callable[[np.array, np.array], float] = MinkowskiDistance(p=1),
+    ) -> Model:
         """
         Construct the model based on the data X.
 
@@ -25,15 +29,16 @@ class NeighbourSearchMethod(ModelFactory):
         X: array shape=(n, m, )
             Construction instances.
 
-        dissimilarity: str = 'manhattan'
+        dissimilarity: (np.array -> float) or ((np.array, np.array) -> float) = BoscovichDistance()
             The dissimilarity measure used to calculate distances.
+            A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
 
         Returns
         -------
         M: Model
             Constructed model
         """
-        return super().__call__(X, dissimilarity=dissimilarity, preprocessors=preprocessors)
+        return super().__call__(X, dissimilarity=dissimilarity)
 
     def _construct(self, X, dissimilarity) -> Model:
         model = super()._construct(X)
@@ -44,7 +49,7 @@ class NeighbourSearchMethod(ModelFactory):
     class Model(ModelFactory.Model):
 
         _X: np.array
-        dissimilarity: str
+        dissimilarity: Callable[[np.array], float] or Callable[[np.array, np.array], float]
 
         def query_self(self, k: int):
             return [a[:, 1:] for a in self(self._X, k + 1)]
@@ -112,16 +117,25 @@ class _SKLearnTree(NeighbourSearchMethod):
             'n_jobs': n_jobs,
         }
 
-    def __call__(self, X, dissimilarity='manhattan'):
-        if dissimilarity == 'cosine':
-            return super().__call__(X, dissimilarity=dissimilarity, preprocessors=(NormNormaliser(p=2),))
-        return super().__call__(X, dissimilarity=dissimilarity, )
-
     def _construct(self, X, dissimilarity) -> Model:
         model = super()._construct(X, dissimilarity)
-        if dissimilarity == 'cosine':
-            dissimilarity = 'euclidean'
-        model.tree = NearestNeighbors(metric=dissimilarity, **self.construction_params).fit(X)
+        params = self.construction_params
+        if isinstance(dissimilarity, MinkowskiDistance):
+            if dissimilarity.p == 0:
+                if dissimilarity.unrooted:
+                    params['metric'] = 'hamming'
+                else:
+                    raise ValueError('Rooted Hamming distance is not supported by the scikit-learn implementations of the KDTree and BallTree algorithms.')
+            elif 0 < dissimilarity.p < 1:
+                raise ValueError('Minkowski distance with `0 < p < 1` is not supported by the scikit-learn implementations of the KDTree and BallTree algorithms.')
+            elif dissimilarity.p == np.inf and dissimilarity.unrooted:
+                raise ValueError('Unrooted Chebyshev distance is not supported by the scikit-learn implementations of the KDTree and BallTree algorithms.')
+            else:
+                params['metric'] = 'minkowski'
+                params['p'] = dissimilarity.p
+        else:
+            params['metric'] = dissimilarity
+        model.tree = NearestNeighbors(**params).fit(X)
         return model
 
     class Model(NeighbourSearchMethod.Model):
@@ -130,8 +144,11 @@ class _SKLearnTree(NeighbourSearchMethod):
 
         def _query(self, X, k: int):
             indices, distances = self.tree.kneighbors(X, n_neighbors=k)[::-1]
-            if self.dissimilarity == 'cosine':
-                distances = 0.25 * distances**2
+            if isinstance(self.dissimilarity, MinkowskiDistance):
+                if self.dissimilarity.scale_by_dimensionality:
+                    distances = distances/(self.m**(1/self.dissimilarity.p))
+                if self.dissimilarity.unrooted and self.dissimilarity.p != 0:
+                    distances = distances**self.dissimilarity.p
             return indices, distances
 
 

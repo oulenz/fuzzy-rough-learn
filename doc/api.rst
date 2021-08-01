@@ -112,6 +112,18 @@ Dispersion measures
     standard_deviation
     total_range
 
+Dissimilarity measures
+----------------------
+
+.. currentmodule:: frlearn.dissimilarity_measures
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+   :template: class.rst
+
+    MinkowskiDistance
+
 Location measures
 -----------------
 

@@ -16,10 +16,9 @@ class ModelFactory(ABC):
         self.preprocessors = preprocessors
 
     @abstractmethod
-    def __call__(self, X, *, preprocessors=(), **kwargs) -> ModelFactory.Model:
-        preprocessors = self.preprocessors + preprocessors
+    def __call__(self, X, **kwargs) -> ModelFactory.Model:
         preprocessing_models = []
-        for preprocessor in preprocessors:
+        for preprocessor in self.preprocessors:
             extra_kwargs = {k: v for k, v in kwargs.items() if k in signature(preprocessor.__call__).parameters}
             preprocessing_model = preprocessor(X, **extra_kwargs)
             X = preprocessing_model(X)

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from typing import Callable
+
 import numpy as np
-from scipy.spatial.distance import cdist
 
 from frlearn.base import Regressor
 from frlearn.feature_preprocessors import RangeNormaliser
 from frlearn.neighbours.utilities import resolve_k
+from frlearn.utilities.utilities import apply_dissimilarity, resolve_dissimilarity
 
 
 class FRNN(Regressor):
@@ -28,14 +30,27 @@ class FRNN(Regressor):
         Due to the computational complexity of this algorithm,
         `k` should not be chosen too large.
 
-    dissimilarity: str = 'chebyshev'
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'chebyshev'
         The dissimilarity measure to use.
+        The similarity between two instances is calculated as 1 minus their dissimilarity.
+
+        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+        When a float or string is passed, the corresponding dissimilarity measure is automatically scaled
+        to ensure that the dissimilarity of `[1, 1, ..., 1]` (with `[0, 0, ..., 0]`) is 1.
+
+        For the default Chebyshev distance, this is already the case,
+        since it assigns the maximum of the per-attribute differences,
+        but e.g. the Boscovich distance normally amounts to the sum of the per-attribute differences.
+        In this case, the scaling step divides by the number of dimensions,
+        and we obtain a dissimilarity that is the mean of the per-attribute differences.
+
+        This can be prevented by explicitly passing a dissimilarity measure without scaling.
 
     preprocessors : iterable = (RangeNormaliser(), )
-        Preprocessors to apply. The default range normaliser ensures that all features have range 1.,
-        To simulate a tolerance relation R that is the mean of the per-atribute tolerance relations,
-        `dissimilarity` should be set to `'manhattan'` and `RangeNormaliser(normalise_dimensionality=True)`
-        should be used as preprocessor, to ensure that the ranges sum to 1.
+        Preprocessors to apply. The default range normaliser ensures that all features have range 1.
 
     Notes
     -----
@@ -54,12 +69,12 @@ class FRNN(Regressor):
     def __init__(
             self,
             k: int = 10,
-            dissimilarity: str = 'chebyshev',
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'chebyshev',
             preprocessors=(RangeNormaliser(), )
     ):
         super().__init__(preprocessors=preprocessors)
         self.k = k
-        self.dissimilarity = dissimilarity
+        self.dissimilarity = resolve_dissimilarity(dissimilarity, scale_by_dimensionality=True)
 
     def _construct(self, X, y) -> Model:
         model: FRNN.Model = super()._construct(X, y)
@@ -73,13 +88,14 @@ class FRNN(Regressor):
     class Model(Regressor.Model):
 
         k: int
-        dissimilarity: str
+        dissimilarity: Callable[[np.array], float] or Callable[[np.array, np.array], float]
         X: np.array
         y: np.array
         y_range: float
 
         def _query(self, X):
-            distances = cdist(X, self.X, self.dissimilarity)
+            #distances = cdist(X, self.X, self.dissimilarity)
+            distances = apply_dissimilarity(X, self.X, self.dissimilarity)
             neighbour_indices = np.argpartition(distances, kth=self.k - 1, axis=-1)[:, :self.k]
             neighbour_vals = self.y[neighbour_indices]
             neighbour_vals_sims = 1 - np.abs((neighbour_vals/self.y_range)[..., None] - self.y / self.y_range)

@@ -8,6 +8,7 @@ import numpy as np
 from frlearn.base import SupervisedInstancePreprocessor
 from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
 from frlearn.utilities.numpy import remove_diagonal, soft_max, soft_min
+from frlearn.utilities.utilities import resolve_dissimilarity
 from frlearn.utilities.weights import ReciprocallyLinearWeights
 
 
@@ -42,8 +43,14 @@ class FRPS(SupervisedInstancePreprocessor):
         OWA weights to use for calculation of soft maximum and/or minimum in quality measure.
         [1] uses linear weights, while [2] uses reciprocally linear weights.
 
-    dissimilarity: str = 'manhattan'
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
         The dissimilarity measure to use.
+
+        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+        The default is Boscovich distance (also known as cityblock, Manhattan or taxicab distance).
 
     nn_search : NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
@@ -68,7 +75,7 @@ class FRPS(SupervisedInstancePreprocessor):
       It seems reasonable that it should either correspond with the similarity relation `R`
       (and therefore incorporate the same aggregation strategy from per-attribute similarities),
       or that it should match whatever dissimilarity is used by nearest neighbour classifition subsequent to FRPS.
-      By default, the present implementation uses manhattan distance on the scaled attribute values.
+      By default, the present implementation uses Boscovich distance on the scaled attribute values.
     * When the largest quality measure value corresponds to a singleton candidate instance set,
       it cannot be evaluated (because the single instance in that set has no nearest neighbour).
       Since this is an edge case that would not score highly anyway, it is simply excluded from consideration.
@@ -94,13 +101,13 @@ class FRPS(SupervisedInstancePreprocessor):
             owa_weights: Callable[[int], np.array] = ReciprocallyLinearWeights(),
             quality_measure: str = 'lower',
             aggr_R = np.mean,
-            dissimilarity: str = 'manhattan',
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
             nn_search: NeighbourSearchMethod = KDTree(),
     ):
         self.owa_weights = owa_weights
         self.aggr_R = aggr_R
         self.quality_measure = quality_measure
-        self.dissimilarity = dissimilarity
+        self.dissimilarity = resolve_dissimilarity(dissimilarity)
         self.nn_search = nn_search
 
     def __call__(self, X, y):

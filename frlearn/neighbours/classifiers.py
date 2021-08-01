@@ -12,6 +12,7 @@ from frlearn.statistics.feature_preprocessors import RangeNormaliser
 from frlearn.utilities.numpy import div_or, soft_max, soft_min
 from frlearn.utilities.parametrisations import multiple
 from frlearn.utilities.transformations import truncated_complement
+from frlearn.utilities.utilities import resolve_dissimilarity
 from frlearn.utilities.weights import ExponentialWeights, LinearWeights
 
 
@@ -53,8 +54,7 @@ class FuzzyRoughEnsemble(MultiClassClassifier):
 
 class FRNN(FuzzyRoughEnsemble):
     """
-    Implementation of Fuzzy Rough Nearest Neighbour (FRNN) classification
-    (FRNN).
+    Implementation of Fuzzy Rough Nearest Neighbour (FRNN) classification.
 
     Parameters
     ----------
@@ -82,16 +82,29 @@ class FRNN(FuzzyRoughEnsemble):
         All such values are rounded to the nearest integer in `[1, n]`.
         Alternatively, if this is 0, only the upper approximation is used.
 
-    dissimilarity: str = 'manhattan'
-        The dissimilarity measure to use. The similarity between two instances is calculated as
-        1 minus their dissimilarity.
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
+        The dissimilarity measure to use.
+        The similarity between two instances is calculated as 1 minus their dissimilarity.
+
+        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+        When a float or string is passed, the corresponding dissimilarity measure is automatically scaled
+        to ensure that the dissimilarity of `[1, 1, ..., 1]` (with `[0, 0, ..., 0]`) is 1.
+
+        For instance, the default Boscovich distance (also known as cityblock, Manhattan or taxicab distance)
+        normally assigns a dissimilarity that is the sum of the per-attribute differences.
+        In this case, the scaling step divides by the number of dimensions,
+        and we obtain a dissimilarity that is the mean of the per-attribute differences.
+
+        This can be prevented by explicitly passing a dissimilarity measure without scaling.
 
     nn_search : NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
 
-    preprocessors : iterable = (RangeNormaliser(normalise_dimensionality=True), )
-        Preprocessors to apply. The default range normaliser ensures that all features have the same range,
-        and that the sum of the ranges is 1, so that we can use the Manhattan distance to obtain the mean similarity.
+    preprocessors : iterable = (RangeNormaliser(), )
+        Preprocessors to apply. The default range normaliser ensures that all features have range 1.
 
     Notes
     -----
@@ -126,10 +139,11 @@ class FRNN(FuzzyRoughEnsemble):
             upper_k: int or Callable[[int], float] or None = 20,
             lower_weights: Callable[[int], np.array] or None = LinearWeights(),
             lower_k: int or Callable[[int], float] or None = 20,
-            dissimilarity: str = 'manhattan',
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
             nn_search: NeighbourSearchMethod = KDTree(),
-            preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
+            preprocessors=(RangeNormaliser(), )
     ):
+        dissimilarity = resolve_dissimilarity(dissimilarity, scale_by_dimensionality=True)
         upper_approximator = upper_k != 0 and NND(
             weights=upper_weights, k=upper_k, proximity=truncated_complement, dissimilarity=dissimilarity, nn_search=nn_search, preprocessors=()
         )
@@ -186,15 +200,29 @@ class FROVOCO(MultiClassClassifier):
         otherwise `balanced_weights` and `balanced_k`.
         Set to `None` to only use `balanced_weights` and `balanced_k`.
 
-    dissimilarity: str = 'manhattan'
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
         The dissimilarity measure to use.
+        The similarity between two instances is calculated as 1 minus their dissimilarity.
+
+        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+        When a float or string is passed, the corresponding dissimilarity measure is automatically scaled
+        to ensure that the dissimilarity of `[1, 1, ..., 1]` (with `[0, 0, ..., 0]`) is 1.
+
+        For instance, the default Boscovich distance (also known as cityblock, Manhattan or taxicab distance)
+        normally assigns a dissimilarity that is the sum of the per-attribute differences.
+        In this case, the scaling step divides by the number of dimensions,
+        and we obtain a dissimilarity that is the mean of the per-attribute differences.
+
+        This can be prevented by explicitly passing a dissimilarity measure without scaling.
 
     nn_search: NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
 
-    preprocessors : iterable = (RangeNormaliser(normalise_dimensionality=True), )
-        Preprocessors to apply. The default range normaliser ensures that all features have the same range,
-        and that the sum of the ranges is 1, so that we can use the Manhattan distance to obtain the mean similarity.
+    preprocessors : iterable = (RangeNormaliser(), )
+        Preprocessors to apply. The default range normaliser ensures that all features have range 1.
 
     Notes
     -----
@@ -227,11 +255,12 @@ class FROVOCO(MultiClassClassifier):
             imbalanced_weights: Callable[[int], np.array] or None = LinearWeights(),
             imbalanced_k: int or Callable[[int], float] or None = multiple(0.1),
             ir_threshold: float or None = 9,
-            dissimilarity: str = 'manhattan',
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
             nn_search: NeighbourSearchMethod = KDTree(),
-            preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
+            preprocessors=(RangeNormaliser(), )
     ):
         super().__init__(preprocessors=preprocessors)
+        dissimilarity = resolve_dissimilarity(dissimilarity, scale_by_dimensionality=True)
         self.ir_threshold = ir_threshold if ir_threshold is not None else np.inf
         self.balanced_approximator = NND(
             dissimilarity=dissimilarity, k=balanced_k, weights=balanced_weights, proximity=truncated_complement,
@@ -340,15 +369,29 @@ class FRONEC(MultiLabelClassifier):
     owa_weights: (int -> np.array) = LinearWeights()
         OWA weights to use for calculation of soft maximum and/or minimum.
 
-    dissimilarity: str = 'manhattan'
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
         The dissimilarity measure to use.
+        The similarity between two instances is calculated as 1 minus their dissimilarity.
+
+        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+        When a float or string is passed, the corresponding dissimilarity measure is automatically scaled
+        to ensure that the dissimilarity of `[1, 1, ..., 1]` (with `[0, 0, ..., 0]`) is 1.
+
+        For instance, the default Boscovich distance (also known as cityblock, Manhattan or taxicab distance)
+        normally assigns a dissimilarity that is the sum of the per-attribute differences.
+        In this case, the scaling step divides by the number of dimensions,
+        and we obtain a dissimilarity that is the mean of the per-attribute differences.
+
+        This can be prevented by explicitly passing a dissimilarity measure without scaling.
 
     nn_search: NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
 
-    preprocessors : iterable = (RangeNormaliser(normalise_dimensionality=True), )
-        Preprocessors to apply. The default range normaliser ensures that all features have the same range,
-        and that the sum of the ranges is 1, so that we can use the Manhattan distance to obtain the mean similarity.
+    preprocessors : iterable = (RangeNormaliser(), )
+        Preprocessors to apply. The default range normaliser ensures that all features have range 1.
 
     References
     ----------
@@ -363,15 +406,16 @@ class FRONEC(MultiLabelClassifier):
     def __init__(
             self, Q_type: int = 2, R_d_type: int = 1,
             k: int = 20, owa_weights: Callable[[int], np.array] | None = LinearWeights(),
-            dissimilarity: str = 'manhattan', nn_search: NeighbourSearchMethod = KDTree(),
-            preprocessors=(RangeNormaliser(normalise_dimensionality=True), )
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
+            nn_search: NeighbourSearchMethod = KDTree(),
+            preprocessors=(RangeNormaliser(), )
     ):
         super().__init__(preprocessors=preprocessors)
         self.Q_type = Q_type
         self.R_d_type = R_d_type
         self.k = k
         self.owa_weights = owa_weights
-        self.dissimilarity = dissimilarity
+        self.dissimilarity = resolve_dissimilarity(dissimilarity, scale_by_dimensionality=True)
         self.nn_search = nn_search
 
     def _construct(self, X, Y) -> Model:
