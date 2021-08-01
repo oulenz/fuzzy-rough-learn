@@ -60,7 +60,7 @@ class FRNN(FuzzyRoughEnsemble):
     ----------
     upper_weights : (int -> np.array) or None = LinearWeights()
         OWA weights to use in calculation of upper approximation of decision classes.
-        If `None`, only the `upper_k`th neighbour is used.
+        If `None`, only the `upper_k`\ th neighbour is used.
 
     upper_k: int or (int -> float) or None = 20
         Effective length of upper weights vector (number of nearest neighbours to consider).
@@ -72,7 +72,7 @@ class FRNN(FuzzyRoughEnsemble):
 
     lower_weights : (int -> np.array) or None = LinearWeights()
         OWA weights to use in calculation of lower approximation of decision classes.
-        If `None`, only the `lower_k`th neighbour is used.
+        If `None`, only the `lower_k`\ th neighbour is used.
 
     lower_k: int or (int -> float) or None = 20
         Effective length of lower weights vector (number of nearest neighbours to consider).
@@ -172,7 +172,7 @@ class FROVOCO(MultiClassClassifier):
     ----------
     balanced_weights : (int -> np.array) or None = ExponentialWeights(base=2)
         OWA weights to use when the imbalance ratio is not larger than `ir_threshold`.
-        If `None`, only the `balanced_k`th neighbour is used.
+        If `None`, only the `balanced_k`\ th neighbour is used.
 
     balanced_k: int or (int -> float) or None = 16
         Length of the weights vector when the imbalance ratio is not larger than `ir_threshold`.
@@ -184,7 +184,7 @@ class FROVOCO(MultiClassClassifier):
 
     imbalanced_weights : (int -> np.array) or None = LinearWeights()
         OWA weights to use when the imbalance ratio is larger than `ir_threshold`.
-        If `None`, only the `imbalanced_k`th neighbour is used.
+        If `None`, only the `imbalanced_k`\ th neighbour is used.
 
     imbalanced_k: int or (int -> float) or None = 0.1 * n
         Length of the weights vector when the imbalance ratio is larger than `ir_threshold`.

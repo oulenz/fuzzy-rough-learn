@@ -190,7 +190,7 @@ def soft_head(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
         Input array of values.
 
     weights : (k -> np.array) or None
-        Weights to apply to the `k` selected values. If None, the `k`th value is returned.
+        Weights to apply to the `k` selected values. If None, the `k`\ th value is returned.
 
     k: int or None
         Number of initial values from which the soft head is calculated.
@@ -225,7 +225,7 @@ def soft_max(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
         Input array of values.
 
     weights : (k -> np.array) or None
-        Weights to apply to the `k` selected values. If None, the `k`th value is returned.
+        Weights to apply to the `k` selected values. If None, the `k`\ th value is returned.
 
     k: int or None
         Number of greatest values from which the soft maximum is calculated.
@@ -260,7 +260,7 @@ def soft_min(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
         Input array of values.
 
     weights : (k -> np.array) or None
-        Weights to apply to the `k` selected values. If None, the `k`th value is returned.
+        Weights to apply to the `k` selected values. If None, the `k`\ th value is returned.
 
     k: int or None
         Number of least values from which the soft minimum is calculated.
@@ -295,7 +295,7 @@ def soft_tail(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
         Input array of values.
 
     weights : (k -> np.array) or None
-        Weights to apply to the `k` selected values. If None, the `k`th value is returned.
+        Weights to apply to the `k` selected values. If None, the `k`\ th value is returned.
 
     k: int or None
         Number of terminal values from which the soft tail is calculated.

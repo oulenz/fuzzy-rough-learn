@@ -183,8 +183,8 @@ Parametrisations
    :toctree: generated/
    :nosignatures:
 
-   fraction
-   log_units
+   log_multiple
+   multiple
 
 T-norms
 -------
