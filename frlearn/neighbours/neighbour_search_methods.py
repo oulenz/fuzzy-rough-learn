@@ -5,7 +5,7 @@ from abc import abstractmethod
 from typing import Callable
 
 import numpy as np
-from sklearn.neighbors._unsupervised import NearestNeighbors
+from sklearn.neighbors import NearestNeighbors
 
 from frlearn.base import ModelFactory
 from frlearn.dissimilarity_measures import MinkowskiDistance
