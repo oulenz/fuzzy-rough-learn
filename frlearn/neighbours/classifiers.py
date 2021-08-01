@@ -12,7 +12,7 @@ from frlearn.statistics.feature_preprocessors import RangeNormaliser
 from frlearn.array_functions import div_or, soft_max, soft_min
 from frlearn.parametrisations import multiple
 from frlearn.transformations import truncated_complement
-from frlearn.utilities.utilities import resolve_dissimilarity
+from frlearn.uncategorised.utilities import resolve_dissimilarity
 from frlearn.weights import ExponentialWeights, LinearWeights
 
 

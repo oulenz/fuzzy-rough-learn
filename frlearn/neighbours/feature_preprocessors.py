@@ -9,7 +9,7 @@ from frlearn.base import FeatureSelector, ClassSupervised
 from frlearn.statistics.feature_preprocessors import Standardiser
 from frlearn.array_functions import soft_min
 from frlearn.t_norms import lukasiewicz_t_norm
-from frlearn.utilities.quantifiers import QuadraticSigmoid
+from frlearn.uncategorised.quantifiers import QuadraticSigmoid
 from frlearn.weights import QuantifierWeights
 
 

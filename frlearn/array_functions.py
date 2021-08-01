@@ -1,1 +1,1 @@
-from .utilities.array_functions import *
+from .uncategorised.array_functions import *

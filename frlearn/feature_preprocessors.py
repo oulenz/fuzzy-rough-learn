@@ -12,7 +12,7 @@ _to_import = [
     ('statistics', 'MaxAbsNormaliser', [],),
     ('statistics', 'RangeNormaliser', [],),
     ('statistics', 'Standardiser', [],),
-    ('utilities', 'NormNormaliser', [],),
+    ('uncategorised', 'NormNormaliser', [],),
 ]
 
 _content = {}

@@ -1,1 +1,1 @@
-from .utilities.parametrisations import *
+from .uncategorised.parametrisations import *

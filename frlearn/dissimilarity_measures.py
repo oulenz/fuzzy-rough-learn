@@ -1,1 +1,1 @@
-from .utilities.dissimilarity_measures import *
+from .uncategorised.dissimilarity_measures import *

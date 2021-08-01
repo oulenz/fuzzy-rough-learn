@@ -14,7 +14,7 @@ from frlearn.neighbours.utilities import resolve_k
 from frlearn.parametrisations import log_multiple
 from frlearn.transformations import shifted_reciprocal
 from frlearn.weights import LinearWeights
-from frlearn.utilities.utilities import resolve_dissimilarity
+from frlearn.uncategorised.utilities import resolve_dissimilarity
 
 
 # TODO: consider implementing NNDescriptor as addition of NeighbourSearchMethod to preprocessors,

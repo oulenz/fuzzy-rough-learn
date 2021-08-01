@@ -7,7 +7,7 @@ import numpy as np
 from frlearn.base import Regressor
 from frlearn.feature_preprocessors import RangeNormaliser
 from frlearn.neighbours.utilities import resolve_k
-from frlearn.utilities.utilities import apply_dissimilarity, resolve_dissimilarity
+from frlearn.uncategorised.utilities import apply_dissimilarity, resolve_dissimilarity
 
 
 class FRNN(Regressor):

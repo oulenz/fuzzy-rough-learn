@@ -23,7 +23,7 @@ from sklearn import datasets
 from frlearn.base import select_class
 from frlearn.classifiers import FRNN
 from frlearn.instance_preprocessors import FRPS
-from frlearn.utilities.t_norms import heyting_t_norm, lukasiewicz_t_norm
+from frlearn.t_norms import heyting_t_norm, lukasiewicz_t_norm
 
 # Import example data and reduce to 2 dimensions.
 iris = datasets.load_iris()

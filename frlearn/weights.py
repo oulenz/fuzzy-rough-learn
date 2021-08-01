@@ -1,1 +1,1 @@
-from .utilities.weights import *
+from .uncategorised.weights import *

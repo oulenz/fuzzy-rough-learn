@@ -1,1 +1,1 @@
-from .utilities.t_norms import *
+from .uncategorised.t_norms import *
