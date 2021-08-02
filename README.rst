@@ -99,8 +99,8 @@ Feature preprocessors
     * Range normaliser
     * Standardiser
 
-* Norm normaliser
 * Shrink Autoencoder (SAE; unsupervised)
+* Vector size normaliser
 
 Instance preprocessors
 ......................
