@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
 from frlearn.base import ModelFactory
-from frlearn.dissimilarity_measures import MinkowskiDistance
+from frlearn.vector_size_measures import MinkowskiSize
 
 
 class NeighbourSearchMethod(ModelFactory):
@@ -19,7 +19,7 @@ class NeighbourSearchMethod(ModelFactory):
 
     def __call__(
             self, X,
-            dissimilarity: Callable[[np.array], float] or Callable[[np.array, np.array], float] = MinkowskiDistance(p=1),
+            dissimilarity: Callable[[np.array], float] or Callable[[np.array, np.array], float] = MinkowskiSize(p=1),
     ) -> Model:
         """
         Construct the model based on the data X.
@@ -31,7 +31,7 @@ class NeighbourSearchMethod(ModelFactory):
 
         dissimilarity: (np.array -> float) or ((np.array, np.array) -> float) = BoscovichDistance()
             The dissimilarity measure used to calculate distances.
-            A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+            A vector size measure `np.array -> float` induces a dissimilarity measure through application to `y - x`.
 
         Returns
         -------
@@ -120,16 +120,16 @@ class _SKLearnTree(NeighbourSearchMethod):
     def _construct(self, X, dissimilarity) -> Model:
         model = super()._construct(X, dissimilarity)
         params = self.construction_params
-        if isinstance(dissimilarity, MinkowskiDistance):
+        if isinstance(dissimilarity, MinkowskiSize):
             if dissimilarity.p == 0:
                 if dissimilarity.unrooted:
                     params['metric'] = 'hamming'
                 else:
-                    raise ValueError('Rooted Hamming distance is not supported by the scikit-learn implementations of the KDTree and BallTree algorithms.')
+                    raise ValueError('Rooted Hamming size is not supported by the scikit-learn implementations of the KDTree and BallTree algorithms.')
             elif 0 < dissimilarity.p < 1:
-                raise ValueError('Minkowski distance with `0 < p < 1` is not supported by the scikit-learn implementations of the KDTree and BallTree algorithms.')
+                raise ValueError('Minkowski size with `0 < p < 1` is not supported by the scikit-learn implementations of the KDTree and BallTree algorithms.')
             elif dissimilarity.p == np.inf and dissimilarity.unrooted:
-                raise ValueError('Unrooted Chebyshev distance is not supported by the scikit-learn implementations of the KDTree and BallTree algorithms.')
+                raise ValueError('Unrooted Chebyshev size is not supported by the scikit-learn implementations of the KDTree and BallTree algorithms.')
             else:
                 params['metric'] = 'minkowski'
                 params['p'] = dissimilarity.p
@@ -144,7 +144,7 @@ class _SKLearnTree(NeighbourSearchMethod):
 
         def _query(self, X, k: int):
             indices, distances = self.tree.kneighbors(X, n_neighbors=k)[::-1]
-            if isinstance(self.dissimilarity, MinkowskiDistance):
+            if isinstance(self.dissimilarity, MinkowskiSize):
                 if self.dissimilarity.scale_by_dimensionality:
                     distances = distances/(self.m**(1/self.dissimilarity.p))
                 if self.dissimilarity.unrooted and self.dissimilarity.p != 0:

@@ -112,12 +112,12 @@ Other
 
 * array functions
 * dispersion measures
-* dissimilarity measures
 * location measures
 * nearest neighbour search methods
 * parametrisations
 * t_norms
 * transformations
+* vector size measures
 * weights
 
 

@@ -1,6 +1,8 @@
 """Statistical data descriptors"""
 from __future__ import annotations
 
+from typing import Callable
+
 import numpy as np
 from scipy import linalg
 from scipy.stats import chi2
@@ -8,6 +10,7 @@ from scipy.stats import chi2
 from frlearn.base import DataDescriptor
 from frlearn.feature_preprocessors import Standardiser
 from frlearn.transformations import shifted_reciprocal
+from frlearn.uncategorised.utilities import resolve_dissimilarity
 
 
 class CD(DataDescriptor):
@@ -15,17 +18,21 @@ class CD(DataDescriptor):
     Implementation of the Centre Distance (CD) data descriptor.
     Calculates a score based on the distance to a central point of the target data.
 
-    This is implemented as simply the norm of each element (the distance to the origin),
+    This is implemented simply as the vector size of each element (the distance to the origin),
     with the expectation that the given preprocessor normalises the data in such a way that
     a suitable central value of the data is located at the origin,
     and that all features have the same scale.
+    The drawback of this approach is that it does not allow
+    dissimilarity measures to be used that are not induced by a vector size measure.
 
     By default (standardisation) this is euclidean centroid distance.
 
     Parameters
     ----------
-    p: float = 2
-        Order of the norm to use. Can also be `-np.inf` or `np.inf`.
+    measure: str or float or (np.array -> float) = 'euclidean'
+        The vector size measure to use.
+        A float is interpreted as Minkowski size with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
 
     threshold_perc : int or None, default=80
         Threshold percentile for normal instances. Should be in (0, 100] or None.
@@ -39,19 +46,20 @@ class CD(DataDescriptor):
 
     def __init__(
             self,
-            p: float = 2,
-            threshold_perc: int | None = 80,
+            measure: str or float or Callable[[np.array], float] = 'euclidean',
+            threshold_perc: int or None = 80,
             preprocessors=(Standardiser(), )
     ):
         super().__init__(preprocessors=preprocessors)
-        self.p = p
+        # TODO: resolve vector size measures separately
+        self.measure = resolve_dissimilarity(measure)
         self.threshold_perc = threshold_perc
 
     def _construct(self, X) -> Model:
         model: CD.Model = super()._construct(X)
-        model.p = self.p
+        model.measure = self.measure
         if self.threshold_perc:
-            distances = model._distances(X)
+            distances = model.measure(X)
             model.threshold = np.percentile(distances, self.threshold_perc)
         else:
             model.threshold = 1
@@ -59,17 +67,12 @@ class CD(DataDescriptor):
 
     class Model(DataDescriptor.Model):
 
-        p: float
+        measure: Callable[[np.array], float]
         threshold: float
 
         def _query(self, X):
-            distances = self._distances(X)
+            distances = self.measure(X)
             return shifted_reciprocal(distances, self.threshold)
-
-        def _distances(self, X):
-            if self.p == 0:
-                return np.where(np.count_nonzero(X, axis=-1) <= 1, np.sum(np.abs(X), axis=-1), np.inf)
-            return np.linalg.norm(X, ord=self.p, axis=1)
 
 
 class MD(DataDescriptor):

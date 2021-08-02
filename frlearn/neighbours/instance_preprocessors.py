@@ -46,11 +46,11 @@ class FRPS(SupervisedInstancePreprocessor):
     dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
         The dissimilarity measure to use.
 
-        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
-        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        A vector size measure `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski size with the corresponding value for `p`.
         For convenience, a number of popular measures can be referred to by name.
 
-        The default is Boscovich distance (also known as cityblock, Manhattan or taxicab distance).
+        The default is the Boscovich norm (also known as cityblock, Manhattan or taxicab norm).
 
     nn_search : NeighbourSearchMethod = KDTree()
         Nearest neighbour search algorithm to use.
@@ -75,7 +75,7 @@ class FRPS(SupervisedInstancePreprocessor):
       It seems reasonable that it should either correspond with the similarity relation `R`
       (and therefore incorporate the same aggregation strategy from per-attribute similarities),
       or that it should match whatever dissimilarity is used by nearest neighbour classifition subsequent to FRPS.
-      By default, the present implementation uses Boscovich distance on the scaled attribute values.
+      By default, the present implementation uses the Boscovich norm on the scaled attribute values.
     * When the largest quality measure value corresponds to a singleton candidate instance set,
       it cannot be evaluated (because the single instance in that set has no nearest neighbour).
       Since this is an edge case that would not score highly anyway, it is simply excluded from consideration.

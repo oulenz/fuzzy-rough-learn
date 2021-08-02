@@ -53,7 +53,7 @@ class FuzzyRoughEnsemble(MultiClassClassifier):
 
 
 class FRNN(FuzzyRoughEnsemble):
-    """
+    r"""
     Implementation of Fuzzy Rough Nearest Neighbour (FRNN) classification.
 
     Parameters
@@ -86,14 +86,14 @@ class FRNN(FuzzyRoughEnsemble):
         The dissimilarity measure to use.
         The similarity between two instances is calculated as 1 minus their dissimilarity.
 
-        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
-        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        A vector size measure `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski size with the corresponding value for `p`.
         For convenience, a number of popular measures can be referred to by name.
 
         When a float or string is passed, the corresponding dissimilarity measure is automatically scaled
-        to ensure that the dissimilarity of `[1, 1, ..., 1]` (with `[0, 0, ..., 0]`) is 1.
+        to ensure that the dissimilarity of `[1, 1, ..., 1]` with `[0, 0, ..., 0]` is 1.
 
-        For instance, the default Boscovich distance (also known as cityblock, Manhattan or taxicab distance)
+        For instance, the default Boscovich norm (also known as cityblock, Manhattan or taxicab norm)
         normally assigns a dissimilarity that is the sum of the per-attribute differences.
         In this case, the scaling step divides by the number of dimensions,
         and we obtain a dissimilarity that is the mean of the per-attribute differences.
@@ -161,7 +161,7 @@ class FRNN(FuzzyRoughEnsemble):
 
 
 class FROVOCO(MultiClassClassifier):
-    """
+    r"""
     Implementation of the Fuzzy Rough OVO COmbination (FROVOCO) ensemble classifier [1]_.
 
     FROVOCO decomposes muliclass classification into a number of one-vs-one and one-vs-rest comparisons.
@@ -204,14 +204,14 @@ class FROVOCO(MultiClassClassifier):
         The dissimilarity measure to use.
         The similarity between two instances is calculated as 1 minus their dissimilarity.
 
-        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
-        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        A vector size measure `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski size with the corresponding value for `p`.
         For convenience, a number of popular measures can be referred to by name.
 
         When a float or string is passed, the corresponding dissimilarity measure is automatically scaled
-        to ensure that the dissimilarity of `[1, 1, ..., 1]` (with `[0, 0, ..., 0]`) is 1.
+        to ensure that the dissimilarity of `[1, 1, ..., 1]` with `[0, 0, ..., 0]` is 1.
 
-        For instance, the default Boscovich distance (also known as cityblock, Manhattan or taxicab distance)
+        For instance, the default Boscovich norm (also known as cityblock, Manhattan or taxicab norm)
         normally assigns a dissimilarity that is the sum of the per-attribute differences.
         In this case, the scaling step divides by the number of dimensions,
         and we obtain a dissimilarity that is the mean of the per-attribute differences.
@@ -373,14 +373,14 @@ class FRONEC(MultiLabelClassifier):
         The dissimilarity measure to use.
         The similarity between two instances is calculated as 1 minus their dissimilarity.
 
-        A callable `np.array -> float` induces a dissimilarity measure through application to `y - x`.
-        A float is interpreted as Minkowski distance with the corresponding value for `p`.
+        A vector size measure `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski size with the corresponding value for `p`.
         For convenience, a number of popular measures can be referred to by name.
 
         When a float or string is passed, the corresponding dissimilarity measure is automatically scaled
-        to ensure that the dissimilarity of `[1, 1, ..., 1]` (with `[0, 0, ..., 0]`) is 1.
+        to ensure that the dissimilarity of `[1, 1, ..., 1]` with `[0, 0, ..., 0]` is 1.
 
-        For instance, the default Boscovich distance (also known as cityblock, Manhattan or taxicab distance)
+        For instance, the default Boscovich norm (also known as cityblock, Manhattan or taxicab norm)
         normally assigns a dissimilarity that is the sum of the per-attribute differences.
         In this case, the scaling step divides by the number of dimensions,
         and we obtain a dissimilarity that is the mean of the per-attribute differences.

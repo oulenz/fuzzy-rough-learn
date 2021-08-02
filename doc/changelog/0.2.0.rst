@@ -32,8 +32,8 @@ New algorithms
         * `RangeNormaliser`
         * `Standardiser`
 
-    * `NormNormaliser`
     * `SAE` (requires optional `tensorflow` dependency
+    * `VectorSizeNormaliser`
 
 * regressors:
 

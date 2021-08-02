@@ -12,7 +12,7 @@ _to_import = [
     ('statistics', 'MaxAbsNormaliser', [],),
     ('statistics', 'RangeNormaliser', [],),
     ('statistics', 'Standardiser', [],),
-    ('uncategorised', 'NormNormaliser', [],),
+    ('uncategorised', 'VectorSizeNormaliser', [],),
 ]
 
 _content = {}

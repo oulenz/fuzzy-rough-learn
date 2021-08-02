@@ -4,9 +4,9 @@ import numpy as np
 
 
 @dataclass(frozen=True)
-class MinkowskiDistance:
+class MinkowskiSize:
     """
-    Family of dissimilarity measures of the form
+    Family of vector size measures of the form
     `(x1**p + x2**p + ... + xm**p)**(1/p)` (if `unrooted = False`), or
     `(x1**p + x2**p + ... + xm**p)` (if `unrooted = True`),
     for `0 < p < ∞`, and their limits in 0 and ∞.
@@ -26,11 +26,11 @@ class MinkowskiDistance:
 
     unrooted: bool = False
         Whether to omit the root `**(1/p)` from the formula.
-        For `p = 0`, this gives Hamming distance.
-        For `p = 2`, this gives squared Euclidean distance.
+        For `p = 0`, this gives Hamming size.
+        For `p = 2`, this gives squared Euclidean size.
 
     scale_by_dimensionality: bool = False
-        If `True`, values are scaled linearly such that the vector `[1, 1, ..., 1]` has distance 1.
+        If `True`, values are scaled linearly such that the vector `[1, 1, ..., 1]` has size 1.
         This can be used to ensure that the range of dissimilarity values in the unit hypercube is `[0, 1]`,
         which can be useful when working with features scaled to `[0, 1]`.
 
@@ -38,11 +38,11 @@ class MinkowskiDistance:
     -----
     The most used parameter combinations have their own name.
 
-    * Hamming distance is unrooted `p = 0`.
-    * Boscovich distance is `p = 1`. Also known as cityblock, Manhattan or Taxicab distance.
-    * Euclidean distance is rooted `p = 2`. Also known as Pythagorean distance.
-    * Squared Euclidean distance is unrooted `p = 2`. Also known as squared Pythagorean distance.
-    * Chebishev distance is rooted `p = ∞`. Also known as chessboard or maximum distance.
+    * Hamming size is unrooted `p = 0`.
+    * The Boscovich norm is `p = 1`. Also known as cityblock, Manhattan or Taxicab norm.
+    * The Euclidean norm is rooted `p = 2`. Also known as Pythagorean norm.
+    * Squared Euclidean size is unrooted `p = 2`.
+    * The Chebishev norm is rooted `p = ∞`. Also known as chessboard or maximum norm.
     """
 
     p: float

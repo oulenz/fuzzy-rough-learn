@@ -81,7 +81,7 @@ Other
    :template: class.rst
 
    FRFS
-   NormNormaliser
+   VectorSizeNormaliser
 
 Instance preprocessors
 ======================
@@ -131,18 +131,6 @@ Dispersion measures
     maximum_absolute_value
     standard_deviation
     total_range
-
-Dissimilarity measures
-----------------------
-
-.. currentmodule:: frlearn.dissimilarity_measures
-
-.. autosummary::
-   :toctree: generated/
-   :nosignatures:
-   :template: class.rst
-
-    MinkowskiDistance
 
 Location measures
 -----------------
@@ -211,6 +199,18 @@ Transformations
    contract
    shifted_reciprocal
    truncated_complement
+
+Vector size measures
+----------------------
+
+.. currentmodule:: frlearn.vector_size_measures
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+   :template: class.rst
+
+    MinkowskiSize
 
 Weights
 -------

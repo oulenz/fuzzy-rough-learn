@@ -1,46 +1,50 @@
-"""Statistical preprocessors"""
+"""Uncategorised preprocessors"""
 from __future__ import annotations
+
+from typing import Callable
 
 import numpy as np
 
 from frlearn.array_functions import div_or
 from frlearn.base import FeaturePreprocessor, Unsupervised
+from frlearn.uncategorised.utilities import resolve_dissimilarity
 
 
-class NormNormaliser(Unsupervised, FeaturePreprocessor):
+class VectorSizeNormaliser(Unsupervised, FeaturePreprocessor):
     """
-    Rescales each instance to unit norm. Typically used on datasets of frequency counts,
+    Rescales each instance (seen as a vector) to size 1.
+    Typically used on datasets of frequency counts,
     when only the relative frequencies are considered important,
     e.g. token counts of texts in NLP.
 
     Parameters
     ----------
-    p: float = 1
-        Order of the norm to use. Can also be `-np.inf` or `np.inf`.
+    measure: str or float or (np.array -> float) = 'boscovich'
+        The vector size measure to use.
+        A float is interpreted as Minkowski size with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
 
     Notes
     -----
-    If the norm of an instance is 0, it will be left unscaled.
-    If the norm of an instance is ∞, it will be scaled to 0.
+    If the size of an instance is 0, it will be left unscaled.
+    If the size of an instance is ∞, it will be scaled to 0.
 
     """
+    # TODO: this doesn't need to be a ModelFactory
 
-    def __init__(self, p: float = 1, ):
+    def __init__(self, measure: str or float or Callable[[np.array], float] = 'boscovich', ):
         super().__init__()
-        self.p = p
+        # TODO: resolve vector size measures separately
+        self.measure = resolve_dissimilarity(measure)
 
     def _construct(self, X, ) -> Model:
         model = super()._construct(X)
-        model.p = self.p
+        model.measure = self.measure
         return model
 
     class Model(Unsupervised.Model, FeaturePreprocessor.Model):
 
-        p: float
+        measure: Callable[[np.array], float]
 
         def _query(self, X):
-            if self.p == 0:
-                norm = np.where(np.count_nonzero(X, axis=-1) <= 1, np.sum(np.abs(X), axis=-1), np.inf)
-            else:
-                norm = np.linalg.norm(X, ord=self.p, axis=-1)
-            return div_or(X, norm[:, None], X)
+            return div_or(X, self.measure(X)[:, None], X)

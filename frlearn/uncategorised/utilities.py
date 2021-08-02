@@ -3,16 +3,16 @@ from inspect import signature, Parameter
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from frlearn.dissimilarity_measures import MinkowskiDistance
+from frlearn.vector_size_measures import MinkowskiSize
 
 
 def resolve_dissimilarity(dissimilarity, scale_by_dimensionality=False):
     """
-    Resolves a dissimilarity measure from a string or a float.
+    Resolves a dissimilarity or vector size measure from a string or a float.
     Passes through values that are already callable.
     Raises an exception for invalid values.
 
-    Floats are resolved as Minkowski distance with corresponding value for `p`.
+    Floats are resolved as Minkowski size with corresponding value for `p`.
 
     Parameters
     ----------
@@ -25,10 +25,10 @@ def resolve_dissimilarity(dissimilarity, scale_by_dimensionality=False):
 
     Returns
     -------
-    dissimilarity_measure: (np.array -> float) or ((np.array, np.array) -> float)
-        The resolved dissimilarity measure.
+    measure: (np.array -> float) or ((np.array, np.array) -> float)
+        The resolved dissimilarity or vector size measure.
         Either a callable that takes two vectors `x` and `y` and returns their dissimilarity,
-        or a callable that takes a single vector and returns its magnitude (like a norm),
+        or a callable that takes a single vector and returns its size,
         which induces a dissimilarity measure through application to `y - x`.
 
     Raises
@@ -57,13 +57,13 @@ def resolve_dissimilarity(dissimilarity, scale_by_dimensionality=False):
             unrooted = False
         else:
             raise ValueError(f'Unknown dissimilarity measure: \'{dissimilarity}\'')
-        return MinkowskiDistance(p=p, unrooted=unrooted, scale_by_dimensionality=scale_by_dimensionality)
+        return MinkowskiSize(p=p, unrooted=unrooted, scale_by_dimensionality=scale_by_dimensionality)
     if isinstance(dissimilarity, (int, float)):
-        return MinkowskiDistance(p=dissimilarity, unrooted=False, scale_by_dimensionality=scale_by_dimensionality)
+        return MinkowskiSize(p=dissimilarity, unrooted=False, scale_by_dimensionality=scale_by_dimensionality)
     raise ValueError(f'Parameter `dissimilarity` must be a function or a callable class, a string, or a float.')
 
 
-def apply_dissimilarity(u, v, dissimilarity_measure):
+def apply_dissimilarity(u, v, measure):
     """
     Calculates the dissimilarity of `u` and `v`,
     or each pair of vectors if `u` and/or `v` is a two-dimensional array.
@@ -78,9 +78,9 @@ def apply_dissimilarity(u, v, dissimilarity_measure):
         Array of 1 or 2 dimensions, corresponding to a single vector or a collection of vectors.
         The length of the vectors in `u` and `v` should match.
 
-    dissimilarity_measure: (np.array -> float) or ((np.array, np.array) -> float)
-        The dissimilarity measure to apply.
-        If this is a callable `np.array -> float` (like a norm),
+    measure: (np.array -> float) or ((np.array, np.array) -> float)
+        The dissimilarity or vector size measure to apply.
+        If this is a vector size measure `np.array -> float` (like a norm),
         it is applied to the difference `v - u`.
 
     Returns
@@ -94,10 +94,10 @@ def apply_dissimilarity(u, v, dissimilarity_measure):
     assert (len(u.shape), len(v.shape) <= 2) and u.shape[-1] == v.shape[-1],\
         'Arrays should not be more than two-dimensional, and the size of their last dimension should match.'
     new_shape = u.shape[:-1] + v.shape[:-1]
-    params = signature(dissimilarity_measure.__call__).parameters.values()
+    params = signature(measure.__call__).parameters.values()
     num_args = len([p for p in params if p.default == Parameter.empty])
     if num_args == 1:
-        return np.reshape(dissimilarity_measure(np.atleast_2d(v) - np.atleast_2d(u)[:, None, :]), new_shape)
+        return np.reshape(measure(np.atleast_2d(v) - np.atleast_2d(u)[:, None, :]), new_shape)
     if num_args == 2:
-        return np.reshape(cdist(np.atleast_2d(u), np.atleast_2d(v), dissimilarity_measure), new_shape)
-    raise ValueError('Dissimilarity measure should be a callable with one or two arguments without default values.')
+        return np.reshape(cdist(np.atleast_2d(u), np.atleast_2d(v), measure), new_shape)
+    raise ValueError('Measure should be a callable with one or two arguments without default values.')
