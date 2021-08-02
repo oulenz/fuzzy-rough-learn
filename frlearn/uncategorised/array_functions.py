@@ -179,7 +179,7 @@ def remove_diagonal(a):
 
 
 def soft_head(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
-    """
+    r"""
     Calculates the soft head of an array.
 
     Parameters
@@ -214,7 +214,7 @@ def soft_head(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
 
 
 def soft_max(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
-    """
+    r"""
     Calculates the soft maximum of an array.
 
     Parameters
@@ -249,7 +249,7 @@ def soft_max(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
 
 
 def soft_min(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
-    """
+    r"""
     Calculates the soft minimum of an array.
 
     Parameters
@@ -284,7 +284,7 @@ def soft_min(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
 
 
 def soft_tail(a, weights, k: int or None, axis=-1, type: str = 'arithmetic'):
-    """
+    r"""
     Calculates the soft tail of an array.
 
     Parameters
