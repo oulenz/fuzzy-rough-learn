@@ -1,6 +1,6 @@
 """Functions for expressing one value in terms of another."""
 
-import numpy as np
+import math
 
 __all__ = [
     'log_multiple', 'multiple',
@@ -22,7 +22,7 @@ def log_multiple(a):
         Function that takes a number `x` and returns `a * log x`.
     """
     def _f(x):
-        return a * np.log(x)
+        return a * math.log(x)
     return _f
 
 
