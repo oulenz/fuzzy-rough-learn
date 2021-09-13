@@ -16,12 +16,12 @@ New algorithms
     * `ALP`
     * `CD`
     * `EIF` (wrapper requiring optional `eif` dependency
-    * `IF` (wrapper for scikit-learn implementation)
+    * `IF` (wrapper for `scikit-learn` implementation)
     * `LNND`
     * `LOF`
     * `MD`
     * `NND`
-    * `SVM` (wrapper for scikit-learn implementation)
+    * `SVM` (wrapper for `scikit-learn` implementation)
 
 * feature preprocessors:
 
@@ -32,7 +32,7 @@ New algorithms
         * `RangeNormaliser`
         * `Standardiser`
 
-    * `SAE` (requires optional `tensorflow` dependency
+    * `SAE` (requires optional `tensorflow` dependency)
     * `VectorSizeNormaliser`
 
 * regressors:
