@@ -29,7 +29,7 @@ class NeighbourSearchMethod(ModelFactory):
         X: array shape=(n, m, )
             Construction instances.
 
-        dissimilarity: (np.array -> float) or ((np.array, np.array) -> float) = BoscovichDistance()
+        dissimilarity: (np.array -> float) or ((np.array, np.array) -> float) = MinkowskiSize(p=1)
             The dissimilarity measure used to calculate distances.
             A vector size measure `np.array -> float` induces a dissimilarity measure through application to `y - x`.
 
