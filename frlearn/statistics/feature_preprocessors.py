@@ -5,7 +5,7 @@ import numpy as np
 
 from frlearn.base import FeaturePreprocessor, Unsupervised
 from frlearn.dispersion_measures import interquartile_range, maximum_absolute_value, standard_deviation, total_range
-from frlearn.location_measures import mean, midhinge, minimum
+from frlearn.location_measures import mean, midhinge, midrange
 
 
 class LinearNormaliser(Unsupervised, FeaturePreprocessor):
@@ -93,7 +93,7 @@ class RangeNormaliser(LinearNormaliser):
     """
     Implementation of the range normaliser.
     Rescales all features by dividing through their total range,
-    ensuring that the values of each feature lie in [0, 1].
+    ensuring that the values of each feature lie in [-0.5, 0.5].
 
     Notes
     -----
@@ -102,7 +102,7 @@ class RangeNormaliser(LinearNormaliser):
     """
 
     def __init__(self):
-        super().__init__(dispersion=total_range, location=minimum, )
+        super().__init__(dispersion=total_range, location=midrange, )
 
 
 class Standardiser(LinearNormaliser):
