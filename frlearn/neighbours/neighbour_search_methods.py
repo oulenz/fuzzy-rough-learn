@@ -7,11 +7,11 @@ from typing import Callable
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
-from frlearn.base import ModelFactory
+from frlearn.base import SoftMachine
 from frlearn.vector_size_measures import MinkowskiSize
 
 
-class NeighbourSearchMethod(ModelFactory):
+class NeighbourSearchMethod(SoftMachine):
     """
     Abstract base class for nearest neighbour searches. Subclasses must
     implement Model._query (and typically __init__ and _construct).
@@ -46,7 +46,7 @@ class NeighbourSearchMethod(ModelFactory):
         model.dissimilarity = dissimilarity
         return model
 
-    class Model(ModelFactory.Model):
+    class Model(SoftMachine.Model):
 
         _X: np.array
         dissimilarity: Callable[[np.array], float] or Callable[[np.array, np.array], float]

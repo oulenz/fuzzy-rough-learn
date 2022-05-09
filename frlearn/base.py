@@ -10,13 +10,19 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 
-class ModelFactory(ABC):
+class SoftMachine(ABC):
+    """
+    Abstract base class for machine learning algorithms.
+    Once initialised with hyperparameters, effectively a function
+    that takes construction data and returns a model,
+    which is another function that takes query data and returns some result.
+    """
 
     def __init__(self, preprocessors=()):
         self.preprocessors = preprocessors
 
     @abstractmethod
-    def __call__(self, X, **kwargs) -> ModelFactory.Model:
+    def __call__(self, X, **kwargs) -> SoftMachine.Model:
         preprocessing_models = []
         for preprocessor in self.preprocessors:
             extra_kwargs = {k: v for k, v in kwargs.items() if k in signature(preprocessor.__call__).parameters}
@@ -32,7 +38,7 @@ class ModelFactory(ABC):
         return self.__call__
 
     @abstractmethod
-    def _construct(self, X, **kwargs) -> ModelFactory.Model:
+    def _construct(self, X, **kwargs) -> SoftMachine.Model:
         model = self.Model.__new__(self.Model)
         model.n, model.m = model.shape = X.shape
         return model
@@ -58,7 +64,7 @@ class ModelFactory(ABC):
             pass
 
 
-class Unsupervised(ModelFactory):
+class Unsupervised(SoftMachine):
 
     def __call__(self, X) -> Unsupervised.Model:
         return super().__call__(X, )
@@ -67,11 +73,11 @@ class Unsupervised(ModelFactory):
         model = super()._construct(X)
         return model
 
-    class Model(ModelFactory.Model):
+    class Model(SoftMachine.Model):
         pass
 
 
-class ClassSupervised(ModelFactory):
+class ClassSupervised(SoftMachine):
 
     def __call__(self, X, y) -> ClassSupervised.Model:
         return super().__call__(X, y=y)
@@ -82,13 +88,13 @@ class ClassSupervised(ModelFactory):
         model.n_classes = len(model.classes)
         return model
 
-    class Model(ModelFactory.Model):
+    class Model(SoftMachine.Model):
 
         classes: np.array
         n_classes: int
 
 
-class LabelSupervised(ModelFactory):
+class LabelSupervised(SoftMachine):
 
     def __call__(self, X, Y) -> LabelSupervised.Model:
         return super().__call__(X, Y=Y)
@@ -98,14 +104,14 @@ class LabelSupervised(ModelFactory):
         model.n_labels = Y.shape[1]
         return model
 
-    class Model(ModelFactory.Model):
+    class Model(SoftMachine.Model):
 
         n_labels: int
 
 
-class Classifier(ModelFactory):
+class Classifier(SoftMachine):
 
-    class Model(ModelFactory.Model):
+    class Model(SoftMachine.Model):
 
         def __call__(self, X):
             return super().__call__(X)
@@ -134,7 +140,7 @@ class MultiLabelClassifier(LabelSupervised, Classifier):
         pass
 
 
-class Regressor(ModelFactory):
+class Regressor(SoftMachine):
 
     def __call__(self, X, y) -> Regressor.Model:
         return super().__call__(X, y=y)
@@ -143,7 +149,7 @@ class Regressor(ModelFactory):
         model = super()._construct(X, y=y)
         return model
 
-    class Model(ModelFactory.Model):
+    class Model(SoftMachine.Model):
 
         def __call__(self, X):
             return super().__call__(X)
@@ -157,9 +163,9 @@ class Regressor(ModelFactory):
             pass
 
 
-class FeaturePreprocessor(ModelFactory):
+class FeaturePreprocessor(SoftMachine):
 
-    class Model(ModelFactory.Model):
+    class Model(SoftMachine.Model):
 
         def __call__(self, X):
             return super().__call__(X)
@@ -278,7 +284,7 @@ class FitPredictClassifier(BaseEstimator, ClassifierMixin, ):
             classifier_or_class: type[MultiClassClassifier] | type[MultiLabelClassifier] | MultiClassClassifier | MultiLabelClassifier,
             *args, **kwargs):
         super().__init__()
-        if isinstance(classifier_or_class, ModelFactory):
+        if isinstance(classifier_or_class, SoftMachine):
             self.classifier = classifier_or_class
         else:
             self.classifier = classifier_or_class(*args, **kwargs)
