@@ -28,19 +28,22 @@ class NNDataDescriptor(DataDescriptor):
             dissimilarity: str,
             k: int or Callable[[int], int] or None,
             nn_search: NeighbourSearchMethod,
+            localised=False,
             preprocessors=()
     ):
         super().__init__(preprocessors=preprocessors)
         self.dissimilarity = resolve_dissimilarity(dissimilarity)
         self.nn_search = nn_search
         self.k = k
+        self.localised = localised
 
     @abstractmethod
     def _construct(self, X) -> Model:
-        model = super()._construct(X)
+        model: NNDataDescriptor.Model = super()._construct(X)
         nn_model = self.nn_search(X, self.dissimilarity)
         model.nn_model = nn_model
-        model.k = resolve_k(self.k, len(nn_model))
+        # TODO: is this the right way to resolve k?
+        model.k = model._resolve_k(self.k, localised=self.localised)
         return model
 
     class Model(DataDescriptor.Model):
@@ -58,6 +61,50 @@ class NNDataDescriptor(DataDescriptor):
         @abstractmethod
         def _query(self, q_neighbours, q_distances):
             pass
+
+        def _resolve_k(self, k: float or Callable[[int], float] or None, localised: bool = False, ):
+            """
+            Helper method to obtain a valid number of neighbours
+            from a parameter `k` given `n` target records,
+            where `k` may be defined in terms of `n`.
+            The maximum number of neighbours `k_max` is `n`,
+            unless `localised` is `True`, in which case it is `n - 1`.
+
+            Parameters
+            ----------
+            k: float or (int -> float) or None
+                Parameter value to resolve. Can be a float,
+                a callable that takes `n` and returns a float,
+                or None.
+
+            localised: bool = False
+                Whether `k` also has to be valid for target records,
+                while excluding these from being their own nearest neighbour.
+                If so, then `k_max` is `n - 1`.
+
+            Returns
+            -------
+            k: int
+               If `k` is a float in [1, k_max]: `k`;
+               If `k` is None: `k_max`;
+               If `k` is callable, the output of `k` applied to `n`,
+               rounded to the nearest integer in `[1, k_max]`.
+
+            Raises
+            ------
+            ValueError
+                If `k` is a float not in [1, k_max].
+
+            """
+            n = len(self)
+            k_max = n - 1 if localised else n
+            if callable(k):
+                k = k(n)
+            elif k is None:
+                k = k_max
+            elif not 1 <= k <= k_max:
+                raise ValueError(f'Cannot create model with {k} nearest neighbours, number has to be between 1 and {k_max}.')
+            return min(max(1, round(k)), k_max)
 
 
 class ALP(NNDataDescriptor):
@@ -137,7 +184,7 @@ class ALP(NNDataDescriptor):
             max_array_size: int = 2**26,
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, preprocessors=preprocessors)
+        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, localised=True, preprocessors=preprocessors)
         self.l = l
         self.scale_weights = scale_weights
         self.localisation_weights = localisation_weights
@@ -145,9 +192,9 @@ class ALP(NNDataDescriptor):
 
     def _construct(self, X):
         model: ALP.Model = super()._construct(X)
-        model.l = resolve_k(self.l, len(model.nn_model))
+        model.l = model._resolve_k(self.l, localised=False)
         model._kl = max(model.k, model.l)
-        _, model.distances = model.nn_model.query_self(model._kl)
+        _, model.distances = model.nn_model.query_self(model.k)
         model.scale_weights = self.scale_weights
         model.localisation_weights = self.localisation_weights
         return model
@@ -172,7 +219,7 @@ class ALP(NNDataDescriptor):
             local_distances = []
             for i in range(0, q_neighbours.shape[0], batch_size):
                 local_distances.append(soft_head(
-                    self.distances[q_neighbours[i:i+batch_size], :self.k],
+                    self.distances[q_neighbours[i:i+batch_size]],
                     self.localisation_weights,
                     self.l, axis=-2
                 ))
@@ -243,7 +290,7 @@ class LNND(NNDataDescriptor):
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, preprocessors=preprocessors)
+        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, localised=True, preprocessors=preprocessors)
 
     def _construct(self, X) -> Model:
         model: LNND.Model = super()._construct(X)
@@ -317,7 +364,7 @@ class LOF(NNDataDescriptor):
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(IQRNormaliser(), )
     ):
-        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, preprocessors=preprocessors)
+        super().__init__(dissimilarity=dissimilarity, k=k, nn_search=nn_search, localised=True, preprocessors=preprocessors)
 
     def _construct(self, X) -> Model:
         model: LOF.Model = super()._construct(X)
