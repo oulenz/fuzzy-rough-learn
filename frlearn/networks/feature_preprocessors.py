@@ -120,7 +120,7 @@ class SAE(Unsupervised, FeaturePreprocessor):
             X, X,
             epochs=self.num_epochs,
             batch_size=batch_size,
-            validation_split=0.2,
+            validation_split=self.validation_perc,
             validation_freq=self.validation_freq,
             callbacks=[es]
         )
