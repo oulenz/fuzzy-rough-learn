@@ -8,9 +8,10 @@ import numpy as np
 from frlearn.base import DataDescriptor, MultiClassClassifier, MultiLabelClassifier
 from frlearn.data_descriptors import NND
 from frlearn.neighbour_search_methods import NeighbourSearchMethod, KDTree
+from frlearn.neighbours.utilities import resolve_k
 from frlearn.statistics.feature_preprocessors import RangeNormaliser
 from frlearn.array_functions import div_or, soft_max, soft_min
-from frlearn.parametrisations import multiple
+from frlearn.parametrisations import at_most, multiple
 from frlearn.transformations import truncated_complement
 from frlearn.uncategorised.utilities import resolve_dissimilarity
 from frlearn.weights import ExponentialWeights, LinearWeights
@@ -62,7 +63,7 @@ class FRNN(FuzzyRoughEnsemble):
         OWA weights to use in calculation of upper approximation of decision classes.
         If `None`, only the `upper_k`\ th neighbour is used.
 
-    upper_k: int or (int -> float) or None = 20
+    upper_k: int or (int -> float) or None = at_most(20)
         Effective length of upper weights vector (number of nearest neighbours to consider).
         Should be either a positive integer,
         or a function that takes the class size `n` and returns a float,
@@ -74,7 +75,7 @@ class FRNN(FuzzyRoughEnsemble):
         OWA weights to use in calculation of lower approximation of decision classes.
         If `None`, only the `lower_k`\ th neighbour is used.
 
-    lower_k: int or (int -> float) or None = 20
+    lower_k: int or (int -> float) or None = at_most(20)
         Effective length of lower weights vector (number of nearest neighbours to consider).
         Should be either a positive integer,
         or a function that takes the size `n` of the complement of the class and returns a float,
@@ -136,9 +137,9 @@ class FRNN(FuzzyRoughEnsemble):
     def __init__(
             self, *,
             upper_weights: Callable[[int], np.array] or None = LinearWeights(),
-            upper_k: int or Callable[[int], float] or None = 20,
+            upper_k: int or Callable[[int], float] or None = at_most(20),
             lower_weights: Callable[[int], np.array] or None = LinearWeights(),
-            lower_k: int or Callable[[int], float] or None = 20,
+            lower_k: int or Callable[[int], float] or None = at_most(20),
             dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(RangeNormaliser(), )
@@ -174,7 +175,7 @@ class FROVOCO(MultiClassClassifier):
         OWA weights to use when the imbalance ratio is not larger than `ir_threshold`.
         If `None`, only the `balanced_k`\ th neighbour is used.
 
-    balanced_k: int or (int -> float) or None = 16
+    balanced_k: int or (int -> float) or None = at_most(16)
         Length of the weights vector when the imbalance ratio is not larger than `ir_threshold`.
         Should be either a positive integer,
         or a function that takes the class size `n` and returns a float,
@@ -251,7 +252,7 @@ class FROVOCO(MultiClassClassifier):
     def __init__(
             self,
             balanced_weights: Callable[[int], np.array] or None = ExponentialWeights(base=2),
-            balanced_k: int or Callable[[int], float] or None = 16,
+            balanced_k: int or Callable[[int], float] or None = at_most(16),
             imbalanced_weights: Callable[[int], np.array] or None = LinearWeights(),
             imbalanced_k: int or Callable[[int], float] or None = multiple(0.1),
             ir_threshold: float or None = 9,
@@ -363,7 +364,7 @@ class FRONEC(MultiLabelClassifier):
         Label similarity relation to use.
         R_d^1 is simple Hamming similarity. R_d^2 is similar, but takes the prior label probabilities into account.
 
-    k : int, default=20
+    k : int, default = at_most(20)
         Number of neighbours to consider for neighbourhood consensus.
 
     owa_weights: (int -> np.array) = LinearWeights()
@@ -405,7 +406,7 @@ class FRONEC(MultiLabelClassifier):
 
     def __init__(
             self, Q_type: int = 2, R_d_type: int = 1,
-            k: int = 20, owa_weights: Callable[[int], np.array] | None = LinearWeights(),
+            k: int = at_most(20), owa_weights: Callable[[int], np.array] | None = LinearWeights(),
             dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
             nn_search: NeighbourSearchMethod = KDTree(),
             preprocessors=(RangeNormaliser(), )
@@ -422,7 +423,7 @@ class FRONEC(MultiLabelClassifier):
         model: FRONEC.Model = super()._construct(X, Y)
         model.Q_type = self.Q_type
         model.R_d = model._R_d_2(Y) if self.R_d_type == 2 else model._R_d_1(Y)
-        model.k = self.k
+        model.k = resolve_k(self.k, len(X))
         model.owa_weights = self.owa_weights
         model.nn_model = self.nn_search(X, dissimilarity=self.dissimilarity)
         model.Y = Y

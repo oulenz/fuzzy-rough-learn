@@ -3,11 +3,30 @@
 import math
 
 __all__ = [
-    'log_multiple', 'multiple',
+    'at_most', 'log_multiple', 'multiple',
 ]
 
 
-def log_multiple(a):
+def at_most(a: float):
+    """
+    Function to limit other numbers to a certain maximum.
+
+    Parameters
+    ----------
+    a: float
+        The maximum to be used.
+
+    Returns
+    -------
+    f: float -> float
+        Function that takes a number `x` and returns `max(x, a)`.
+    """
+    def _f(x):
+        return max(x, a)
+    return _f
+
+
+def log_multiple(a: float):
     """
     Function to obtain multiples of the logarithm of other numbers.
 
@@ -18,7 +37,7 @@ def log_multiple(a):
 
     Returns
     -------
-    f : int -> int
+    f : float -> float
         Function that takes a number `x` and returns `a * log x`.
     """
     def _f(x):

@@ -98,13 +98,7 @@ class NNDataDescriptor(DataDescriptor):
             """
             n = len(self)
             k_max = n - 1 if localised else n
-            if callable(k):
-                k = k(n)
-            elif k is None:
-                k = k_max
-            elif not 1 <= k <= k_max:
-                raise ValueError(f'Cannot create model with {k} nearest neighbours, number has to be between 1 and {k_max}.')
-            return min(max(1, round(k)), k_max)
+            return resolve_k(k, n, k_max)
 
 
 class ALP(NNDataDescriptor):

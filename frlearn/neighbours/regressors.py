@@ -7,6 +7,7 @@ import numpy as np
 from frlearn.base import Regressor
 from frlearn.feature_preprocessors import RangeNormaliser
 from frlearn.neighbours.utilities import resolve_k
+from frlearn.parametrisations import at_most
 from frlearn.uncategorised.utilities import apply_dissimilarity, resolve_dissimilarity
 
 
@@ -22,7 +23,7 @@ class FRNN(Regressor):
 
     Parameters
     ----------
-    k: int or (int -> float) = 10
+    k: int or (int -> float) = at_most(10)
         Number of neighbours to consider.
         Should be either a positive integer,
         or a function that takes the training set size `n` and returns a float.
@@ -68,7 +69,7 @@ class FRNN(Regressor):
     """
     def __init__(
             self,
-            k: int = 10,
+            k: int = at_most(10),
             dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'chebyshev',
             preprocessors=(RangeNormaliser(), )
     ):
