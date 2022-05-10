@@ -24,33 +24,33 @@ export CXX=/usr/lib/ccache/g++
 # ~60M is used by .ccache when compiling from scratch at the time of writing
 ccache --max-size 100M --show-stats
 
-make_conda() {
+make_mamba() {
 	TO_INSTALL="$@"
     # Deactivate the travis-provided virtual environment and setup a
-    # conda-based environment instead
+    # mamba-based environment instead
     deactivate
 
-    # Install miniconda
-    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-        -O miniconda.sh
-    MINICONDA_PATH=/home/travis/miniconda
-    chmod +x miniconda.sh && ./miniconda.sh -b -p $MINICONDA_PATH
-    export PATH=$MINICONDA_PATH/bin:$PATH
-    conda update --yes conda
+    # Install mambaforge
+    wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh \
+        -O mambaforge.sh
+    MAMBAFORGE_PATH=/home/travis/mambaforge
+    chmod +x mambaforge.sh && ./mambaforge.sh -b -p $MAMBAFORGE_PATH
+    export PATH=$MAMBAFORGE_PATH/bin:$PATH
+    mamba update --yes mamba
 
-    conda create -n testenv --yes $TO_INSTALL
+    mamba create -n testenv --yes $TO_INSTALL
     source activate testenv
 }
 
 TO_INSTALL="python=$PYTHON_VERSION pip pytest pytest-cov \
             numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION"
-  make_conda $TO_INSTALL
+  make_mamba $TO_INSTALL
 
 if [[ "$SKLEARN_VERSION" == "nightly" ]]; then
-    conda install --yes cython
+    mamba install --yes cython
     pip install --pre -f https://sklearn-nightly.scdn8.secure.raxcdn.com scikit-learn
 else
-    conda install --yes scikit-learn=$SKLEARN_VERSION
+    mamba install --yes scikit-learn=$SKLEARN_VERSION
 fi
 
 pip install coverage codecov
