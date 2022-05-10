@@ -21,7 +21,7 @@ URL = 'https://github.com/oulenz/fuzzy-rough-learn'
 LICENSE = 'MIT'
 DOWNLOAD_URL = 'https://github.com/oulenz/fuzzy-rough-learn'
 VERSION = __version__
-INSTALL_REQUIRES = ['numpy>=1.17.0', 'scipy>=1.1.0', 'scikit-learn>=0.22.0']
+INSTALL_REQUIRES = ['numpy>=1.17.0', 'scipy>=1.1.0', 'scikit-learn>=0.24.0']
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
                'License :: OSI Approved',
