@@ -23,11 +23,14 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PYTHON%\\Library\\bin;%PATH%"
   # install the dependencies
   - conda update conda -y -q
-  - conda create -n testenv --yes python=%PYTHON_VERSION% pip
+  - conda config --add channels conda-forge
+  - conda update --all -y -q
+  - conda install mamba -n base -y -q
+  - mamba create -n testenv --yes python=%PYTHON_VERSION% pip
   - activate testenv
-  - conda install scipy==%SCIPY_VERSION% numpy==%NUMPY_VERSION% -y -q
-  - conda install scikit-learn==%SKLEARN_VERSION% -y -q
-  - conda install nose pytest pytest-cov -y -q
+  - mamba install scipy==%SCIPY_VERSION% numpy==%NUMPY_VERSION% -y -q
+  - mamba install scikit-learn==%SKLEARN_VERSION% -y -q
+  - mamba install nose pytest pytest-cov -y -q
   - pip install codecov
   - pip install .
 
