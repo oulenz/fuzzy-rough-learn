@@ -263,7 +263,8 @@ def probabilities_from_scores(scores):
         Array of class probabilities.
 
     """
-    rows_0 = ~np.all(scores, axis=1)
+    scores = scores.copy()
+    rows_0 = ~np.any(scores, axis=1)
     scores[rows_0] = 1
     return scores/np.sum(scores, axis=1, keepdims=True)
 
