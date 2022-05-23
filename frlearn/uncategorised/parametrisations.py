@@ -22,7 +22,7 @@ def at_most(a: float):
         Function that takes a number `x` and returns `max(x, a)`.
     """
     def _f(x):
-        return max(x, a)
+        return min(x, a)
     return _f
 
 
