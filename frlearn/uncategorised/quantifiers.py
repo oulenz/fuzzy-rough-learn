@@ -36,3 +36,56 @@ class QuadraticSigmoid():
                         np.where(a >= β, 1,
                                  np.where(a <= (α + β) / 2, 2 * (a - α) ** 2 / (β - α) ** 2,
                                           1 - 2 * (a - β) ** 2 / (β - α) ** 2)))
+
+
+@dataclass
+class MoreThan():
+    """"
+    A RIM quantifiers that represent the quantifiers “more than 100 ∗ k%”[1]
+
+    Parameters
+    ----------
+    k: float
+       Should be a value in `[0, 1]`
+
+    Refrences
+    ---------
+    [1] THEERENS, Adnan et CORNELIS, Chris.
+    Fuzzy rough sets based on fuzzy quantification.
+    Fuzzy Sets and Systems, 2023, vol. 473, p. 108704.
+"""
+
+    k: float
+
+    def __call__(self, p: float):
+        k = self.k
+        if p > k:
+            return 1
+        else:
+            return 0
+
+
+@dataclass
+class AtLeast():
+    """"
+        A RIM quantifiers that represent the quantifiers “at least 100 ∗ k%”[1]
+
+        Parameters
+        ----------
+        k: float
+           Should be a value in `[0, 1]`
+
+        Refrences
+        ---------
+        [1] THEERENS, Adnan et CORNELIS, Chris.
+        Fuzzy rough sets based on fuzzy quantification.
+        Fuzzy Sets and Systems, 2023, vol. 473, p. 108704.
+    """
+    k: float
+
+    def __call__(self, p: float):
+        k = self.k
+        if p >= k:
+            return 1
+        else:
+            return 0
