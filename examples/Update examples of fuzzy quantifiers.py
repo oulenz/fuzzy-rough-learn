@@ -1,4 +1,4 @@
-from frlearn.uncategorised import fuzzy_v as fuzz
+from frlearn.uncategorised import fuzzy_quantifers as fuzz
 from frlearn.uncategorised import quantifiers
 import numpy as np
 
