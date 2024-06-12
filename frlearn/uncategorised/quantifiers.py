@@ -41,14 +41,14 @@ class QuadraticSigmoid():
 @dataclass
 class MoreThan():
     """"
-    A RIM quantifiers that represent the quantifiers “more than 100 ∗ k%”[1]
+    A RIM quantifier that represents the quantifier “more than 100 ∗ k%”[1]
 
     Parameters
     ----------
     k: float
        Should be a value in `[0, 1]`
 
-    Refrences
+    References
     ---------
     [1] THEERENS, Adnan et CORNELIS, Chris.
     Fuzzy rough sets based on fuzzy quantification.
@@ -68,14 +68,14 @@ class MoreThan():
 @dataclass
 class AtLeast():
     """"
-        A RIM quantifiers that represent the quantifiers “at least 100 ∗ k%”[1]
+        A RIM quantifier that represent the quantifier “at least 100 ∗ k%”[1]
 
         Parameters
         ----------
         k: float
            Should be a value in `[0, 1]`
 
-        Refrences
+        References
         ---------
         [1] THEERENS, Adnan et CORNELIS, Chris.
         Fuzzy rough sets based on fuzzy quantification.
