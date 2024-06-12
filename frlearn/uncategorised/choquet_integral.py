@@ -1,7 +1,7 @@
 """
 Implementation of the Choquet integral [1] in the most general way
 References
-    ----------
+----------
     [1] THEERENS, Adnan et CORNELIS, Chris.
     Fuzzy rough sets based on fuzzy quantification.
     Fuzzy Sets and Systems, 2023, vol. 473, p. 108704.
