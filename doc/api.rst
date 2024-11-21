@@ -17,6 +17,7 @@ Classifiers
    FRNN
    FROVOCO
    FRONEC
+   NN
 
 Data descriptors
 ================

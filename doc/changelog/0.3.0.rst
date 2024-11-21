@@ -1,0 +1,17 @@
+.. _changes_0_3_0:
+
+Version 0.3
+===========
+
+Changelog
+---------
+
+New algorithms
+~~~~~~~~~~~~~~
+
+* classifiers:
+
+    * `NN`
+
+API changes
+~~~~~~~~~~~

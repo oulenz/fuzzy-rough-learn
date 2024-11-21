@@ -469,9 +469,97 @@ class FRONEC(MultiLabelClassifier):
             return np.sum(np.minimum(self.Y, Q[..., None]), axis=1) / np.sum(Q, axis=-1, keepdims=True)
 
         def _Q_1(self, neighbours, R):
-            vals = np.minimum(1 - R[..., None] + self.R_d[neighbours, :] - 1, 1)
+            vals = np.minimum(1 - R[..., None] + self.R_d[neighbours, :], 1)
             return soft_min(vals, self.owa_weights, k=None, axis=1)
 
         def _Q_2(self, neighbours, R):
             vals = np.maximum(R[..., None] + self.R_d[neighbours, :] - 1, 0)
             return soft_max(vals, self.owa_weights, k=None, axis=1)
+
+
+class NN(MultiClassClassifier):
+    r"""
+    Implementation of Nearest Neighbour (NN) classification.
+
+    Parameters
+    ----------
+
+    k: int or (int -> float) or None = at_most(5)
+        Number of neighbours to consider. Should be either a positive integer,
+        or a function that takes the dataset size `n` and returns a float,
+        or `None`, which is resolved as `n`.
+        All such values are rounded to the nearest integer in `[1, n]`.
+
+    dissimilarity: str or float or (np.array -> float) or ((np.array, np.array) -> float) = 'boscovich'
+        The dissimilarity measure to use.
+        The similarity between two instances is calculated as 1 minus their dissimilarity.
+
+        A vector size measure `np.array -> float` induces a dissimilarity measure through application to `y - x`.
+        A float is interpreted as Minkowski size with the corresponding value for `p`.
+        For convenience, a number of popular measures can be referred to by name.
+
+    distance_weighted: boolean = False
+        If `True`, NN with reciprocally linear distance weights.
+        If `False`, unweighted NN.
+
+    nn_search : NeighbourSearchMethod = KDTree()
+        Nearest neighbour search algorithm to use.
+
+    preprocessors : iterable = (RangeNormaliser(), )
+        Preprocessors to apply. The default range normaliser ensures that all features have range 1.
+
+    References
+    ----------
+    .. [1] `Fix E, Hodges Jr JL (1951).
+       Discriminatory analysis — nonparametric discrimination: Consistency properties.
+       Technical report 21-49-004, USAF School of Aviation Medicine, Randolph Field, Texas
+       <https://apps.dtic.mil/sti/citations/tr/ADA800276>`_
+    """
+
+    def __init__(
+            self,
+            k: int or Callable[[int], float] or None = at_most(5),
+            dissimilarity: str or float or Callable[[np.array], float] or Callable[[np.array, np.array], float] = 'boscovich',
+            distance_weighted: bool = False,
+            nn_search: NeighbourSearchMethod = KDTree(),
+            preprocessors=(RangeNormaliser(), )
+    ):
+        super().__init__(preprocessors=preprocessors)
+        self.distance_weighted = distance_weighted
+        self.k = k
+        self.dissimilarity = resolve_dissimilarity(dissimilarity)
+        self.nn_search = nn_search
+
+    def _construct(self, X, y) -> Model:
+        model: NN.Model = super()._construct(X, y)
+        model.distance_weighted = self.distance_weighted
+        model.k = resolve_k(self.k, len(X))
+        model.nn_model = self.nn_search(X, dissimilarity=self.dissimilarity)
+        model.y = y
+        return model
+
+    class Model(MultiClassClassifier.Model):
+
+        distance_weighted: bool
+        k: int
+        nn_model: NeighbourSearchMethod.Model
+        y: np.array
+
+        def _query(self, X):
+            neighbours, distances = self.nn_model(X, k=self.k)
+            q_classes = self.y[neighbours]
+
+            vals = np.zeros((neighbours.shape[0], len(self.classes)))
+
+            if self.distance_weighted:
+                zero_distances = np.any(distances <= 0, axis=-1)
+                inv_distances = np.where(zero_distances[:, None], np.where(distances <= 0, 1, 0), 1 / distances)
+
+                for i, c in enumerate(self.classes):
+                    vals[:, i] = np.sum((q_classes == c) * inv_distances, axis=-1)
+                vals = vals / np.sum(vals, axis=-1)[:, None]
+            else:
+                for i, c in enumerate(self.classes):
+                    vals[:, i] = np.count_nonzero(q_classes == c, axis=-1)
+                vals = vals / self.k
+            return vals

@@ -69,6 +69,7 @@ Multiclass classifiers
 * Fuzzy Rough Nearest Neighbours (FRNN; multiclass)
 * Fuzzy Rough OVO COmbination (FROVOCO; muliclass, suitable for imbalanced data)
 * Fuzzy ROugh NEighbourhood Consensus (FRONEC; multilabel)
+* Nearest Neighbours (NN; multiclass)
 
 Data descriptors
 ................

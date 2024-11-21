@@ -60,3 +60,8 @@ doc/generated/
 
 # PyBuilder
 target/
+
+# IDEs
+.idea/
+.kdev4/
+*.kdev4
