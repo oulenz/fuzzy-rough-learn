@@ -1,12 +1,15 @@
 .. -*- mode: rst -*-
 
-|Travis|_ |AppVeyor|_ |Codecov|_ |CircleCI|_ |ReadTheDocs|_
+|Travis|_ |AppVeyor|_ |Tests|_ |Codecov|_ |CircleCI|_ |ReadTheDocs|_
 
 .. |Travis| image:: https://travis-ci.com/oulenz/fuzzy-rough-learn.svg?branch=master
 .. _Travis: https://travis-ci.com/oulenz/fuzzy-rough-learn
 
 .. |AppVeyor| image:: https://ci.appveyor.com/api/projects/status/7xrrtwcj0i3lgd5a/branch/master?svg=true
 .. _AppVeyor: https://ci.appveyor.com/project/oulenz/fuzzy-rough-learn
+
+.. |Tests| image:: https://github.com/oulenz/fuzzy-rough-learn/actions/workflows/python-app.yaml/badge.svg
+.. _Tests: https://github.com/oulenz/fuzzy-rough-learn/actions/workflows/python-app.yaml
 
 .. |Codecov| image:: https://codecov.io/gh/oulenz/fuzzy-rough-learn/branch/master/graph/badge.svg
 .. _Codecov: https://codecov.io/gh/oulenz/fuzzy-rough-learn

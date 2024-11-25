@@ -1,0 +1,88 @@
+[build-system]
+requires = ['setuptools>=64', 'setuptools_scm[toml]>=8']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'fuzzy-rough-learn'
+dynamic = ['version']
+authors = [
+  { name='Oliver Urs Lenz', email='oliver.urs.lenz@gmail.com' },
+]
+description = 'A library of machine learning algorithms.'
+license = {file = 'LICENSE'}
+readme = 'README.rst'
+requires-python = '>=3.7'
+dependencies = [
+  'numpy>=1.17.0',
+  'scipy>=1.3.3',
+  'scikit-learn>=0.24.0',
+]
+classifiers = [
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved',
+    'Topic :: Software Development',
+    'Topic :: Scientific/Engineering',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: POSIX',
+    'Operating System :: Unix',
+    'Operating System :: MacOS',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+]
+
+[project.urls]
+Homepage = 'https://github.com/oulenz/fuzzy-rough-learn'
+Issues = 'https://github.com/oulenz/fuzzy-rough-learn/issues'
+
+[tool.setuptools]
+packages = ['frlearn']
+
+[tool.setuptools_scm]
+version_file = 'frlearn/_version.py'
+
+[tool.pixi.project]
+channels = ['conda-forge']
+platforms = ['win-64', 'linux-64', 'osx-64', 'osx-arm64']
+
+[tool.pixi.dependencies]
+python = '>=3.7'
+scikit-learn = '>=0.24.0'
+
+[tool.pixi.pypi-dependencies]
+fuzzy-rough-learn = { path='.', editable=true }
+
+[tool.pixi.feature.test.dependencies]
+pytest = '*'
+pytest-cov = '*'
+
+[tool.pixi.feature.test.tasks]
+test = { cmd = 'pytest -vsl --cov=frlearn --cov-report=xml frlearn/tests' }
+
+[tool.pixi.feature.doc.dependencies]
+matplotlib = '*'
+numpydoc = '*'
+pydata-sphinx-theme = '*'
+setuptools-scm = '>=8'  # needed for the versioning
+sphinx = '*'
+sphinx-design = '*'
+sphinx-gallery = '*'
+sphinx-prompt = '*'
+
+[tool.pixi.feature.doc.tasks]
+build-doc = { cmd = 'make html', cwd = 'doc' }
+clean-doc = { cmd = 'rm -rf _build', cwd = 'doc' }
+
+[tool.pixi.environments]
+doc = ['doc']
+test = ['test']
+dev = ['doc', 'test']
+
+[tool.pytest.ini_options]
+addopts = '--doctest-modules --color=yes'
+doctest_optionflags = 'NORMALIZE_WHITESPACE'
