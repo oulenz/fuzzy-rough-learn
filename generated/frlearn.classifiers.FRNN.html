@@ -1,0 +1,713 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>FRNN &#8212; fuzzy-rough-learn 0.2.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/fuzzy-rough-learn.css?v=352684a6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/fuzzy-rough-learn.css?v=352684a6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=227644f7"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/frlearn.classifiers.FRNN';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FROVOCO" href="frlearn.classifiers.FROVOCO.html" />
+    <link rel="prev" title="fuzzy-rough-learn API" href="../api.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">fuzzy-rough-learn 0.2.2 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../api.html">
+                        fuzzy-rough-learn API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../changelog.html">
+                        Release history
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/oulenz/fuzzy-rough-learn" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../api.html">
+                        fuzzy-rough-learn API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../changelog.html">
+                        Release history
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/oulenz/fuzzy-rough-learn" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">FRNN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.classifiers.FROVOCO.html">FROVOCO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.classifiers.FRONEC.html">FRONEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.classifiers.NN.html">NN</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.data_descriptors.ALP.html">ALP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.data_descriptors.CD.html">CD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.data_descriptors.EIF.html">EIF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.data_descriptors.IF.html">IF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.data_descriptors.LNND.html">LNND</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.data_descriptors.LOF.html">LOF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.data_descriptors.MD.html">MD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.data_descriptors.NND.html">NND</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.data_descriptors.SVM.html">SVM</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.regressors.FRNN.html">FRNN</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.feature_preprocessors.LinearNormaliser.html">LinearNormaliser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.feature_preprocessors.IQRNormaliser.html">IQRNormaliser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.feature_preprocessors.MaxAbsNormaliser.html">MaxAbsNormaliser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.feature_preprocessors.RangeNormaliser.html">RangeNormaliser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.feature_preprocessors.Standardiser.html">Standardiser</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.feature_preprocessors.FRFS.html">FRFS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.feature_preprocessors.VectorSizeNormaliser.html">VectorSizeNormaliser</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.instance_preprocessors.FRPS.html">FRPS</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.div_or.html">frlearn.array_functions.div_or</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.first.html">frlearn.array_functions.first</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.greatest.html">frlearn.array_functions.greatest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.last.html">frlearn.array_functions.last</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.least.html">frlearn.array_functions.least</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.remove_diagonal.html">frlearn.array_functions.remove_diagonal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.soft_head.html">frlearn.array_functions.soft_head</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.soft_max.html">frlearn.array_functions.soft_max</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.soft_min.html">frlearn.array_functions.soft_min</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.array_functions.soft_tail.html">frlearn.array_functions.soft_tail</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.dispersion_measures.interquartile_range.html">frlearn.dispersion_measures.interquartile_range</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.dispersion_measures.maximum_absolute_value.html">frlearn.dispersion_measures.maximum_absolute_value</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.dispersion_measures.standard_deviation.html">frlearn.dispersion_measures.standard_deviation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.dispersion_measures.total_range.html">frlearn.dispersion_measures.total_range</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.location_measures.maximum.html">frlearn.location_measures.maximum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.location_measures.mean.html">frlearn.location_measures.mean</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.location_measures.median.html">frlearn.location_measures.median</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.location_measures.midhinge.html">frlearn.location_measures.midhinge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.location_measures.midrange.html">frlearn.location_measures.midrange</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.location_measures.minimum.html">frlearn.location_measures.minimum</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.neighbour_search_methods.BallTree.html">BallTree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.neighbour_search_methods.KDTree.html">KDTree</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.parametrisations.log_multiple.html">frlearn.parametrisations.log_multiple</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.parametrisations.multiple.html">frlearn.parametrisations.multiple</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.t_norms.goguen_t_norm.html">frlearn.t_norms.goguen_t_norm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.t_norms.heyting_t_norm.html">frlearn.t_norms.heyting_t_norm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.t_norms.lukasiewicz_t_norm.html">frlearn.t_norms.lukasiewicz_t_norm</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.transformations.contract.html">frlearn.transformations.contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.transformations.shifted_reciprocal.html">frlearn.transformations.shifted_reciprocal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.transformations.truncated_complement.html">frlearn.transformations.truncated_complement</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.vector_size_measures.MinkowskiSize.html">MinkowskiSize</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="frlearn.weights.Weights.html">Weights</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.weights.ConstantWeights.html">ConstantWeights</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.weights.ExponentialWeights.html">ExponentialWeights</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.weights.LinearWeights.html">LinearWeights</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.weights.QuantifierWeights.html">QuantifierWeights</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frlearn.weights.ReciprocallyLinearWeights.html">ReciprocallyLinearWeights</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">fuzzy-rough-learn API</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">FRNN</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="frnn">
+<h1>FRNN<a class="headerlink" href="#frnn" title="Permalink to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="frlearn.classifiers.FRNN">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">frlearn.classifiers.</span></span><span class="sig-name descname"><span class="pre">FRNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">upper_weights:</span> <span class="pre">~typing.Callable[[int],</span> <span class="pre">~numpy.array]</span> <span class="pre">=</span> <span class="pre">LinearWeights(),</span> <span class="pre">upper_k:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">at_most.&lt;locals&gt;._f&gt;,</span> <span class="pre">lower_weights:</span> <span class="pre">~typing.Callable[[int],</span> <span class="pre">~numpy.array]</span> <span class="pre">=</span> <span class="pre">LinearWeights(),</span> <span class="pre">lower_k:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">at_most.&lt;locals&gt;._f&gt;,</span> <span class="pre">dissimilarity:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'boscovich',</span> <span class="pre">nn_search:</span> <span class="pre">~frlearn.neighbours.neighbour_search_methods.NeighbourSearchMethod</span> <span class="pre">=</span> <span class="pre">&lt;frlearn.neighbours.neighbour_search_methods.KDTree</span> <span class="pre">object&gt;,</span> <span class="pre">preprocessors=(&lt;frlearn.statistics.feature_preprocessors.RangeNormaliser</span> <span class="pre">object&gt;,)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#frlearn.classifiers.FRNN" title="Permalink to this definition">#</a></dt>
+<dd><p>Implementation of Fuzzy Rough Nearest Neighbour (FRNN) classification.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>upper_weights</strong><span class="classifier">(int -&gt; np.array) or None = LinearWeights()</span></dt><dd><p>OWA weights to use in calculation of upper approximation of decision classes.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, only the <code class="docutils literal notranslate"><span class="pre">upper_k</span></code>th neighbour is used.</p>
+</dd>
+<dt><strong>upper_k: int or (int -&gt; float) or None = at_most(20)</strong></dt><dd><p>Effective length of upper weights vector (number of nearest neighbours to consider).
+Should be either a positive integer,
+or a function that takes the class size <code class="docutils literal notranslate"><span class="pre">n</span></code> and returns a float,
+or None, which is resolved as <code class="docutils literal notranslate"><span class="pre">n</span></code>.
+All such values are rounded to the nearest integer in <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">n]</span></code>.
+Alternatively, if this is 0, only the lower approximation is used.</p>
+</dd>
+<dt><strong>lower_weights</strong><span class="classifier">(int -&gt; np.array) or None = LinearWeights()</span></dt><dd><p>OWA weights to use in calculation of lower approximation of decision classes.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, only the <code class="docutils literal notranslate"><span class="pre">lower_k</span></code>th neighbour is used.</p>
+</dd>
+<dt><strong>lower_k: int or (int -&gt; float) or None = at_most(20)</strong></dt><dd><p>Effective length of lower weights vector (number of nearest neighbours to consider).
+Should be either a positive integer,
+or a function that takes the size <code class="docutils literal notranslate"><span class="pre">n</span></code> of the complement of the class and returns a float,
+or None, which is resolved as <code class="docutils literal notranslate"><span class="pre">n</span></code>.
+All such values are rounded to the nearest integer in <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">n]</span></code>.
+Alternatively, if this is 0, only the upper approximation is used.</p>
+</dd>
+<dt><strong>dissimilarity: str or float or (np.array -&gt; float) or ((np.array, np.array) -&gt; float) = ‘boscovich’</strong></dt><dd><p>The dissimilarity measure to use.
+The similarity between two instances is calculated as 1 minus their dissimilarity.</p>
+<p>A vector size measure <code class="docutils literal notranslate"><span class="pre">np.array</span> <span class="pre">-&gt;</span> <span class="pre">float</span></code> induces a dissimilarity measure through application to <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">-</span> <span class="pre">x</span></code>.
+A float is interpreted as Minkowski size with the corresponding value for <code class="docutils literal notranslate"><span class="pre">p</span></code>.
+For convenience, a number of popular measures can be referred to by name.</p>
+<p>When a float or string is passed, the corresponding dissimilarity measure is automatically scaled
+to ensure that the dissimilarity of <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">...,</span> <span class="pre">1]</span></code> with <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">...,</span> <span class="pre">0]</span></code> is 1.</p>
+<p>For instance, the default Boscovich norm (also known as cityblock, Manhattan or taxicab norm)
+normally assigns a dissimilarity that is the sum of the per-attribute differences.
+In this case, the scaling step divides by the number of dimensions,
+and we obtain a dissimilarity that is the mean of the per-attribute differences.</p>
+<p>This can be prevented by explicitly passing a dissimilarity measure without scaling.</p>
+</dd>
+<dt><strong>nn_search</strong><span class="classifier">NeighbourSearchMethod = KDTree()</span></dt><dd><p>Nearest neighbour search algorithm to use.</p>
+</dd>
+<dt><strong>preprocessors</strong><span class="classifier">iterable = (RangeNormaliser(), )</span></dt><dd><p>Preprocessors to apply. The default range normaliser ensures that all features have range 1.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">upper_weights</span> <span class="pre">=</span> <span class="pre">lower_weights</span> <span class="pre">=</span> <span class="pre">None</span></code> and <code class="docutils literal notranslate"><span class="pre">upper_k</span> <span class="pre">=</span> <span class="pre">lower_k</span> <span class="pre">=</span> <span class="pre">1</span></code>,
+this is the original strict FRNN classification as presented in <a class="reference internal" href="#r4ade3b23ddb2-1" id="id1">[1]</a>.
+The use of OWA operators for the calculation of fuzzy rough sets was proposed in <a class="reference internal" href="#r4ade3b23ddb2-2" id="id2">[2]</a>,
+and OWA operators were first explicitly combined with FRNN in <a class="reference internal" href="#r4ade3b23ddb2-3" id="id3">[3]</a>.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="r4ade3b23ddb2-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-540-88425-5_32">Jensen R, Cornelis C (2008).
+A New Approach to Fuzzy-Rough Nearest Neighbour Classification.
+In: Chan CC, Grzymala-Busse JW, Ziarko WP (eds). Rough Sets and Current Trends in Computing. RSCTC 2008.
+Lecture Notes in Computer Science, vol 5306. Springer, Berlin, Heidelberg.
+doi: 10.1007/978-3-540-88425-5_32</a></p>
+</div>
+<div class="citation" id="r4ade3b23ddb2-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-642-16248-0_16">Cornelis C, Verbiest N, Jensen R (2010).
+Ordered Weighted Average Based Fuzzy Rough Sets.
+In: Yu J, Greco S, Lingras P, Wang G, Skowron A (eds). Rough Set and Knowledge Technology. RSKT 2010.
+Lecture Notes in Computer Science, vol 6401. Springer, Berlin, Heidelberg.
+doi: 10.1007/978-3-642-16248-0_16</a></p>
+</div>
+<div class="citation" id="r4ade3b23ddb2-3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://ieeexplore.ieee.org/document/6960859">Ramentol E, Vluymans S, Verbiest N, Caballero Y, Bello R, Cornelis C, Herrera F (2015).
+IFROWANN: Imbalanced Fuzzy-Rough Ordered Weighted Average Nearest Neighbor Classification.
+IEEE Transactions on Fuzzy Systems, vol 23, no 5, pp 1622–1637.
+doi: 10.1109/TFUZZ.2014.2371472</a></p>
+</div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="frlearn.classifiers.FRNN.Model">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Model</span></span><a class="headerlink" href="#frlearn.classifiers.FRNN.Model" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<section id="examples-using-frlearn-classifiers-frnn">
+<h2>Examples using <code class="docutils literal notranslate"><span class="pre">frlearn.classifiers.FRNN</span></code><a class="headerlink" href="#examples-using-frlearn-classifiers-frnn" title="Permalink to this heading">#</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="The figures contain the training instances within a section of the selected feature space. The training instances are coloured according to their true labels, while the feature space is coloured according to predictions on the basis of the training instances, making the decision boundaries visible."><img alt="" src="../_images/sphx_glr_frnn_thumb.png" />
+<p><a class="reference internal" href="../examples/classifiers/frnn.html#sphx-glr-examples-classifiers-frnn-py"><span class="std std-ref">Multiclass classification with FRNN</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Multiclass classification with FRNN</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Sample usage of FRFS feature selection, demonstrated in combination with (strict) FRNN classification."><img alt="" src="../_images/sphx_glr_frfs_thumb.png" />
+<p><a class="reference internal" href="../examples/preprocessors/frfs.html#sphx-glr-examples-preprocessors-frfs-py"><span class="std std-ref">Feature selection with FRFS</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Feature selection with FRFS</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Sample usage of FRPS preprocessing, demonstrated in combination with (strict) FRNN classification."><img alt="" src="../_images/sphx_glr_frps_thumb.png" />
+<p><a class="reference internal" href="../examples/preprocessors/frps.html#sphx-glr-examples-preprocessors-frps-py"><span class="std std-ref">Instance selection with FRPS</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Instance selection with FRPS</div>
+</div></div><div style='clear:both'></div></section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../api.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">fuzzy-rough-learn API</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="frlearn.classifiers.FROVOCO.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">FROVOCO</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#frlearn.classifiers.FRNN"><code class="docutils literal notranslate"><span class="pre">FRNN</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#frlearn.classifiers.FRNN.Model"><code class="docutils literal notranslate"><span class="pre">FRNN.Model</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-using-frlearn-classifiers-frnn">Examples using <code class="docutils literal notranslate"><span class="pre">frlearn.classifiers.FRNN</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/oulenz/fuzzy-rough-learn/edit/master/doc/generated/frlearn.classifiers.FRNN.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/generated/frlearn.classifiers.FRNN.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2019–2024, Oliver Urs Lenz.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

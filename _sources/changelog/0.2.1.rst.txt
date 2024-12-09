@@ -1,0 +1,10 @@
+.. _changes_0_2_1:
+
+Version 0.2.1
+=============
+
+Changelog
+---------
+
+* Bug fixes
+* Rename abstract base class `ModelFactory` to `SoftMachine`

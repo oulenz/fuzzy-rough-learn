@@ -1,0 +1,12 @@
+﻿.. currentmodule:: frlearn.classifiers
+
+NN
+====================================
+
+.. autoclass:: NN
+
+.. include:: frlearn.classifiers.NN.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

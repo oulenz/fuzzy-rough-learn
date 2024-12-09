@@ -1,0 +1,229 @@
+:orphan:
+
+.. _general_examples:
+
+Example Gallery
+===============
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+Classifiers
+===========
+
+Examples of the application of classifiers in fuzzy-rough-learn.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The figures contain the training instances within a section of the selected feature space. The training instances are coloured according to their true labels, while the feature space is coloured according to predictions on the basis of the training instances, making the decision boundaries visible.">
+
+.. only:: html
+
+  .. image:: /examples/classifiers/images/thumb/sphx_glr_frovoco_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_classifiers_frovoco.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Imbalanced multiclass classification with FROVOCO</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The figures contain the training instances within a section of the selected feature space. The training instances are coloured according to their true labels, while the feature space is coloured according to predictions on the basis of the training instances, making the decision boundaries visible.">
+
+.. only:: html
+
+  .. image:: /examples/classifiers/images/thumb/sphx_glr_nn_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_classifiers_nn.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multiclass classification with NN</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The figures contain the training instances within a section of the selected feature space. The training instances are coloured according to their true labels, while the feature space is coloured according to predictions on the basis of the training instances, making the decision boundaries visible.">
+
+.. only:: html
+
+  .. image:: /examples/classifiers/images/thumb/sphx_glr_frnn_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_classifiers_frnn.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multiclass classification with FRNN</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The figures contain training instances within a section of the feature space. The training instances are coloured according to their true labels, while the feature space is coloured according to predictions on the basis of the training instances, making the decision boundaries visible.">
+
+.. only:: html
+
+  .. image:: /examples/classifiers/images/thumb/sphx_glr_fronec_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_classifiers_fronec.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multilabel classification with FRONEC</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+Data descriptors
+================
+
+Examples of the application of data descriptors in fuzzy-rough-learn.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Data descriptors generalise knowledge about a target class of data to the whole attribute space. This can be used to predict whether new data instances belong to the target class or not, or to identify which new instances should be subjected to further inspection. This type of binary classification is known as one-class classification, semi-supervised outlier detection, semi-supervised anomaly detection, or novelty detection. In principle, there is no good or bad way to generalise the target class, this can only be evaluated empirically. In practice, we want a good balance between variance and bias.">
+
+.. only:: html
+
+  .. image:: /examples/data_descriptors/images/thumb/sphx_glr_one_class_classification_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_data_descriptors_one_class_classification.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">One class classification</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+Preprocessors
+=============
+
+Examples of the application of preprocessors in fuzzy-rough-learn.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Sample usage of FRFS feature selection, demonstrated in combination with (strict) FRNN classification.">
+
+.. only:: html
+
+  .. image:: /examples/preprocessors/images/thumb/sphx_glr_frfs_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_preprocessors_frfs.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Feature selection with FRFS</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Sample usage of FRPS preprocessing, demonstrated in combination with (strict) FRNN classification.">
+
+.. only:: html
+
+  .. image:: /examples/preprocessors/images/thumb/sphx_glr_frps_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_preprocessors_frps.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Instance selection with FRPS</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+   :includehidden:
+
+
+   /examples/classifiers/index.rst
+   /examples/data_descriptors/index.rst
+   /examples/preprocessors/index.rst
+
+
+.. only:: html
+
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
+
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download all examples in Python source code: examples_python.zip </examples/examples_python.zip>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download all examples in Jupyter notebooks: examples_jupyter.zip </examples/examples_jupyter.zip>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

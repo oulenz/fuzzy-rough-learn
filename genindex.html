@@ -1,0 +1,754 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; fuzzy-rough-learn 0.2.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/css/fuzzy-rough-learn.css?v=352684a6" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="_static/css/fuzzy-rough-learn.css?v=352684a6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=227644f7"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/design-tabs.js?v=36754332"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">fuzzy-rough-learn 0.2.2 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        fuzzy-rough-learn API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples/index.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="changelog.html">
+                        Release history
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/oulenz/fuzzy-rough-learn" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        fuzzy-rough-learn API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples/index.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="changelog.html">
+                        Release history
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/oulenz/fuzzy-rough-learn" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.data_descriptors.ALP.html#frlearn.data_descriptors.ALP">ALP (class in frlearn.data_descriptors)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.data_descriptors.ALP.html#frlearn.data_descriptors.ALP.Model">ALP.Model (class in frlearn.data_descriptors)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.neighbour_search_methods.BallTree.html#frlearn.neighbour_search_methods.BallTree">BallTree (class in frlearn.neighbour_search_methods)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.neighbour_search_methods.BallTree.html#frlearn.neighbour_search_methods.BallTree.Model">BallTree.Model (class in frlearn.neighbour_search_methods)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.data_descriptors.CD.html#frlearn.data_descriptors.CD">CD (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.CD.html#frlearn.data_descriptors.CD.Model">CD.Model (class in frlearn.data_descriptors)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.weights.ConstantWeights.html#frlearn.weights.ConstantWeights">ConstantWeights (class in frlearn.weights)</a>
+</li>
+      <li><a href="generated/frlearn.transformations.contract.html#frlearn.transformations.contract">contract() (in module frlearn.transformations)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.array_functions.div_or.html#frlearn.array_functions.div_or">div_or() (in module frlearn.array_functions)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.data_descriptors.EIF.html#frlearn.data_descriptors.EIF">EIF (class in frlearn.data_descriptors)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.data_descriptors.EIF.html#frlearn.data_descriptors.EIF.Model">EIF.Model (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.weights.ExponentialWeights.html#frlearn.weights.ExponentialWeights">ExponentialWeights (class in frlearn.weights)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.array_functions.first.html#frlearn.array_functions.first">first() (in module frlearn.array_functions)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.FRFS.html#frlearn.feature_preprocessors.FRFS">FRFS (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.FRFS.html#frlearn.feature_preprocessors.FRFS.Model">FRFS.Model (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.classifiers.FRNN.html#frlearn.classifiers.FRNN">FRNN (class in frlearn.classifiers)</a>
+
+      <ul>
+        <li><a href="generated/frlearn.regressors.FRNN.html#frlearn.regressors.FRNN">(class in frlearn.regressors)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/frlearn.classifiers.FRNN.html#frlearn.classifiers.FRNN.Model">FRNN.Model (class in frlearn.classifiers)</a>
+
+      <ul>
+        <li><a href="generated/frlearn.regressors.FRNN.html#frlearn.regressors.FRNN.Model">(class in frlearn.regressors)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.classifiers.FRONEC.html#frlearn.classifiers.FRONEC">FRONEC (class in frlearn.classifiers)</a>
+</li>
+      <li><a href="generated/frlearn.classifiers.FRONEC.html#frlearn.classifiers.FRONEC.Model">FRONEC.Model (class in frlearn.classifiers)</a>
+</li>
+      <li><a href="generated/frlearn.classifiers.FROVOCO.html#frlearn.classifiers.FROVOCO">FROVOCO (class in frlearn.classifiers)</a>
+</li>
+      <li><a href="generated/frlearn.classifiers.FROVOCO.html#frlearn.classifiers.FROVOCO.Model">FROVOCO.Model (class in frlearn.classifiers)</a>
+</li>
+      <li><a href="generated/frlearn.instance_preprocessors.FRPS.html#frlearn.instance_preprocessors.FRPS">FRPS (class in frlearn.instance_preprocessors)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.t_norms.goguen_t_norm.html#frlearn.t_norms.goguen_t_norm">goguen_t_norm() (in module frlearn.t_norms)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.array_functions.greatest.html#frlearn.array_functions.greatest">greatest() (in module frlearn.array_functions)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.t_norms.heyting_t_norm.html#frlearn.t_norms.heyting_t_norm">heyting_t_norm() (in module frlearn.t_norms)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.data_descriptors.IF.html#frlearn.data_descriptors.IF">IF (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.IF.html#frlearn.data_descriptors.IF.Model">IF.Model (class in frlearn.data_descriptors)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.dispersion_measures.interquartile_range.html#frlearn.dispersion_measures.interquartile_range">interquartile_range() (in module frlearn.dispersion_measures)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.IQRNormaliser.html#frlearn.feature_preprocessors.IQRNormaliser">IQRNormaliser (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.IQRNormaliser.html#frlearn.feature_preprocessors.IQRNormaliser.Model">IQRNormaliser.Model (class in frlearn.feature_preprocessors)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.neighbour_search_methods.KDTree.html#frlearn.neighbour_search_methods.KDTree">KDTree (class in frlearn.neighbour_search_methods)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.neighbour_search_methods.KDTree.html#frlearn.neighbour_search_methods.KDTree.Model">KDTree.Model (class in frlearn.neighbour_search_methods)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.array_functions.last.html#frlearn.array_functions.last">last() (in module frlearn.array_functions)</a>
+</li>
+      <li><a href="generated/frlearn.array_functions.least.html#frlearn.array_functions.least">least() (in module frlearn.array_functions)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.LinearNormaliser.html#frlearn.feature_preprocessors.LinearNormaliser">LinearNormaliser (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.LinearNormaliser.html#frlearn.feature_preprocessors.LinearNormaliser.Model">LinearNormaliser.Model (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.weights.LinearWeights.html#frlearn.weights.LinearWeights">LinearWeights (class in frlearn.weights)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.data_descriptors.LNND.html#frlearn.data_descriptors.LNND">LNND (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.LNND.html#frlearn.data_descriptors.LNND.Model">LNND.Model (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.LOF.html#frlearn.data_descriptors.LOF">LOF (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.LOF.html#frlearn.data_descriptors.LOF.Model">LOF.Model (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.parametrisations.log_multiple.html#frlearn.parametrisations.log_multiple">log_multiple() (in module frlearn.parametrisations)</a>
+</li>
+      <li><a href="generated/frlearn.t_norms.lukasiewicz_t_norm.html#frlearn.t_norms.lukasiewicz_t_norm">lukasiewicz_t_norm() (in module frlearn.t_norms)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.feature_preprocessors.MaxAbsNormaliser.html#frlearn.feature_preprocessors.MaxAbsNormaliser">MaxAbsNormaliser (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.MaxAbsNormaliser.html#frlearn.feature_preprocessors.MaxAbsNormaliser.Model">MaxAbsNormaliser.Model (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.location_measures.maximum.html#frlearn.location_measures.maximum">maximum() (in module frlearn.location_measures)</a>
+</li>
+      <li><a href="generated/frlearn.dispersion_measures.maximum_absolute_value.html#frlearn.dispersion_measures.maximum_absolute_value">maximum_absolute_value() (in module frlearn.dispersion_measures)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.MD.html#frlearn.data_descriptors.MD">MD (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.MD.html#frlearn.data_descriptors.MD.Model">MD.Model (class in frlearn.data_descriptors)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.location_measures.mean.html#frlearn.location_measures.mean">mean() (in module frlearn.location_measures)</a>
+</li>
+      <li><a href="generated/frlearn.location_measures.median.html#frlearn.location_measures.median">median() (in module frlearn.location_measures)</a>
+</li>
+      <li><a href="generated/frlearn.location_measures.midhinge.html#frlearn.location_measures.midhinge">midhinge() (in module frlearn.location_measures)</a>
+</li>
+      <li><a href="generated/frlearn.location_measures.midrange.html#frlearn.location_measures.midrange">midrange() (in module frlearn.location_measures)</a>
+</li>
+      <li><a href="generated/frlearn.location_measures.minimum.html#frlearn.location_measures.minimum">minimum() (in module frlearn.location_measures)</a>
+</li>
+      <li><a href="generated/frlearn.vector_size_measures.MinkowskiSize.html#frlearn.vector_size_measures.MinkowskiSize">MinkowskiSize (class in frlearn.vector_size_measures)</a>
+</li>
+      <li><a href="generated/frlearn.parametrisations.multiple.html#frlearn.parametrisations.multiple">multiple() (in module frlearn.parametrisations)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.classifiers.NN.html#frlearn.classifiers.NN">NN (class in frlearn.classifiers)</a>
+</li>
+      <li><a href="generated/frlearn.classifiers.NN.html#frlearn.classifiers.NN.Model">NN.Model (class in frlearn.classifiers)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.data_descriptors.NND.html#frlearn.data_descriptors.NND">NND (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.NND.html#frlearn.data_descriptors.NND.Model">NND.Model (class in frlearn.data_descriptors)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.weights.QuantifierWeights.html#frlearn.weights.QuantifierWeights">QuantifierWeights (class in frlearn.weights)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.feature_preprocessors.RangeNormaliser.html#frlearn.feature_preprocessors.RangeNormaliser">RangeNormaliser (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.RangeNormaliser.html#frlearn.feature_preprocessors.RangeNormaliser.Model">RangeNormaliser.Model (class in frlearn.feature_preprocessors)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.weights.ReciprocallyLinearWeights.html#frlearn.weights.ReciprocallyLinearWeights">ReciprocallyLinearWeights (class in frlearn.weights)</a>
+</li>
+      <li><a href="generated/frlearn.array_functions.remove_diagonal.html#frlearn.array_functions.remove_diagonal">remove_diagonal() (in module frlearn.array_functions)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.transformations.shifted_reciprocal.html#frlearn.transformations.shifted_reciprocal">shifted_reciprocal() (in module frlearn.transformations)</a>
+</li>
+      <li><a href="generated/frlearn.array_functions.soft_head.html#frlearn.array_functions.soft_head">soft_head() (in module frlearn.array_functions)</a>
+</li>
+      <li><a href="generated/frlearn.array_functions.soft_max.html#frlearn.array_functions.soft_max">soft_max() (in module frlearn.array_functions)</a>
+</li>
+      <li><a href="generated/frlearn.array_functions.soft_min.html#frlearn.array_functions.soft_min">soft_min() (in module frlearn.array_functions)</a>
+</li>
+      <li><a href="generated/frlearn.array_functions.soft_tail.html#frlearn.array_functions.soft_tail">soft_tail() (in module frlearn.array_functions)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.dispersion_measures.standard_deviation.html#frlearn.dispersion_measures.standard_deviation">standard_deviation() (in module frlearn.dispersion_measures)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.Standardiser.html#frlearn.feature_preprocessors.Standardiser">Standardiser (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.feature_preprocessors.Standardiser.html#frlearn.feature_preprocessors.Standardiser.Model">Standardiser.Model (class in frlearn.feature_preprocessors)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.SVM.html#frlearn.data_descriptors.SVM">SVM (class in frlearn.data_descriptors)</a>
+</li>
+      <li><a href="generated/frlearn.data_descriptors.SVM.html#frlearn.data_descriptors.SVM.Model">SVM.Model (class in frlearn.data_descriptors)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.dispersion_measures.total_range.html#frlearn.dispersion_measures.total_range">total_range() (in module frlearn.dispersion_measures)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.transformations.truncated_complement.html#frlearn.transformations.truncated_complement">truncated_complement() (in module frlearn.transformations)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.feature_preprocessors.VectorSizeNormaliser.html#frlearn.feature_preprocessors.VectorSizeNormaliser">VectorSizeNormaliser (class in frlearn.feature_preprocessors)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.feature_preprocessors.VectorSizeNormaliser.html#frlearn.feature_preprocessors.VectorSizeNormaliser.Model">VectorSizeNormaliser.Model (class in frlearn.feature_preprocessors)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/frlearn.weights.Weights.html#frlearn.weights.Weights">Weights (class in frlearn.weights)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2019–2024, Oliver Urs Lenz.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

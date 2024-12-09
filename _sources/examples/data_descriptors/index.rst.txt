@@ -1,0 +1,48 @@
+
+
+.. _sphx_glr_examples_data_descriptors:
+
+.. _data_descriptor_examples:
+
+Data descriptors
+================
+
+Examples of the application of data descriptors in fuzzy-rough-learn.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Data descriptors generalise knowledge about a target class of data to the whole attribute space. This can be used to predict whether new data instances belong to the target class or not, or to identify which new instances should be subjected to further inspection. This type of binary classification is known as one-class classification, semi-supervised outlier detection, semi-supervised anomaly detection, or novelty detection. In principle, there is no good or bad way to generalise the target class, this can only be evaluated empirically. In practice, we want a good balance between variance and bias.">
+
+.. only:: html
+
+  .. image:: /examples/data_descriptors/images/thumb/sphx_glr_one_class_classification_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_data_descriptors_one_class_classification.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">One class classification</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/data_descriptors/one_class_classification
+

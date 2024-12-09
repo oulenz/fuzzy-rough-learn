@@ -1,0 +1,26 @@
+.. _changes_0_1_0:
+
+Version 0.1
+===========
+
+Changelog
+---------
+
+Adds number of existing fuzzy rough set algorithms.
+
+New algorithms
+~~~~~~~~~~~~~~
+
+* FRFS
+* FRONEC
+* FROVOCO
+* FRPS
+
+API changes
+~~~~~~~~~~~
+* `neighbours.FRNNClassifier` replaced by `neighbours.FRNN`.
+* Classifiers give confidence scores; absolute class predictions can be obtained with utility functions.
+* Classifiers follow construct/query pattern; scikit-learn fit/predict pattern can be obtained with utility class.
+* `neighbours.owa_operators` moved to `utils.owa_operators`.
+* `utils.OWAOperator` no longer initialised with fixed `k`, has to be passed to method calls instead.
+* `utils.OWAOperator` method calls and functions in `utils.np_utils` now accept fractional and None `k`.

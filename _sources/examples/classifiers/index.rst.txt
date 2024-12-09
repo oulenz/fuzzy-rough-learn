@@ -1,0 +1,102 @@
+
+
+.. _sphx_glr_examples_classifiers:
+
+.. _classifier_examples:
+
+Classifiers
+===========
+
+Examples of the application of classifiers in fuzzy-rough-learn.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The figures contain the training instances within a section of the selected feature space. The training instances are coloured according to their true labels, while the feature space is coloured according to predictions on the basis of the training instances, making the decision boundaries visible.">
+
+.. only:: html
+
+  .. image:: /examples/classifiers/images/thumb/sphx_glr_frovoco_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_classifiers_frovoco.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Imbalanced multiclass classification with FROVOCO</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The figures contain the training instances within a section of the selected feature space. The training instances are coloured according to their true labels, while the feature space is coloured according to predictions on the basis of the training instances, making the decision boundaries visible.">
+
+.. only:: html
+
+  .. image:: /examples/classifiers/images/thumb/sphx_glr_nn_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_classifiers_nn.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multiclass classification with NN</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The figures contain the training instances within a section of the selected feature space. The training instances are coloured according to their true labels, while the feature space is coloured according to predictions on the basis of the training instances, making the decision boundaries visible.">
+
+.. only:: html
+
+  .. image:: /examples/classifiers/images/thumb/sphx_glr_frnn_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_classifiers_frnn.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multiclass classification with FRNN</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The figures contain training instances within a section of the feature space. The training instances are coloured according to their true labels, while the feature space is coloured according to predictions on the basis of the training instances, making the decision boundaries visible.">
+
+.. only:: html
+
+  .. image:: /examples/classifiers/images/thumb/sphx_glr_fronec_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_classifiers_fronec.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Multilabel classification with FRONEC</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/classifiers/frovoco
+   /examples/classifiers/nn
+   /examples/classifiers/frnn
+   /examples/classifiers/fronec
+
