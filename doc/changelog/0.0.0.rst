@@ -6,7 +6,7 @@ Version 0
 Changelog
 ---------
 
-First release, by :user:`Oliver Urs Lenz <oulenz>`.
+First release.
 
 New algorithms
 ~~~~~~~~~~~~~~

@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 
-|Travis|_ |AppVeyor|_ |Tests|_ |Codecov|_ |CircleCI|_ |ReadTheDocs|_
+|Travis|_ |AppVeyor|_ |Tests|_ |Documentation|_ |Codecov|_ |CircleCI|_
 
 .. |Travis| image:: https://travis-ci.com/oulenz/fuzzy-rough-learn.svg?branch=master
 .. _Travis: https://travis-ci.com/oulenz/fuzzy-rough-learn
@@ -8,17 +8,17 @@
 .. |AppVeyor| image:: https://ci.appveyor.com/api/projects/status/7xrrtwcj0i3lgd5a/branch/master?svg=true
 .. _AppVeyor: https://ci.appveyor.com/project/oulenz/fuzzy-rough-learn
 
-.. |Tests| image:: https://github.com/oulenz/fuzzy-rough-learn/actions/workflows/python-app.yaml/badge.svg
-.. _Tests: https://github.com/oulenz/fuzzy-rough-learn/actions/workflows/python-app.yaml
+.. |Tests| image:: https://github.com/oulenz/fuzzy-rough-learn/actions/workflows/tests.yaml/badge.svg
+.. _Tests: https://github.com/oulenz/fuzzy-rough-learn/actions/workflows/tests.yaml
+
+.. |Documentation| image:: https://github.com/oulenz/fuzzy-rough-learn/actions/workflows/documentation.yaml/badge.svg
+.. _Documentation: https://oulenz.github.io/fuzzy-rough-learn/
 
 .. |Codecov| image:: https://codecov.io/gh/oulenz/fuzzy-rough-learn/branch/master/graph/badge.svg
 .. _Codecov: https://codecov.io/gh/oulenz/fuzzy-rough-learn
 
 .. |CircleCI| image:: https://circleci.com/gh/oulenz/fuzzy-rough-learn.svg?style=shield&circle-token=:circle-token
 .. _CircleCI: https://circleci.com/gh/oulenz/fuzzy-rough-learn/tree/master
-
-.. |ReadTheDocs| image:: https://readthedocs.org/projects/fuzzy-rough-learn/badge/?version=latest
-.. _ReadTheDocs: https://fuzzy-rough-learn.readthedocs.io/en/latest/?badge=latest
 
 fuzzy-rough-learn
 =================
@@ -130,7 +130,7 @@ Documentation
 
 The documentation is located here_.
 
-.. _here: https://fuzzy-rough-learn.readthedocs.io/en/stable/
+.. _here: https://oulenz.github.io/fuzzy-rough-learn/
 
 
 Dependencies
