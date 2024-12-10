@@ -1,12 +1,6 @@
 .. -*- mode: rst -*-
 
-|Travis|_ |AppVeyor|_ |Tests|_ |Documentation|_ |Codecov|_ |CircleCI|_
-
-.. |Travis| image:: https://travis-ci.com/oulenz/fuzzy-rough-learn.svg?branch=master
-.. _Travis: https://travis-ci.com/oulenz/fuzzy-rough-learn
-
-.. |AppVeyor| image:: https://ci.appveyor.com/api/projects/status/7xrrtwcj0i3lgd5a/branch/master?svg=true
-.. _AppVeyor: https://ci.appveyor.com/project/oulenz/fuzzy-rough-learn
+|Tests|_ |Documentation|_ |Codecov|_
 
 .. |Tests| image:: https://github.com/oulenz/fuzzy-rough-learn/actions/workflows/tests.yaml/badge.svg
 .. _Tests: https://github.com/oulenz/fuzzy-rough-learn/actions/workflows/tests.yaml
@@ -16,9 +10,6 @@
 
 .. |Codecov| image:: https://codecov.io/gh/oulenz/fuzzy-rough-learn/branch/master/graph/badge.svg
 .. _Codecov: https://codecov.io/gh/oulenz/fuzzy-rough-learn
-
-.. |CircleCI| image:: https://circleci.com/gh/oulenz/fuzzy-rough-learn.svg?style=shield&circle-token=:circle-token
-.. _CircleCI: https://circleci.com/gh/oulenz/fuzzy-rough-learn/tree/master
 
 fuzzy-rough-learn
 =================
