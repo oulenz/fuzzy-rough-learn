@@ -52,7 +52,7 @@ html_css_files = [
 html_sidebars = {
     'quick_start': [],
     'user_guide': [],
-    'auto_examples/index': [],
+    'examples/index': [],
 }
 
 html_theme_options = {
@@ -111,7 +111,7 @@ intersphinx_mapping = {
 # -- Options for sphinx-gallery -----------------------------------------------
 
 # Generate the plot for the gallery
-plot_gallery = True
+plot_gallery = 'True'
 
 sphinx_gallery_conf = {
     'doc_module': 'frlearn',
@@ -119,5 +119,5 @@ sphinx_gallery_conf = {
     #'reference_url': {'frlearn': None},
     'examples_dirs': ['../examples', ],
     'gallery_dirs': ['examples', ],
-    #'filename_pattern': '/',
+    'filename_pattern': '/',
 }
