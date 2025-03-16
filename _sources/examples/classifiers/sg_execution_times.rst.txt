@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.000** total execution time for 4 files **from examples/classifiers**:
+**00:02.487** total execution time for 4 files **from examples/classifiers**:
 
 .. container::
 
@@ -32,15 +32,15 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_examples_classifiers_frnn.py` (``frnn.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_examples_classifiers_fronec.py` (``fronec.py``)
-     - 00:00.000
+     - 00:00.844
+     - 0.0
+   * - :ref:`sphx_glr_examples_classifiers_frnn.py` (``frnn.py``)
+     - 00:00.817
      - 0.0
    * - :ref:`sphx_glr_examples_classifiers_frovoco.py` (``frovoco.py``)
-     - 00:00.000
+     - 00:00.495
      - 0.0
    * - :ref:`sphx_glr_examples_classifiers_nn.py` (``nn.py``)
-     - 00:00.000
+     - 00:00.330
      - 0.0

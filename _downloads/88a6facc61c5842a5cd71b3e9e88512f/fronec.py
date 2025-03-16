@@ -77,9 +77,9 @@ for i, R_d_type in enumerate([1, 2]):
         plt.ylim(yy.min(), yy.max())
 
         # Describe columns and rows.
-        if axes.is_first_col():
+        if axes.get_subplotspec().is_first_col():
             plt.ylabel('R_d^{}'.format(R_d_type), rotation=0, size='large', ha='right')
-        if axes.is_first_row():
+        if axes.get_subplotspec().is_first_row():
             plt.title('Q^{}'.format(Q_type))
 
 plt.tight_layout()

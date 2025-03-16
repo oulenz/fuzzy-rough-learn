@@ -45,6 +45,17 @@ References
 
 .. GENERATED FROM PYTHON SOURCE LINES 27-95
 
+
+
+.. image-sg:: /examples/data_descriptors/images/sphx_glr_one_class_classification_001.png
+   :alt: ALP, CD, IF, LNND, LOF, MD, NND, SVM
+   :srcset: /examples/data_descriptors/images/sphx_glr_one_class_classification_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
 .. code-block:: Python
 
     print(__doc__)
@@ -115,6 +126,11 @@ References
 
     fig.tight_layout()
     plt.show()
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** (0 minutes 1.844 seconds)
 
 
 .. _sphx_glr_download_examples_data_descriptors_one_class_classification.py:

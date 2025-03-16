@@ -29,6 +29,17 @@ making the decision boundaries visible.
 
 .. GENERATED FROM PYTHON SOURCE LINES 11-65
 
+
+
+.. image-sg:: /examples/classifiers/images/sphx_glr_frovoco_001.png
+   :alt: FROVOCO applied to an imbalanced selection of iris dataset
+   :srcset: /examples/classifiers/images/sphx_glr_frovoco_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
 .. code-block:: Python
 
     print(__doc__)
@@ -85,6 +96,11 @@ making the decision boundaries visible.
 
     plt.show()
 
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** (0 minutes 0.495 seconds)
 
 
 .. _sphx_glr_download_examples_classifiers_frovoco.py:

@@ -64,7 +64,7 @@ Both classifiers and feature preprocessors are functions that take training data
 
 The docstrings of the classes and functions.
 
-`Examples <auto_examples/index.html>`_
+`Examples <examples/index.html>`_
 --------------------------------------
 
 A series of examples.

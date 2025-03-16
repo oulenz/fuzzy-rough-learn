@@ -71,9 +71,9 @@ for i, (aggr_name, aggr_R) in enumerate([('mean', np.mean), ('Łukasiewicz', luk
         plt.ylim(yy.min(), yy.max())
 
         # Describe columns and rows.
-        if axes.is_first_col():
+        if axes.get_subplotspec().is_first_col():
             plt.ylabel(aggr_name, rotation=0, size='large', ha='right')
-        if axes.is_first_row():
+        if axes.get_subplotspec().is_first_row():
             plt.title(quality_measure)
 
 plt.suptitle('FRNN applied to instances of iris dataset selected by FRPS', fontsize=14)

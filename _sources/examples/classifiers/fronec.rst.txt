@@ -34,6 +34,17 @@ In total, six subfigures are displayed, to illustrate the effect of the `Q_type`
 
 .. GENERATED FROM PYTHON SOURCE LINES 16-87
 
+
+
+.. image-sg:: /examples/classifiers/images/sphx_glr_fronec_001.png
+   :alt: Q^1, Q^2, Q^3
+   :srcset: /examples/classifiers/images/sphx_glr_fronec_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
 .. code-block:: Python
 
     print(__doc__)
@@ -100,13 +111,18 @@ In total, six subfigures are displayed, to illustrate the effect of the `Q_type`
             plt.ylim(yy.min(), yy.max())
 
             # Describe columns and rows.
-            if axes.is_first_col():
+            if axes.get_subplotspec().is_first_col():
                 plt.ylabel('R_d^{}'.format(R_d_type), rotation=0, size='large', ha='right')
-            if axes.is_first_row():
+            if axes.get_subplotspec().is_first_row():
                 plt.title('Q^{}'.format(Q_type))
 
     plt.tight_layout()
     plt.show()
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** (0 minutes 0.844 seconds)
 
 
 .. _sphx_glr_download_examples_classifiers_fronec.py:

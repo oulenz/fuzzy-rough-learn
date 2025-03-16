@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.000** total execution time for 2 files **from examples/preprocessors**:
+**00:03.177** total execution time for 2 files **from examples/preprocessors**:
 
 .. container::
 
@@ -32,9 +32,9 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_examples_preprocessors_frfs.py` (``frfs.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_examples_preprocessors_frps.py` (``frps.py``)
-     - 00:00.000
+     - 00:02.664
+     - 0.0
+   * - :ref:`sphx_glr_examples_preprocessors_frfs.py` (``frfs.py``)
+     - 00:00.513
      - 0.0
