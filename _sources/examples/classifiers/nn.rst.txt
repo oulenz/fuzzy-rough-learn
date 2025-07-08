@@ -112,7 +112,7 @@ while the second represents distance-weighted NN with `k == 5`.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.330 seconds)
+   **Total running time of the script:** (0 minutes 0.345 seconds)
 
 
 .. _sphx_glr_download_examples_classifiers_nn.py:

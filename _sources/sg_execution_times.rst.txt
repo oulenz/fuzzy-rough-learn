@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:07.509** total execution time for 7 files **from all galleries**:
+**00:07.824** total execution time for 7 files **from all galleries**:
 
 .. container::
 
@@ -33,23 +33,23 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_preprocessors_frps.py` (``../examples/preprocessors/frps.py``)
-     - 00:02.664
+     - 00:02.793
      - 0.0
    * - :ref:`sphx_glr_examples_data_descriptors_one_class_classification.py` (``../examples/data_descriptors/one_class_classification.py``)
-     - 00:01.844
+     - 00:01.923
      - 0.0
    * - :ref:`sphx_glr_examples_classifiers_fronec.py` (``../examples/classifiers/fronec.py``)
-     - 00:00.844
+     - 00:00.910
      - 0.0
    * - :ref:`sphx_glr_examples_classifiers_frnn.py` (``../examples/classifiers/frnn.py``)
-     - 00:00.817
-     - 0.0
-   * - :ref:`sphx_glr_examples_preprocessors_frfs.py` (``../examples/preprocessors/frfs.py``)
-     - 00:00.513
+     - 00:00.841
      - 0.0
    * - :ref:`sphx_glr_examples_classifiers_frovoco.py` (``../examples/classifiers/frovoco.py``)
-     - 00:00.495
+     - 00:00.515
+     - 0.0
+   * - :ref:`sphx_glr_examples_preprocessors_frfs.py` (``../examples/preprocessors/frfs.py``)
+     - 00:00.497
      - 0.0
    * - :ref:`sphx_glr_examples_classifiers_nn.py` (``../examples/classifiers/nn.py``)
-     - 00:00.330
+     - 00:00.345
      - 0.0

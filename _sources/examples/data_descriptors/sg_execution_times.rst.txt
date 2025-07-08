@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.844** total execution time for 1 file **from examples/data_descriptors**:
+**00:01.923** total execution time for 1 file **from examples/data_descriptors**:
 
 .. container::
 
@@ -33,5 +33,5 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_data_descriptors_one_class_classification.py` (``one_class_classification.py``)
-     - 00:01.844
+     - 00:01.923
      - 0.0
